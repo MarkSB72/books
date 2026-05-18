@@ -1,0 +1,23 @@
+# OpenClaw workspace
+memory/
+.openclaw/
+.clawhub/
+
+# Media / large files
+media/
+
+# Temp files
+tmp/
+*.tmp
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# System
+.DS_Store
+Thumbs.db
