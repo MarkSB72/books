@@ -81,6 +81,8 @@ AUTOSAR（AUTomotive Open System ARchitecture，汽车开放系统架构）是�
 
 ---
 
+这些组件的部分示例如下图所示：
+
 ![图 1.2 – 车辆中 ECU 的示例](images/p025_0.png)
 
 图 1.2 – 车辆中 ECU 的示例
