@@ -124,6 +124,9 @@ Component         Component      ...     Component
                Microcontroller          API
 ```
 
+![图 1.3 AUTOSAR 分层软件架构](images/ch01/p028_arch.png)
+*图 1.3 – AUTOSAR 分层软件架构*
+
 汽车制造商、供应商和工具开发商共同开发应用层的组件。该标准将这些组件称为 AUTOSAR 软件组件。它们与运行时环境层交互。运行时环境层实现了以下对象之间的通信：
 
 - 应用层的各组件之间
