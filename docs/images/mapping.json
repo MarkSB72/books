@@ -1,0 +1,662 @@
+{
+  "1": [
+    [
+      "p001_0.png",
+      "Figure on page 1"
+    ]
+  ],
+  "2": [
+    [
+      "p002_0.png",
+      "Figure on page 2"
+    ]
+  ],
+  "19": [
+    [
+      "p019_0.png",
+      "Figure on page 19"
+    ]
+  ],
+  "23": [
+    [
+      "p023_0.png",
+      "Figure on page 23"
+    ]
+  ],
+  "25": [
+    [
+      "p025_0.png",
+      "Figure on page 25"
+    ]
+  ],
+  "27": [
+    [
+      "p027_0.png",
+      "Figure on page 27"
+    ]
+  ],
+  "31": [
+    [
+      "p031_0.png",
+      "Figure on page 31"
+    ]
+  ],
+  "33": [
+    [
+      "p033_0.png",
+      "Figure on page 33"
+    ]
+  ],
+  "34": [
+    [
+      "p034_0.png",
+      "Figure on page 34"
+    ]
+  ],
+  "35": [
+    [
+      "p035_0.png",
+      "Figure on page 35"
+    ],
+    [
+      "p035_1.png",
+      "Figure on page 35"
+    ]
+  ],
+  "37": [
+    [
+      "p037_0.png",
+      "Figure on page 37"
+    ]
+  ],
+  "38": [
+    [
+      "p038_0.png",
+      "Figure on page 38"
+    ]
+  ],
+  "43": [
+    [
+      "p043_0.png",
+      "Figure on page 43"
+    ]
+  ],
+  "44": [
+    [
+      "p044_0.png",
+      "Figure on page 44"
+    ]
+  ],
+  "45": [
+    [
+      "p045_0.png",
+      "Figure on page 45"
+    ]
+  ],
+  "46": [
+    [
+      "p046_0.png",
+      "Figure on page 46"
+    ]
+  ],
+  "47": [
+    [
+      "p047_0.png",
+      "Figure on page 47"
+    ]
+  ],
+  "49": [
+    [
+      "p049_0.png",
+      "Figure on page 49"
+    ]
+  ],
+  "50": [
+    [
+      "p050_0.png",
+      "Figure on page 50"
+    ]
+  ],
+  "51": [
+    [
+      "p051_0.png",
+      "Figure on page 51"
+    ]
+  ],
+  "52": [
+    [
+      "p052_0.png",
+      "Figure on page 52"
+    ]
+  ],
+  "54": [
+    [
+      "p054_0.png",
+      "Figure on page 54"
+    ]
+  ],
+  "55": [
+    [
+      "p055_0.png",
+      "Figure on page 55"
+    ]
+  ],
+  "56": [
+    [
+      "p056_0.png",
+      "Figure on page 56"
+    ]
+  ],
+  "58": [
+    [
+      "p058_0.png",
+      "Figure on page 58"
+    ]
+  ],
+  "60": [
+    [
+      "p060_0.png",
+      "Figure on page 60"
+    ]
+  ],
+  "63": [
+    [
+      "p063_0.png",
+      "Figure on page 63"
+    ]
+  ],
+  "66": [
+    [
+      "p066_0.png",
+      "Figure on page 66"
+    ]
+  ],
+  "67": [
+    [
+      "p067_0.png",
+      "Figure on page 67"
+    ]
+  ],
+  "68": [
+    [
+      "p068_0.png",
+      "Figure on page 68"
+    ]
+  ],
+  "70": [
+    [
+      "p070_0.png",
+      "Figure on page 70"
+    ]
+  ],
+  "79": [
+    [
+      "p079_0.png",
+      "Figure on page 79"
+    ]
+  ],
+  "81": [
+    [
+      "p081_0.png",
+      "Figure on page 81"
+    ]
+  ],
+  "82": [
+    [
+      "p082_0.png",
+      "Figure on page 82"
+    ]
+  ],
+  "83": [
+    [
+      "p083_0.png",
+      "Figure on page 83"
+    ]
+  ],
+  "84": [
+    [
+      "p084_0.png",
+      "Figure on page 84"
+    ],
+    [
+      "p084_1.png",
+      "Figure on page 84"
+    ]
+  ],
+  "85": [
+    [
+      "p085_0.png",
+      "Figure on page 85"
+    ]
+  ],
+  "88": [
+    [
+      "p088_0.png",
+      "Figure on page 88"
+    ]
+  ],
+  "91": [
+    [
+      "p091_0.png",
+      "Figure on page 91"
+    ]
+  ],
+  "94": [
+    [
+      "p094_0.png",
+      "Figure on page 94"
+    ]
+  ],
+  "95": [
+    [
+      "p095_0.png",
+      "Figure on page 95"
+    ]
+  ],
+  "99": [
+    [
+      "p099_0.png",
+      "Figure on page 99"
+    ]
+  ],
+  "103": [
+    [
+      "p103_0.png",
+      "Figure on page 103"
+    ]
+  ],
+  "106": [
+    [
+      "p106_0.png",
+      "Figure on page 106"
+    ]
+  ],
+  "107": [
+    [
+      "p107_0.png",
+      "Figure on page 107"
+    ]
+  ],
+  "111": [
+    [
+      "p111_0.png",
+      "Figure on page 111"
+    ]
+  ],
+  "112": [
+    [
+      "p112_0.png",
+      "Figure on page 112"
+    ]
+  ],
+  "113": [
+    [
+      "p113_0.png",
+      "Figure on page 113"
+    ]
+  ],
+  "115": [
+    [
+      "p115_0.png",
+      "Figure on page 115"
+    ]
+  ],
+  "117": [
+    [
+      "p117_0.png",
+      "Figure on page 117"
+    ]
+  ],
+  "118": [
+    [
+      "p118_0.png",
+      "Figure on page 118"
+    ]
+  ],
+  "119": [
+    [
+      "p119_0.png",
+      "Figure on page 119"
+    ]
+  ],
+  "122": [
+    [
+      "p122_0.png",
+      "Figure on page 122"
+    ]
+  ],
+  "125": [
+    [
+      "p125_0.png",
+      "Figure on page 125"
+    ],
+    [
+      "p125_1.png",
+      "Figure on page 125"
+    ]
+  ],
+  "126": [
+    [
+      "p126_0.png",
+      "Figure on page 126"
+    ]
+  ],
+  "131": [
+    [
+      "p131_0.png",
+      "Figure on page 131"
+    ]
+  ],
+  "133": [
+    [
+      "p133_0.png",
+      "Figure on page 133"
+    ]
+  ],
+  "134": [
+    [
+      "p134_0.png",
+      "Figure on page 134"
+    ]
+  ],
+  "136": [
+    [
+      "p136_0.png",
+      "Figure on page 136"
+    ]
+  ],
+  "137": [
+    [
+      "p137_0.png",
+      "Figure on page 137"
+    ]
+  ],
+  "139": [
+    [
+      "p139_0.png",
+      "Figure on page 139"
+    ]
+  ],
+  "141": [
+    [
+      "p141_0.png",
+      "Figure on page 141"
+    ]
+  ],
+  "142": [
+    [
+      "p142_0.png",
+      "Figure on page 142"
+    ],
+    [
+      "p142_1.png",
+      "Figure on page 142"
+    ]
+  ],
+  "145": [
+    [
+      "p145_0.png",
+      "Figure on page 145"
+    ]
+  ],
+  "147": [
+    [
+      "p147_0.png",
+      "Figure on page 147"
+    ]
+  ],
+  "154": [
+    [
+      "p154_0.png",
+      "Figure on page 154"
+    ]
+  ],
+  "157": [
+    [
+      "p157_0.png",
+      "Figure on page 157"
+    ]
+  ],
+  "159": [
+    [
+      "p159_0.png",
+      "Figure on page 159"
+    ]
+  ],
+  "160": [
+    [
+      "p160_0.png",
+      "Figure on page 160"
+    ]
+  ],
+  "161": [
+    [
+      "p161_0.png",
+      "Figure on page 161"
+    ]
+  ],
+  "162": [
+    [
+      "p162_0.png",
+      "Figure on page 162"
+    ],
+    [
+      "p162_1.png",
+      "Figure on page 162"
+    ]
+  ],
+  "163": [
+    [
+      "p163_0.png",
+      "Figure on page 163"
+    ],
+    [
+      "p163_1.png",
+      "Figure on page 163"
+    ]
+  ],
+  "168": [
+    [
+      "p168_0.png",
+      "Figure on page 168"
+    ]
+  ],
+  "169": [
+    [
+      "p169_0.png",
+      "Figure on page 169"
+    ]
+  ],
+  "174": [
+    [
+      "p174_0.png",
+      "Figure on page 174"
+    ]
+  ],
+  "175": [
+    [
+      "p175_0.png",
+      "Figure on page 175"
+    ]
+  ],
+  "177": [
+    [
+      "p177_0.png",
+      "Figure on page 177"
+    ]
+  ],
+  "184": [
+    [
+      "p184_0.png",
+      "Figure on page 184"
+    ]
+  ],
+  "185": [
+    [
+      "p185_0.png",
+      "Figure on page 185"
+    ]
+  ],
+  "187": [
+    [
+      "p187_0.png",
+      "Figure on page 187"
+    ]
+  ],
+  "192": [
+    [
+      "p192_0.png",
+      "Figure on page 192"
+    ]
+  ],
+  "194": [
+    [
+      "p194_0.png",
+      "Figure on page 194"
+    ]
+  ],
+  "196": [
+    [
+      "p196_0.png",
+      "Figure on page 196"
+    ]
+  ],
+  "198": [
+    [
+      "p198_0.png",
+      "Figure on page 198"
+    ]
+  ],
+  "200": [
+    [
+      "p200_0.png",
+      "Figure on page 200"
+    ]
+  ],
+  "204": [
+    [
+      "p204_0.png",
+      "Figure on page 204"
+    ]
+  ],
+  "205": [
+    [
+      "p205_0.png",
+      "Figure on page 205"
+    ]
+  ],
+  "206": [
+    [
+      "p206_0.png",
+      "Figure on page 206"
+    ]
+  ],
+  "210": [
+    [
+      "p210_0.png",
+      "Figure on page 210"
+    ]
+  ],
+  "212": [
+    [
+      "p212_0.png",
+      "Figure on page 212"
+    ]
+  ],
+  "213": [
+    [
+      "p213_0.png",
+      "Figure on page 213"
+    ]
+  ],
+  "214": [
+    [
+      "p214_0.png",
+      "Figure on page 214"
+    ]
+  ],
+  "216": [
+    [
+      "p216_0.png",
+      "Figure on page 216"
+    ]
+  ],
+  "221": [
+    [
+      "p221_0.png",
+      "Figure on page 221"
+    ]
+  ],
+  "222": [
+    [
+      "p222_0.png",
+      "Figure on page 222"
+    ]
+  ],
+  "223": [
+    [
+      "p223_0.png",
+      "Figure on page 223"
+    ]
+  ],
+  "224": [
+    [
+      "p224_0.png",
+      "Figure on page 224"
+    ]
+  ],
+  "225": [
+    [
+      "p225_0.png",
+      "Figure on page 225"
+    ]
+  ],
+  "227": [
+    [
+      "p227_0.png",
+      "Figure on page 227"
+    ]
+  ],
+  "228": [
+    [
+      "p228_0.png",
+      "Figure on page 228"
+    ]
+  ],
+  "234": [
+    [
+      "p234_0.png",
+      "Figure on page 234"
+    ]
+  ],
+  "236": [
+    [
+      "p236_0.png",
+      "Figure on page 236"
+    ]
+  ],
+  "250": [
+    [
+      "p250_0.png",
+      "Figure on page 250"
+    ]
+  ],
+  "251": [
+    [
+      "p251_0.png",
+      "Figure on page 251"
+    ]
+  ],
+  "252": [
+    [
+      "p252_0.png",
+      "Figure on page 252"
+    ]
+  ],
+  "254": [
+    [
+      "p254_0.png",
+      "Figure on page 254"
+    ]
+  ]
+}
