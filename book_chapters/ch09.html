@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第9章 内存与模式管理</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;background:#f5f5f0;color:#2c2c2c;line-height:1.8;font-size:15px}.container{max-width:780px;margin:0 auto;padding:40px 24px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.06);min-height:100vh}h1{font-size:22px;text-align:center;margin:30px 0 10px}h2{font-size:18px;margin:28px 0 12px;color:#333;border-bottom:2px solid #e0e0e0;padding-bottom:6px}h3{font-size:16px;margin:20px 0 8px;color:#444}p{margin:8px 0;text-align:justify}ul,ol{margin:8px 0 8px 24px}li{margin:3px 0}.page-marker{text-align:right;color:#bbb;font-size:12px;margin:24px 0 0;border-top:1px dashed #e8e8e8;padding-top:4px}.page-marker:first-child{border-top:none;margin-top:0}.figure{text-align:center;margin:16px 0;padding:12px;background:#fafaf7;border:1px solid #eee;border-radius:4px}.figure img{max-width:100%;height:auto;border:1px solid #e0e0e0;border-radius:4px}.figure p{margin-top:6px;font-weight:bold;color:#555;font-size:14px}.note{margin:12px 0;padding:12px 16px;background:#f0f7ff;border-left:4px solid #4a90d9;border-radius:0 4px 4px 0;font-size:14px}.note::before{content:"📝 注意 ";font-weight:bold;color:#4a90d9}.questions,.summary{margin:16px 0;padding:16px 20px;border-radius:6px}.summary{background:#f0fff0}.summary h3{margin-top:0;color:#2d7d2d}.questions{background:#f5f0ff}.questions h3{margin-top:0;color:#6b3fa0}.subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:24px}pre{background:#2d2d2d;color:#e0e0e0;padding:14px 18px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.5;margin:10px 0}code{font-family:Consolas,Monaco,Courier New,monospace}</style></head><body><div class="container">
+<h1>第9章 内存与模式管理</h1><p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+<div class="page-marker">第 203 页</div>
+<h2>AUTOSAR 中的内存栈</h2>
+<p>将内存栈（Memory Stack）想象为图书馆的存储系统：每本书代表一段需要存储、编目和高效检索的数据。在 AUTOSAR 中，内存栈就是管理这个系统的图书管理员，确保关键信息在电源周期和系统重置后得以保留。</p>
+<p>在 ECU 中，通常需要保存车辆设置、标定参数、诊断故障码（DTC（Diagnostic Trouble Code，诊断故障码），Diagnostic Trouble Code）以及其他对正常运行不可或缺的数据。BSW 内置了 NVM 栈，可使用 EEPROM 或 Flash 存储器进行存储。</p>
+<div class="page-marker">第 204 页</div>
+<div class="figure"><img src="images/p204_0.png" alt="图9.1"><p>图 9.1 – 内存栈架构</p></div>
+<h3>各层模块详解</h3>
+<p><strong>服务层——NvM（NVRAM Manager，NVRAM 管理器）：</strong>内存栈的核心组件，提供管理 NVM 操作的标准化接口和服务。关键功能包括数据块管理、读写操作和错误处理。</p>
+<div class="page-marker">第 205 页</div>
+<div class="figure"><img src="images/p205_0.png" alt="图9.2"><p>图 9.2 – 内存栈模块交互</p></div>
+<p><strong>抽象层：</strong></p>
+<ul><li><strong>FEE（Flash EEPROM Emulation，Flash EEPROM 仿真）：</strong>在 Flash 存储器中模拟 EEPROM 行为</li><li><strong>EA（EEPROM Abstraction，EEPROM 抽象）：</strong>抽象外部 EEPROM 硬件，提供标准化接口</li><li><strong>MemIf（Memory Abstraction Interface，存储器抽象接口）：</strong>抽象底层 FEE 和 EA 模块的统一接口，提供读写擦除和块管理任务以及磨损均衡</li></ul>
+<div class="figure"><img src="images/p206_0.png" alt="图9.3"><p>图 9.3 – 基本存储对象定义</p></div>
+<p><strong>MCAL 层：</strong>Fls（Flash Driver）和 Eep（EEPROM Driver）直接控制硬件存储器。</p>
+<div class="page-marker">第 210 页</div>
+<h3>NVM 使用流程</h3>
+<div class="figure"><img src="images/p210_0.png" alt="图9.4"><p>图 9.4 – 系统中 NVM 使用抽象序列图</p></div>
+<p>SWC → RTE → NvM → MemIf → FEE/EA → Flash/EEPROM 驱动 → 物理存储器。数据可以在运行时立即写入，也可以延迟直到 ECU 关闭时才批量写入。可配置的设置控制数据何时以何种方式写入和读取——数据变更后立即写入还是延迟到系统关闭，启动时自动检索还是仅在特定请求时读取。</p>
+<div class="page-marker">第 212 页</div>
+<h2>模式管理</h2>
+<h3>BSWM（BSW Mode Manager，BSW 模式管理器）</h3>
+<div class="figure"><img src="images/p212_0.png" alt="图9.5"><p>图 9.5 – BSWM 模式请求处理与控制</p></div>
+<p>BSWM 基于规则评估系统条件并触发模式切换。它接收来自其他模块的模式请求，应用预定义的评估规则，并触发相应的模式控制动作。</p>
+<div class="figure"><img src="images/p213_0.png" alt="图9.6"><p>图 9.6 – BSWM 模式控制评估</p></div>
+<p>每条规则包含"模式条件"（Mode Condition）和"模式控制"（Mode Control）两部分。当条件评估为 TRUE 时，执行对应的模式控制动作。</p>
+<div class="figure"><img src="images/p214_0.png" alt="图9.7"><p>图 9.7 – BSWM 规则执行流程</p></div>
+<p><strong>ECUM（ECU State Manager，ECU 状态管理器）：</strong>控制 ECU 的整体状态转换——启动（Startup）、运行（RUN）、关闭（Shutdown）和休眠（Sleep）。启动序列包括初始化 BSW 模块、初始化 OS 和启动 RTE。</p>
+<div class="page-marker">第 216 页</div>
+<h3>安全 ECU 关闭用例</h3>
+<div class="figure"><img src="images/p216_0.png" alt="图9.8"><p>图 9.8 – 安全 ECU 关闭序列图</p></div>
+<p>当检测到电压过低时，BSWM 触发安全关闭流程：通知 ECUM → 各模块将关键数据写入 NVM → 确认数据写入完成 → 系统安全关机。这确保在意外断电情况下重要数据不会丢失。</p>
+<div class="page-marker">第 217 页</div>
+<div class="summary"><h3>本章小结</h3><p>本章探讨了 AUTOSAR 内存栈的结构——NvM、MemIf、FEE、EA、Fls 和 Eep 等模块如何在各层协同工作以在电源周期中保持数据完整性和可用性。模式管理部分讨论了 BSWM 基于规则的模式切换逻辑、ECUM 在管理 ECU 生命周期中的角色，以及电压过低时的安全关闭序列。</p></div>
+<div class="questions"><h3>思考题</h3><ol><li>ECU 内存栈的各个模块及其角色是什么？</li><li>FEE 和 EA 在 AUTOSAR 中的区别？</li><li>BSWM 如何基于规则触发模式切换？</li><li>描述安全 ECU 关闭的完整流程。</li></ol></div>
+<div class="page-marker">第 218 页</div>
+<h2>第10章 总结与知识拓展用例</h2>
+<p>本章作为全书的收尾，涵盖诊断概览、时间同步简介、如何阅读 AUTOSAR 标准文档，以及一个综合性的自动驾驶泊车辅助系统（Autonomous Parking Assist System）案例研究，将全书所学的各个模块整合为一个完整的实际应用。</p>
+</div></body></html>

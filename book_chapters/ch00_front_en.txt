@@ -1,0 +1,468 @@
+=== Page 1 ===
+(blank)
+
+
+=== Page 2 ===
+AUTOSAR Fundamentals
+and Applications
+Establishing a solid foundation for automotive
+software design with AUTOSAR
+Hossam Soffar
+
+
+=== Page 3 ===
+AUTOSAR Fundamentals and Applications
+Copyright © 2024 Packt Publishing
+All rights reserved. No part of this book may be reproduced, stored in a retrieval system, or transmitted
+in any form or by any means, without the prior written permission of the publisher, except in the case
+of brief quotations embedded in critical articles or reviews.
+Every effort has been made in the preparation of this book to ensure the accuracy of the information
+presented. However, the information contained in this book is sold without warranty, either express
+or implied. Neither the author, nor Packt Publishing or its dealers and distributors, will be held liable
+for any damages caused or alleged to have been caused directly or indirectly by this book.
+Packt Publishing has endeavored to provide trademark information about all of the companies and
+products mentioned in this book by the appropriate use of capitals. However, Packt Publishing cannot
+guarantee the accuracy of this information.
+Group Product Manager: Preet Ahuja
+Publishing Product Manager: Surbhi Suman
+Book Project Manager: Ashwin Dinesh Kharwa
+Senior Editor: Apramit Bhattacharya
+Technical Editor: Nithik Cheruvakodan
+Copy Editor: Safis Editing
+Proofreader: Apramit Bhattacharya
+Indexer: Rekha Nair
+Production Designer: Nilesh Mohite
+DevRel Marketing Coordinator: Rohan Dobhal
+First published: December 2024
+Production reference: 1221124
+Published by Packt Publishing Ltd.
+Grosvenor House
+11 St Paul’s Square
+Birmingham
+B3 1RB, UK
+ISBN 978-1-80512-087-2
+www.packtpub.com
+
+
+=== Page 4 ===
+This book is humbly dedicated to all the extraordinary individuals who have supported and inspired
+me throughout my journey. To my beloved family: your unwavering love and encouragement have
+been the foundation of all my endeavors. Thank you for your endless support and belief in me.
+To my colleagues, past and present, from Valeo Egypt, Elektrobit, FEV, and now Plus AI: your
+creativity, dedication, and collaboration have been invaluable. Working alongside such talented and
+innovative minds has been a true privilege, and I am grateful for every moment we have shared. You
+have taught me countless lessons and enriched my career in ways I could never have imagined.
+I also dedicate this book to all the unfortunate souls in the world. May you find peace and justice one
+day. Your resilience and strength inspire us to strive for a better, more equitable world.
+
+
+=== Page 5 ===
+Contributors
+About the author
+Hossam Soffar is a seasoned automotive embedded software engineer with over 12 years of experience
+in the automotive software industry. He has acquired substantial expertise in AUTOSAR through his
+roles in development and consulting for automotive ECUs, collaborating with an extensive network
+of OEMs and Tier 1 and Tier 2 suppliers. He has been involved in debugging embedded software,
+establishing software architectures, improving software performance, and managing software
+requirements and architectural design, with a particular focus on safety, security, and real-time
+performance. Committed to lifelong learning, Hossam values the opportunity to share his knowledge
+and insights with colleagues and peers in the field.
+
+
+=== Page 6 ===
+About the reviewers
+Shriram Gobichettipalayam Ramalingam is an automotive embedded software architecture
+specialist with 14+ years of experience in the automotive domain. He has contributed to designing
+in-vehicle network architecture, classic and adaptive AUTOSAR software stack configuration, and
+the development of various OEMs.
+I would like to thank my manager, Mr. Sandeep, who motivated me to expand my experience beyond
+work. Thank you for breaking stereotypes and being understanding and supportive in all activities.
+Dan Stroud is a senior solutions architect for AWS, specializing in the automotive sector. He gained
+his CEng in 2016 and has an MSc in systems engineering management (UCL) and a BSc in software
+engineering (University of Portsmouth). His 17+ years of experience in software development and
+architecture includes flight controls architecture (777x), leading the design of a new EV platform
+architecture for an automotive OEM, heavily focused around the AUTOSAR framework, and now
+specializing in helping automotive customers to deliver connected features and accelerate innovation
+through the cloud.
+The automotive industry has seen a fundamental shift, with innovation now being driven by software.
+With resources limited and expectations high, it’s technologies such as AUTOSAR that allow developers
+to focus on features, rather than re-inventing the platform wheel. I feel privileged to have experienced
+this as an OEM and I’m excited to see how connectivity and the power of the cloud drive the next cycle
+of innovation.
+Alaa Mahran is a senior embedded software engineer with over 10 years of experience in automotive
+software, specializing in AUTOSAR. He currently works at Webasto SE, where he leads software
+architecture and bootloader development, focusing on safety-critical and cybersecurity-compliant
+projects. Alaa has also worked with Valeo on ADAS applications, contributing to enhancing automotive
+safety and driver assistance features.
+I want to express my appreciation for my father, who taught me to keep an eye out for details and strive
+for excellence and continuous improvement.
+
+
+=== Page 7 ===
+(blank)
+
+
+=== Page 8 ===
+Table of Contents
+Preface xiii
+Part 1: Introduction – The Genesis and Framework
+of AUTOSAR
+1
+Exploring the Genesis and Objectives of AUTOSAR 3
+Evolution of the automotive industry 3 Case study – Developing an ECU in the
+AUTOSAR framework 13
+What is an ECU? 5
+Introducing automotive software development 6 Understanding the AUTOSAR
+Understanding traditional software development 7 standards 13
+Case study – Replacing an MCU and Software architecture and design 17
+exchanging microcontroller drivers 9
+Layers 17
+Introducing the AUTOSAR framework 9 Stacks 19
+Impact on traditional software development 11
+Summary 20
+How were these goals achieved? 12
+Questions 21
+2
+Introducing the AUTOSAR Software Layers 23
+Understanding layered software Understanding the function of the RTE 28
+architecture in AUTOSAR 24
+Basic software layer 31
+Application layer 25
+Service layer 31
+Runtime environment 27
+ECU abstraction layer 33
+Understanding the VFB concept 27 Microcontroller abstraction layer 34
+
+
+=== Page 9 ===
+viii Table of Contents
+Complex drivers 36 BSW – Service layer 40
+BSW – ECU abstraction layer 41
+Interfaces 37
+BSW – MCAL 41
+Case study – Developing a BMS ECU 39
+Summary 42
+Application layer 40
+RTE 40 Exercise 42
+3
+AUTOSAR Methodology and Data Exchange Formats 43
+Introducing the AUTOSAR Code Generation 49
+methodology 43
+Using templates for data exchange 51
+Understanding the AUTOSAR
+Conformance classes for AUTOSAR 54
+methodology 45
+Summary 54
+System Configuration 45
+Exercise 55
+ECU Configuration 48
+Part 2: Investigating the Building Blocks
+of AUTOSAR
+4
+Working with Software Components and RTE 59
+Understanding SWCs 60 Introducing compositions 73
+Example – Throttle controller 61 Connector types 74
+Types of AUTOSAR SWCs 62 Understanding the significance of the
+Elements of SWC 63 RTE 76
+Exploring AUTOSAR datatypes 67 Generation of RTE 77
+Modeling an SWC 69 Summary 81
+What is an AUTOSAR authoring tool? 69 Questions 82
+Communication between the SWCs 72
+
+
+=== Page 10 ===
+Table of Contents ix
+5
+Designing and Implementing Events and Interfaces 83
+Introducing the communication model 83 How do ports, interfaces, and events interact
+with each other? 103
+Explaining the information flow 84
+Events for temperature monitoring example 108
+Sender-receiver communication 87
+Client-server communication 95 Summary 109
+Rethinking temperature sensor design 100
+Questions 109
+Understanding events in AUTOSAR 102
+6
+Getting Started with the AUTOSAR Operating System 111
+A brief overview of the AUTOSAR OS 111 Interrupts 119
+Introduction to real-time operating systems 112 Events 120
+Introduction to OSEK 113 Scheduling 122
+Configuring the AUTOSAR OS 114 Task trigger mechanisms 124
+OS resources 128
+Exploring the AUTOSAR OS
+Hooks 129
+architecture 115
+Summary 130
+Tasks 116
+Questions 131
+7
+Exploring the Communication Stack 133
+What is the COM stack? 134 Network management 157
+COM stack overview 134 Key modules in network management 157
+An overview of basic COM concepts 137 Summary 160
+COM module 141
+Questions 160
+PDU-Router (PduR) Module 149
+CAN modules 151
+Exploring an example of sending a CAN
+message 154
+
+
+=== Page 11 ===
+x Table of Contents
+Part 3: Beyond Fundamentals – Advanced
+AUTOSAR Concepts
+8
+Securing the AUTOSAR System with Crypto and Security Stack 163
+Introduction to automotive security 163 Crypto module 171
+Fundamentals of automotive security 164 Other helper modules to achieve security 173
+Security in AUTOSAR 165 Crypto Stack use cases and examples 174
+Differentiating between safety and security 166 Data encryption 174
+Security stack architecture in Secure communication 177
+AUTOSAR 167 Secure diagnostics 179
+Secure boot in AUTOSAR 180
+Cryptographic techniques 167
+Crypto service manager module 169 Summary 182
+Crypto Interface module 171 Questions 182
+9
+Dealing with Memory and Mode Management 183
+Memory stack in AUTOSAR 184 Mode management 192
+Significance of non-volatile memory in Role and functionality 192
+AUTOSAR 184 Use case for the BSWM – Vehicle
+Understanding the memory stack 184 shutdown process 196
+Storage objects 186
+Summary 198
+Use case 190
+Questions 198
+10
+Wrapping Up and Extending Knowledge with a Use Case 199
+Overview of diagnostics 200 Default Error Tracer (DET) 204
+Diagnostic Communication Manager (DCM) Failure Management 205
+in detail 201
+Overview of time synchronization 206
+Diagnostic Event Manager 202
+
+
+=== Page 12 ===
+Table of Contents xi
+Synchronized Time-Base Manager What’s next? 213
+(StbM) module 207 Case study – Development of an
+CAN Time Synchronization (CanTSyn) 209 autonomous parking assist system 214
+How to read the standards 210 Application layer (SWCs) 217
+Key AUTOSAR documents 211 AUTOSAR BSW modules 218
+Summary 219
+Index 221
+Other Books You May Enjoy 232
+
+
+=== Page 13 ===
+(blank)
+
+
+=== Page 14 ===
+Preface
+Embedded software teams use the AUTOSAR framework to standardize interfaces between application
+software and basic vehicular functions. This standardization helps develop and deploy software
+rapidly and efficiently for automotive electronic control units (ECUs) and ensures more effective
+project management.
+Many engineers find AUTOSAR challenging due to its complexity owing to the difficulty of grasping
+its concepts at the beginning. The intricate architecture and extensive standards can lead to confusion,
+making it hard for beginners to see the full picture and understand how everything fits together.
+Additionally, beginner-friendly resources are limited. This book addresses these challenges with clear
+explanations, key concepts, and practical advice to help beginners and intermediate-level engineers
+confidently navigate the AUTOSAR landscape.
+Automotive ECUs are safety-critical and hard real-time systems, and this book will provide you
+with the foundational knowledge and skills needed to participate in their development and manage
+AUTOSAR projects more effectively.
+With a focus on the practical application of AUTOSAR, this book dives deep into the AUTOSAR
+framework and architecture and shows how to implement it in the development of automotive electronic
+systems using best practices and real-world use cases.
+The book begins with an overview of the goals and objectives of AUTOSAR and then discusses its
+layered architecture, including the different AUTOSAR stacks, components and modules, and internal
+and external communication mechanisms. You’ll discover how to configure, design, and integrate
+AUTOSAR software components in a run-time environment (RTE) and understand the principles
+of diagnostics, security, and real-time operating system (RTOS) for developing high-quality, secure,
+and efficient ECUs.
+After reading this book, you’ll have detailed insights into AUTOSAR and be skilled in building,
+implementing, and managing complex automotive systems confidently and efficiently.
+Who this book is for
+This book is designed for embedded software engineers and any software developer or software
+architect who works with or plans to work with automotive systems but has minimal or no knowledge
+of AUTOSAR. It serves as a valuable reference for project managers, students, and researchers who
+seek to learn about AUTOSAR and its applications or understand its main concepts. A background
+knowledge of software development processes and C programming will be beneficial.
+
+
+=== Page 15 ===
+xiv Preface
+What this book covers
+Chapter 1, Exploring the Genesis and Objectives of AUTOSAR, introduces the origins and goals of the
+AUTOSAR standard. It explains the foundational principles and motivations behind its development,
+offering a comprehensive understanding of its objectives.
+Chapter 2, Introducing the AUTOSAR Software Layers, explores the essential layers of AUTOSAR
+architecture, including the application layer, RTE, service layer, ECU abstraction layer, and MCAL.
+It highlights the design and implementation of modular and compatible software components, using
+a BMS ECU as a case study to illustrate practical applications. This chapter provides foundational
+knowledge for understanding how these layers interact and support automotive software development.
+Chapter 3, AUTOSAR Methodology and Data Exchange Formats, outlines the AUTOSAR development
+methodology, emphasizing the independence of software component implementation from ECU
+configuration. It introduces AUTOSAR templates for data exchange and covers system design,
+modeling, code generation, and configuration. The chapter also explains conformance classes, detailing
+the essential BSW modules required for compliance.
+Chapter 4, Working with Software Components and RTE, explores the structure, functionality, and types
+of AUTOSAR software components, including application software components and complex device
+drivers. It explains software component communication via ports, the role of runnable entities, and
+triggering conditions. The chapter also highlights the importance of the runtime environment and
+its connection with the virtual function bus (VFB), providing a foundation for developing complex
+automotive systems.
+Chapter 5, Designing and Implementing Events and Interfaces, unravels the complexities of events
+and interfaces in the AUTOSAR framework. It emphasizes their role in data transitions, real-time
+responses, and safety. The chapter covers advanced communication models, including sender-receiver
+and client-server interfaces, and synchronous versus asynchronous communication, using a car’s
+temperature monitoring system as an example.
+Chapter 6, Getting Started with the AUTOSAR Operating System, examines the AUTOSAR operating
+system (OS), its architecture, RTOS, and the OSEK standard. It highlights priority-based scheduling,
+fast interrupt processing, and inter-task communication. The chapter also covers task management,
+synchronization, and resource allocation, providing essential knowledge for developing efficient and
+reliable automotive software systems.
+Chapter 7, Exploring the Communication Stack, covers the COM module’s role in data exchange, the
+significance of signals, and the PDUR module’s function in routing and transforming data. Using
+the CAN stack as an example, it provides insights into the key components and mechanisms of
+AUTOSAR communication.
+
+
+=== Page 16 ===
+Preface xv
+Chapter 8, Securing the AUTOSAR System with Crypto and Security Stack, focuses on automotive
+cybersecurity within the AUTOSAR framework. It highlights the importance of security and potential
+risks. The chapter explores the AUTOSAR crypto stack, including its core components and their roles
+in cryptographic operations. It also covers Secure Onboard Communication (SecOC) for ensuring
+data confidentiality and integrity between ECUs, emphasizing the importance of secure coding
+practices and regulatory compliance.
+Chapter 9, Dealing with Memory and Mode Management, covers the architecture and functionalities of
+the NVM stack, focusing on data storage and retrieval through the Non-Volatile Memory Manager
+(NVMM) module. It provides practical insights into configuring NVM, discussing storage objects,
+block management, and error handling. Additionally, it discusses Basic Software Mode Management
+(BSWM), illustrating its role in managing different operating modes within automotive ECUs to
+ensure seamless operation and reliability.
+Chapter 10, Wrapping Up and Extending Knowledge with a Use Case, concludes our exploration of
+AUTOSAR, emphasizing its importance in automotive software engineering. It recaps key concepts,
+including AUTOSAR architecture, SWS, TPS, RS, RTE, and BSW specifications, and presents a use
+case for designing a real-time control system within an automotive ECU. This chapter serves as a
+foundation, encouraging engineers to continue studying AUTOSAR specifications, gain hands-on
+experience, and stay updated with industry trends to master this powerful standard.
+To get the most out of this book
+You should have a basic understanding of automotive software development and embedded systems.
+Familiarity with RTOS and general software engineering principles will be beneficial. Additionally, a
+foundational knowledge of communication protocols and basic cybersecurity concepts will help in
+grasping the more advanced topics covered in the chapters.
+If you are using the digital version of this book, we advise you to type the code yourself. Doing so
+will help you avoid any potential errors related to the copying and pasting of code.
+Conventions used
+There are a number of text conventions used throughout this book.
+Code in text: Indicates code words in text, database table names, folder names, filenames,
+file extensions, pathnames, dummy URLs, user input, and Twitter handles. Here is an example:
+“The function then reads a value and stores it in the receivedData variable.”
+
+
+=== Page 17 ===
+xvi Preface
+A block of code is set as follows:
+#include "Rte_Receiver.h"
+void ReceiverCounterFunction(void) {
+UInt32 receivedData;
+Rte_Read_ReceiverInterface_ReceiverInput(&receivedData);
+// Process received data, e.g., control an actuator based on the
+input
+// In this example only odd counter value is sent
+if (receivedData % 2) {
+Rte_Write_ReciverModule_CounterSig(receivedData)
+}
+}
+Bold: Indicates a new term, an important word, or words that you see onscreen. For instance, words in
+menus or dialog boxes appear in bold. Here is an example: “AUTomotive Open System ARchitecture
+(AUTOSAR) is a standard for the development of automotive electronic systems. “
+Tips or important notes
+Appear like this.
+Get in touch
+Feedback from our readers is always welcome.
+General feedback: If you have questions about any aspect of this book, email us at customercare@
+packtpub.com and mention the book title in the subject of your message.
+Errata: Although we have taken every care to ensure the accuracy of our content, mistakes do happen.
+If you have found a mistake in this book, we would be grateful if you would report this to us. Please
+visit www.packtpub.com/support/errata and fill in the form.
+Piracy: If you come across any illegal copies of our works in any form on the internet, we would
+be grateful if you would provide us with the location address or website name. Please contact us at
+copyright@packt.com with a link to the material.
+If you are interested in becoming an author: If there is a topic that you have expertise in and you
+are interested in either writing or contributing to a book, please visit authors.packtpub.com
+
+
+=== Page 18 ===
+Preface xvii
+Share Your Thoughts
+Once you’ve read AUTOSAR Fundamentals and Applications, we’d love to hear your thoughts! Please
+click here to go straight to the Amazon review page for this book and share your feedback.
+Your review is important to us and the tech community and will help us make sure we’re delivering
+excellent quality content.
+
+
+=== Page 19 ===
+xviii Preface
+Download a free PDF copy of this book
+Thanks for purchasing this book!
+Do you like to read on the go but are unable to carry your print books everywhere?
+Is your eBook purchase not compatible with the device of your choice?
+Don’t worry, now with every Packt book you get a DRM-free PDF version of that book at no cost.
+Read anywhere, any place, on any device. Search, copy, and paste code from your favorite technical
+books directly into your application.
+The perks don’t stop there, you can get exclusive access to discounts, newsletters, and great free content
+in your inbox daily
+Follow these simple steps to get the benefits:
+1. Scan the QR code or visit the link below
+https://packt.link/free-ebook/978-1-80512-087-2
+2. Submit your proof of purchase
+3. That’s it! We’ll send your free PDF and other benefits to your email directly
+
+
+=== Page 20 ===
+Part 1:
+Introduction – The Genesis
+and Framework of AUTOSAR
+This part provides a foundational understanding of AUTOSAR, its origins, and its layered architecture.
+It introduces the key principles, motivations, and methodologies that underpin the AUTOSAR
+framework, offering insights into how data exchange formats facilitate seamless communication
+within the system. You will gain a solid grasp of the fundamental concepts necessary for developing
+AUTOSAR-compliant automotive software.
+This part has the following chapters:
+• Chapter 1, Exploring the Genesis and Objectives of AUTOSAR
+• Chapter 2, Introducing the AUTOSAR Software Layers
+• Chapter 3, AUTOSAR Methodology and Data Exchange Formats
+
+
+=== Page 21 ===
+(blank)
+
+
+=== Page 22 ===
+1
+Exploring the Genesis and
+Objectives of AUTOSAR
+AUTomotive Open System ARchitecture (AUTOSAR) is a standard for the development of automotive
+electronic systems. It provides a common software architecture for electronic control units (ECUs)
+in vehicles, allowing for the easier integration and development of new features. It is a partnership of
+major automotive manufacturers and suppliers, and its goal is to improve the overall efficiency and
+flexibility of the automotive software development process.
+In this first chapter, we will discuss the motivation behind the development of AUTOSAR, the organization
+of the partnership, and its aims and objectives. In this chapter, we will cover the following main topics:
+• Evolution of the automotive industry
+• Introducing the AUTOSAR framework
+• Understanding the AUTOSAR standards
+• Software architecture and design
+Evolution of the automotive industry
+Over the past few decades, the automobile industry has evolved from a simple means of transportation
+to a complex machine that resembles a smartphone on wheels. This transformation is due to the
+integration of advanced technologies and the adoption of a more sophisticated approach to design
+and development.
+

@@ -1,0 +1,719 @@
+=== Page 79 ===
+60 Working with Software Components and RTE
+Understanding SWCs
+As discussed in Chapter 2, in the AUTOSAR standard, an SWC refers to an encapsulated piece of
+software with a specific function within an embedded automotive system.
+An AUTOSAR software component is designed to be independent, reusable, and transferable between
+different electronic control units (ECUs) in a vehicle.
+These SWCs are made up of a set of runnable entities (i.e., code functions) that are activated or
+scheduled by certain events and interact with the system through well-defined interfaces.
+Important note
+Imagine a car is like a big puzzle, and every part of the car needs to work together smoothly.
+In AUTOSAR, SWCs are like individual pieces of that puzzle. They are small, self-contained
+parts of the car’s computer systems, each with a specific job to do. Some of these components
+are grouped together within a single ECU, while others are distributed across different ECUs
+throughout the vehicle.
+The following figure illustrates the interaction and data exchange between SWCs via the RTE. Notice
+how the SWCs are positioned above the RTE, and the RTE is responsible for managing the exchange
+of data and control between them:
+Figure 4.1 – SWCs in AUTOSAR
+Some characteristics of AUTOSAR SWCs are as follows:
+• Their capability to link with an AUTOSAR RTE is crucial. This link enables them to communicate
+with other SWCs and with other SWCs within the BSW layer of the AUTOSAR architecture.
+This results in multiple benefits like the reusability of software, improved mobility of components
+between ECUs, and more resourceful and economical utilization of resources.
+
+
+=== Page 80 ===
+Understanding SWCs 61
+• AUTOSAR SWCs are also scalable. They can form AUTOSAR compositions, a unique type of
+software component that allows grouping SWCs with similar functionalities. These compositions
+function as a system abstraction layer, handling complexity and aiding scalability in designing
+a software application’s logical representation.
+• AUTOSAR SWCs offer a modular, expandable, and efficient approach to automotive software
+development. They play a crucial role in the smooth operation of complex automotive systems,
+and their adaptability and reusability make them a valuable resource in the ever-evolving world
+of automotive software architecture.
+Since the components can communicate seamlessly, the same software modules can be reused across
+different projects and platforms, reducing development time and effort. To understand SWCs better,
+let’s look at an example.
+Example – Throttle controller
+Consider a throttle control component in an automotive engine management system. This component
+might be responsible for controlling the position of the throttle valve based on inputs from the driver’s
+acceleration pedal, engine control unit, or cruise control system. The throttle control SWC might
+include several functions, such as the following:
+• calculateThrottlePosition(): This function takes the input from the acceleration
+pedal sensor and calculates the desired throttle position.
+• actuateThrottle(): This function takes the desired throttle position and controls the
+physical throttle valve accordingly.
+Here’s a simplified example of how these might look in C code:
+void calculateThrottlePosition(AccelerationPedalPosition position) {
+// Algorithm to calculate throttle position based on pedal
+position
+...
+}
+void actuateThrottle(ThrottlePosition position) {
+// Control signal sent to throttle actuator based on calculated
+position
+...
+}
+In this example, the inputs and outputs would be passed through the defined interfaces of the SWC,
+allowing it to interact with other components such as a sensor SWC (for acceleration pedal sensor
+input) and an actuator SWC (for controlling the throttle actuator). Figure 4.2 shall show a simplified
+example of such interaction.
+
+
+=== Page 81 ===
+62 Working with Software Components and RTE
+Figure 4.2 – Throttle Control SWC interaction
+The AUTOSAR authoring tool would be used to create the descriptions of these components,
+runnable entities, and their interfaces, typically in a standardized XML-based format, AUTOSAR
+XML (ARXML), which would then be used to generate the necessary glue code or wrapper layer for
+integrating these components into the overall system (ECU). This will be explored later on, when we
+explore the building blocks of the SWC.
+We now have an understanding of what a SWC might do. A question might arise as to how it would
+integrate into AUTOSAR software. Additionally, we might wonder how these SWCs are organized,
+how they communicate, and how they are represented in models. First, let’s delve deeper to understand
+the various types of SWCs, then figure out how to model and realize them into AUTOSAR.
+Types of AUTOSAR SWCs
+In this section, we will delve into an array of fundamental SWCs that form the bedrock of the AUTOSAR
+framework, explaining their unique roles and interactions within the intricate architecture:
+• Application SWC: This represents an indivisible software component that performs a part or
+whole of an application. Confined to only one ECU, this component forms the fundamental
+building block of an AUTOSAR application.
+• Parameter SWC: This is primarily used to access calibration parameters from the ECU and
+to supply calibration parameters to other SWCs. This component does not include internal
+behavior and provides parameters to SWC through a specific type of interface.
+• Service SWC: Standard interfaces for direct communication with other BSW modules are offered,
+for example, a service from the COMM module to manage communication channels’ states.
+• Complex device driver: This generalizes the ECU abstraction component and can communicate
+with BSW modules. If there’s a complex application that AUTOSAR’s BSW architecture
+cannot implement, then the complex device driver component can be used to implement this
+non-AUTOSAR-defined functionality within the AUTOSAR ECU, more extending functionality.
+
+
+=== Page 82 ===
+Understanding SWCs 63
+• NVBlock SWC: This manages non-volatile memory within an ECU. It ensures important data,
+such as calibration parameters, persists across power cycles, enhancing system reliability by
+offering an interface for reading and writing data that survives restarts.
+Moving forward, our next focus will be the procedure for designing a software component within
+AUTOSAR. We’ll familiarize ourselves with the SWC elements next.
+Elements of SWC
+AUTOSAR SWCs are highly structured entities that comprise several essential elements, as shown
+in Figure 4.3:
+Figure 4.3 – Internal structure of a SWC
+Let’s look at these elements in detail:
+• Ports: In AUTOSAR, a port acts as a well-defined interaction point between a SWC and the
+external world. It facilitates data exchange following a standardized approach. There are two
+types of ports in AUTOSAR:
+ Provided ports (PPorts): This acts as an output channel for an SWC. Data is generated by
+the component and transmitted through the PPort to other SWCs or the basic software
+(BSW) layer, the PPort is like a service desk, offering specific services that other components
+or users. For example, a Temperature Sensor SWC may have a provided port that offers the
+service of reporting the current engine temperature.
+
+
+=== Page 83 ===
+64 Working with Software Components and RTE
+ Required ports (RPorts): This serves as an input channel for an SWC. The component
+expects to receive data through the RPort from other components or the BSW. It specifies
+the operations or functions that the component needs but doesn’t implement by itself. In the
+context of our service provider analogy, the required Port is like a customer who requests
+specific services. For example, an engine control SWC may have a required port that needs
+the engine temperature. It will connect to the provided port of the Temperature Sensor SWC
+to get this information.
+Note
+Ports in AUTOSAR can be compared to electrical outlets and plugs in a house. Electrical
+outlets, like server ports in AUTOSAR, provide services or data to other components. Plugs,
+like client ports in AUTOSAR, request and receive services or data from server ports. A plug
+must fit an outlet to draw power, just as a client port must connect correctly to a server port
+to access services or data. Electrical outlets and plugs are standardized for compatibility, and
+similarly, AUTOSAR ports are standardized to ensure interoperability between components
+from different manufacturers.
+• Interfaces: These establish the communication protocols between SWCs, enabling their smooth
+interaction. AUTOSAR provides several communication interfaces. However, in the current
+scope, we will focus on discussing the two most used categories of communication interfaces:
+ Sender-receiver interface: This refers to a communication model where one SWC, acting as the
+sender, transmits data to one or more SWCs acting as receivers. This form of communication
+is unidirectional, meaning data only flows from the sender to the receiver(s). It is represented
+as follows:
+Figure 4.4 – Sender-receiver interface symbols
+Consider an example as shown in Figure 4.5, where we have three SWCs in a vehicle’s control system:
+ Speed sensor SWC (sender): This is responsible for detecting and recording the vehicle’s
+current speed. The measured speed data is crucial information needed by other components in
+the system for different purposes. The Speed Sensor SWC (sender) sends this speed data to the
+Speed Display SWC and Cruise Control SWC (receivers) through the sender-receiver interface.
+ Speed display SWC (receiver): The Speed Display SWC uses this data to update the
+speedometer readout on the vehicle’s dashboard, allowing the driver to see the vehicle’s
+current speed.
+
+
+=== Page 84 ===
+Understanding SWCs 65
+ Cruise control SWC (receiver): Meanwhile, the Cruise Control SWC uses the data to
+maintain or adjust the vehicle’s speed per the driver’s setting. For instance, if the vehicle’s
+speed drops below the set speed, the Cruise Control SWC may instruct the engine control
+system to increase acceleration.
+Figure 4.5 – Sender-receiver example
+Having explored the sender-receiver interface, let’s explore the client-server communication
+model in AUTOSAR:
+ Client-server interface: It facilitates communication between SWCs based on a request-
+response model. Here, one SWC (the client) requests a specific service from another SWC
+(the server), and the server then responds by executing the service and sending a response
+back to the client. This is a bi-directional interface since communication occurs in both
+directions – from the client to the server and back. Figure 4.6 shows how the client-server
+interface is represented in the AUTOSAR models:
+Figure 4.6 – Client-server interface symbols
+For example, let’s consider a vehicle’s control system with two SWCs:
+ Climate control SWC (client)
+ Air conditioning system SWC (server)
+The Climate Control SWC manages the vehicle’s interior climate, including temperature,
+humidity, and airflow. To do this, it communicates with other systems in the vehicle, in this
+case, the Air Conditioning System SWC.
+
+
+=== Page 85 ===
+66 Working with Software Components and RTE
+Here’s how a client-server interface could work in this context:
+i. User input: The driver adjusts the desired temperature on the climate control panel.
+ii. Climate analysis: The Climate Control SWC receives user input and sensor data. Based
+on the difference between the desired and current temperature (and potentially humidity),
+the Climate Control SWC determines the necessary adjustments.
+iii. Client request: The Climate Control SWC sends a request through its RPort, invoking a
+specific operation on the Air Conditioning System SWC (server). This operation could
+be named SetTargetTemperature and include arguments such as the desired
+temperature value.
+iv. Server operation: The Air Conditioning System SWC receives the request and executes
+the SetTargetTemperature function with the provided argument.
+v. AC system control: Based on the received target temperature, the Air Conditioning
+System SWC activates various actuators (e.g., compressor and fan) to adjust airflow and
+achieve the desired temperature.
+In this example, the client-server interface within the AUTOSAR framework exemplifies
+how different SWCs can interact clearly and efficiently. This enables the system to respond
+precisely to external stimuli and execute the desired functionalities, ensuring a well-coordinated
+performance within the vehicle.
+Other types of interfaces that are also used in AUTOSAR include the one shown in the
+following figure:
+Figure 4.7 – List of AUTOSAR interfaces
+
+
+=== Page 86 ===
+Exploring AUTOSAR datatypes 67
+Note
+Interfaces in AUTOSAR can be compared to ethernet or telephone wires, which carry specific
+data, while ports can be seen as plugs that connect to these wires, enabling the exchange of
+data and services between components.
+• Runnable entities: These encapsulate distinct functionality that the software component needs
+to perform. Each runnable entity corresponds to a specific task or operation of the component,
+such as processing inputs, calculating outputs, managing internal data, or executing specific
+algorithms. We can consider that a runnable is the implementation of a code function.
+• Internal behavior: The internal behavior of an AUTOSAR SWC serves as a blueprint for its
+internal operations, meticulously detailing the fundamental building blocks called runnables,
+data access (defining how runnables consume or use data through ports and interfaces ), and
+triggering mechanisms (initiating runnables based on data changes, time-based events, or event-
+driven triggers), thus offering a comprehensive picture of how the SWC functions internally.
+These elements work together to ensure that AUTOSAR SWCs are scalable, reusable, and
+maintainable entities.
+You’ve now grasped the basic concepts of SWCs, as well as their various types and elements. Furthermore,
+you’ve learned that a SWC is essentially a collection of different functions (runnables) that activate in
+response to events. Next, let’s explore the various kinds of data that can be employed within these SWCs.
+Exploring AUTOSAR datatypes
+The AUTOSAR standard outlines a method for handling AUTOSAR data types, wherein base data
+types are associated with implementation and application data types. This approach allows for the
+distinction between physical attributes related to the application level, such as real-world value
+ranges, data structures, and physical meanings, and attributes specific to the implementation level,
+such as minimum and maximum values for stored integers and specifications of primitive types (e.g.,
+integer, Boolean, or real).
+Understanding this distinction is essential when working with SWCs because it ensures that the data is
+not only functional but also technically sound. It’s like making sure that the puzzle pieces fit together
+perfectly, both in terms of their intended use and their technical compatibility.
+Let’s give a brief idea of what each data type represents:
+• Application data types: In AUTOSAR, these are defined in a platform-independent manner,
+meaning they are not tied to a specific programming language or hardware platform. They
+capture the physical attributes, semantics, and behavior of data in the application domain. This
+includes information such as the range of valid values, units of measurement, data structures
+(e.g., records or arrays), and any relevant semantic constraints.
+
+
+=== Page 87 ===
+68 Working with Software Components and RTE
+The purpose of application data types is to provide a standardized and portable representation
+of data within AUTOSAR systems. By separating the application-level attributes from the
+implementation-level details, application data types enable SWCs to be developed independently of
+specific hardware or software platforms. This promotes modularity, reusability, and interoperability
+within the AUTOSAR ecosystem.
+• Implementation data types: In AUTOSAR, these are closely tied to the underlying programming
+language and hardware architecture. They are used to generate the actual code that will be
+executed on the target platform, considering aspects such as memory allocation, bit ordering,
+and alignment requirements. Examples of an implementation data type include the following:
+ uint32: This represents an unsigned integer with a size of 32 bits. This type is commonly
+used to store and manipulate non-negative integer values ranging from 0 to 4,294,967,295.
+ float32: This represents a single-precision floating-point number with 32 bits. It is used
+to perform calculations involving decimal values with a certain degree of precision.
+These implementation data types are the building blocks for defining the SWCs’ variables,
+structures, and arrays. They provide the necessary detail and specificity to ensure compatibility
+and efficient execution on the target hardware and software platform.
+• Base types: In programming, a base data type, also known as a primitive data type, is a fundamental
+data type provided by a programming language. Base data types are not composed of other data
+types and represent basic values that can be manipulated directly by the computer’s hardware.
+Base data types encompass the hardware-specific characteristics of a data type, such as its
+size and encoding. They serve as the foundation upon which implementation data types are
+constructed. It is possible for multiple implementation data types to reference a single base type.
+In the following figure, we can see how data types are connected. For instance, within the application,
+there’s a data type known as adt_VehSpeed, and it’s interesting to note that this data type has a maximum
+value set at 212. This illustrates how application data types in AUTOSAR carry specific attributes and
+constraints that are crucial for defining how data is used and processed within the SWC:
+
+
+=== Page 88 ===
+Modeling an SWC 69
+Figure 4.8 – Data types and their relation
+Application data types are like labels that tell the software how to handle certain information. They
+define things such as the range of valid values, the structure of complex data, and what the data
+represents in the context of the application. In the case of adt_VehSpeed, it appears to pertain
+to vehicle speed, and knowing its maximum value is essential for ensuring the software component
+functions correctly when dealing with this type of data.
+In the next section, we will explore how SWCs are modeled.
+Modeling an SWC
+Specialized software applications known as authoring tools streamline the creation and construction
+of SWCs and other aspects of the automotive software framework. These tools support engineers and
+developers in shaping, tailoring, and supervising various AUTOSAR elements, including SWCs and
+communication interfaces. Since tools such as Vector DaVinci Configurator and SystemDesk aren’t
+available for free, let’s explore the ARXML output instead. This will give us valuable insights into what
+to expect when using these tools.
+What is an AUTOSAR authoring tool?
+An AUTOSAR authoring tool is a specialized software application designed to interpret, manage,
+and create AUTOSAR descriptions, which are integral to the function and definition of SWCs. These
+descriptions highlight the functionalities, system requirements, resource demands, implementation
+specifics, and system constraints of SWCs, as well as details about ECU resources and configurations.
+An SWC consists of two main parts: a comprehensive description that details its infrastructure setup,
+and an implementation that incorporates its functionality. The latter is usually written in C code. Before
+creating an SWC, its component type must be defined. This definition outlines its fixed characteristics,
+such as port names, communication properties, interface types and their specific attributes, and the
+SWC’s behavior.
+
+
+=== Page 89 ===
+70 Working with Software Components and RTE
+AUTOSAR elements interact with each other in a standardized XML file format, the ARXML format,
+which can vary slightly according to the AUTOSAR release version. Therefore, AUTOSAR authoring
+tools must be capable of interpreting, creating, or modifying ARXML descriptions based on the
+ARXML Schema version.
+Let’s consider this as an exercise to model a SWC. We will describe the process of designing an
+AUTOSAR software component named TemperatureHandler, which handles temperature data.
+In this example, it uses a sender-receiver interface to propagate temperature data. It also uses a client-
+server interface to query the temperature value (operation) from a server (provider). The definition
+of the software component in an ARXML file is as follows:
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" xmlns:xsi="http://www.
+w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://autosar.
+org/schema/r4.0 AUTOSAR_4-3-0.xsd">
+<AR-PACKAGES>
+<AR-PACKAGE>
+<SHORT-NAME>TemperatureControlPackage</SHORT-NAME> <ELEMENTS>
+............................
+.........................
+<SW-COMPONENT-PROTOTYPE>
+<SHORT-NAME>TemperatureHandler</SHORT-NAME>
+<PORTS>
+<P-PORT-PROTOTYPE SHORT-NAME="TempOutputPort">
+<PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-
+INTERFACE">/TemperatureOutputInterface</PROVIDED-INTERFACE-TREF>
+</P-PORT-PROTOTYPE>
+<R-PORT-PROTOTYPE SHORT-NAME="TempInputPort">
+<REQUIRED-INTERFACE-TREF DEST="CLIENT-SERVER-INTERFACE">/
+TemperatureSetInterface</REQUIRED-INTERFACE-TREF>
+</R-PORT-PROTOTYPE>
+</PORTS>
+</SW-COMPONENT-PROTOTYPE>
+<INTERNAL-BEHAVIORS>
+<SWC-INTERNAL-BEHAVIOR>
+<SHORT-NAME>TemperatureControlSWC_Behavior</SHORT-NAME>
+<RUNNABLES>
+<RUNNABLE-ENTITY>
+<SHORT-NAME> TemperatureHandler_MainFunction
+</SHORT-NAME>
+................................
+.........................
+</ELEMENTS>
+</AR-PACKAGE>
+</AR-PACKAGES>
+</AUTOSAR>
+
+
+=== Page 90 ===
+Modeling an SWC 71
+In the preceding code snippet, the TemperatureHandler software component has been defined
+with two ports. The sender-receiver port is named TempOutputPort, and the client-server port
+is named TempInputPort.
+The code for this software component might look like this:
+#include "Rte_TemperatureHandler.h"
+float currentTemperature = 0.0;
+void TemperatureHandler_MainFunction(void)
+{
+Rte_ResultType res = Rte_Call_TempInputPort_
+GetTemperature(&currentTemperature, &isupdated);
+if(isupdated == TRUE) {
+/* Propagate the new temperature */
+Rte_Write_TempOutputPort_Temperature(&currentTemperature);
+}
+}
+In this code, there is a main function (TemperatureHandler_MainFunction) that runs
+periodically. It checks whether a new temperature has been set. If so, it updates the temperature and
+propagates the new temperature data.
+The following snippet is the generated header file that contains the API definitions:
+#include "Rte_Type.h"
+/* RTE API prototypes */
+Std_ReturnType Rte_Call_TempInputPort_GetTemperature(float*
+temperature, boolean *isupdated);
+Std_ReturnType Rte_Write_TempOutputPort_Temperature(const float*
+temperature);
+In this RTE code, you can see the function prototypes for the RTE APIs that the software component
+uses. The Rte_Call_TempInputPort_GetTemperature function is used to check whether
+a new temperature value was updated. The isupdated flag indicates that a new temperature value
+has been updated and Rte_Write_TempOutputPort_Temperature is used to propagate the
+new temperature data to other users.
+Note
+Please note that the process would be more complex in a real-world application and involve
+additional steps. The code and ARXML snippets are very simplified for illustrative purposes
+and only show the port definition part. The code design is only to show how the modeling
+process would generate code.
+
+
+=== Page 91 ===
+72 Working with Software Components and RTE
+At this point, we have a clearer idea of how a SWC design and implementation would work. Let’s now
+examine how different SWCs would interact.
+Communication between the SWCs
+The virtual functional bus (VFB) implements communication between SWCs. It provides an
+abstraction layer that isolates the applications from the base infrastructure. During operation, the
+VFB is generally embodied by the RTE and is uniquely produced for each ECU in the AUTOSAR
+system. Communication within the VFB occurs through dedicated ports, requiring the mapping of
+communication interfaces from the application software to these ports. The VFB handles communication
+both within an individual ECU and between multiple ECUs, enabling a seamless exchange of data
+and information across the system:
+Figure 4.9 – Intra/inter-ECU communication
+The communication between SWCs can occur in two ways, as depicted in the preceding diagram:
+inter-ECU and intra-ECU. Both types of communication are managed through the AUTOSAR RTE.
+Let’s take a closer look at them:
+• Inter-ECU communication, such as between ECU I and ECU II, occurs through and beneath
+the RTE, passing via the BSW module. The BSW module handles various functions, including
+memory interactions, diagnostics, and communication services (if necessary) to facilitate
+inter-ECU communication.
+
+
+=== Page 92 ===
+Communication between the SWCs 73
+• Intra-ECU communication refers to communication within a single ECU, between software
+component B (SWC B) and software component C (SWC C). Intra-ECU communication is
+entirely handled through the RTE. The diagram shows that SWCs mapped to a single ECU
+utilize the intra-ECU communication method.
+The application layer (Application SWCs) communicates with the lower layers and with each other
+via the RTE. Whenever an SWC needs a service, the RTE maps these requests to the appropriate
+service BSW service provider.
+Now that you understand how SWC communication works, it’s important to be introduced to a
+grouping for SWCs called compositions, which helps in managing complexity, logically organizing
+the system, and enhancing scalability.
+Introducing compositions
+SWCs and compositions are significant constructs in the AUTOSAR architecture, each serving a
+unique purpose. They offer different levels of abstraction and organizational methods to handle the
+complex ecosystem of automotive software.
+We have explored SWCs earlier in this chapter; now let’s understand compositions. These are a special
+type of SWC that doesn’t contain any implementation of their own. Instead, they serve as containers
+to aggregate related SWCs, aiding in managing complexity and structuring larger systems.
+For instance, you might have an Engine System composition that groups the Engine Control, Fuel Sensor,
+Temperature Sensor, and Throttle Position SWCs. The composition doesn’t perform any functionality
+itself but aggregates these related components, improving the overall system’s manageability. The
+creation of compositions offers distinct benefits:
+• Managing complexity: As the number of SWCs in a system grows, managing them can
+become increasingly complex. Compositions provide a means to group related SWCs together,
+simplifying the architecture.
+• Logical organization: Compositions help to logically organize the system by grouping related
+functionalities, enhancing the understandability of the system’s structure and functions.
+• Scalability: As a system expands or new features are added, new SWCs can be easily integrated
+by adding them to the appropriate composition.
+In conclusion, the introduction of SWCs and compositions is significant in managing complexity and
+improving the development efficiency of automotive software systems. Now that we’ve covered SWCs
+and their compositions, it’s time to explore how information moves between these entities via ports.
+This emphasizes why it’s crucial to grasp the various connector types, which shall be explored next.
+
+
+=== Page 93 ===
+74 Working with Software Components and RTE
+Connector types
+Connectors serve as representations of data flow between PPorts and RPorts of SWCs or software
+compositions. They establish the necessary links for data exchange and coordination. In particular,
+Assembly and Delegation connectors are fundamental components within the AUTOSAR architecture
+that play a critical role in enabling communication and managing information flow between SWCs.
+Let’s look at these in detail:
+• Assembly connector: An Assembly connector establishes a direct link between a provided
+interface of one SWC and the required interface of another SWC. This connection enables
+seamless communication and information exchange between the connected components.
+For instance, let’s consider an example involving a vehicle’s cruise control system. This system
+comprises two SWCs: Cruise Control Manager and Throttle Controller. The Cruise Control
+Manager SWC offers a provided interface that outputs the desired speed, while the Throttle
+Controller SWC requires this desired speed information to control the throttle. To establish
+communication between these two components, an Assembly connector is employed. It
+connects the provided interface of the Cruise Control Manager SWC to the required interface
+of the Throttle Controller SWC, allowing the former to transmit the desired speed information
+directly to the latter. This connection ensures effective coordination and control within the
+cruise control system.
+• Delegation connector: A Delegation connector is utilized within a composition to establish a
+connection between an inner SWC interface and an interface of the composition itself. It enables
+the composition to delegate the required or provided interface to one of its internal components.
+Expanding on the previous example, let’s introduce a composition called Vehicle Control System,
+which encompasses the Cruise Control Manager and Throttle Controller SWCs. In this scenario,
+we may want the Vehicle Control System SWC to offer an interface to the external environment
+that provides the current speed information. To achieve this, we would use a Delegation
+connector to connect the Vehicle Control System interface responsible for outputting the current
+speed to the Cruise Control Manager SWC’s interface, which is responsible for providing this
+information. The Delegation connector allows the Vehicle Control System SWC to delegate the
+task of providing the current speed interface to the Cruise Control Manager SWC, enabling
+access to this functionality through the composition interface.
+
+
+=== Page 94 ===
+Communication between the SWCs 75
+Figure 4.10 illustrates the arrangement of SWCs and compositions, demonstrating how connections
+are established between them:
+Figure 4.10 – Compositions and SWC
+Some of the key differences between the Assembly connector and the Delegation connector are as follows:
+• An Assembly connector connects a provider and receiver port. The Delegation connector
+connects the same port type, provider to provider or receiver to receiver.
+• The Assembly connector facilitates the flow of data or signals directly between the connected
+SWCs. In contrast, the Delegation connector is meant to abstract the functionality of an inner
+SWC and expose it as part of the composition’s interface. It allows the composition to mediate or
+provide specific functionalities, delegating the implementation details to the internal components.
+Having observed the various types of communication between SWCs, it is now essential to delve
+deeper into the functionality and significance of the RTE layer.
+
+
+=== Page 95 ===
+76 Working with Software Components and RTE
+Understanding the significance of the RTE
+The collaborative efforts of the RTE and VFB enable efficient utilization of the underlying BSW layer,
+decoupling SWCs from specific implementations. This separation fosters flexibility and portability,
+allowing SWCs to seamlessly integrate into different automotive systems while benefiting from the
+standardized AUTOSAR framework.
+Figure 4.11 shows how RTE acts as a middleware between the Application layer and the BSW layer.
+Figure 4.11 – RTE as a middle layer
+The main features of the RTE layer are as follows:
+• RTE as middleware: The RTE can be seen as a form of middleware that provides a standardized
+interface for SWCs. It abstracts the complexities of lower-level operations, such as data exchange
+mechanisms, task scheduling, and network management, presenting a simplified interface to
+the application layer. This allows application developers to focus on the core business logic
+while minimizing concerns about the underlying hardware or system-level tasks.
+• Communication management: The RTE handles inter-ECU (between different ECUs) and
+intra-ECU (within the same ECU) communication. It efficiently manages the routing of
+information between sender and receiver components, irrespective of whether they reside
+within the same or different ECUs.
+• Data mapping and conversion: The RTE is responsible for any necessary data mapping and
+conversion. As data is exchanged between components, it often needs to be transformed from
+one format to another. This may involve changing data types or encoding schemes.
+
+
+=== Page 96 ===
+Understanding the significance of the RTE 77
+• Safety and security: Due to its central role, RTE is critical in maintaining system integrity. It
+manages access rights, ensuring that only authorized components can communicate with each
+other. Furthermore, the RTE assists in identifying or mitigating specific faults such as timing
+errors and communication failures. It uses mechanisms such as error handling and monitoring
+to detect anomalies and either correct them or put the system into a safe state.
+• SWC–BSW interaction: The RTE bridges the gap between the application layer (SWCs) and
+the BSW layer. SWCs interact with the BSW modules (such as OS and communication services)
+through standardized APIs provided by the RTE.
+• Event handling: The RTE manages the execution of SWC functionalities. It can trigger specific
+parts of an SWC (runnables) based on pre-configured events, such as receiving data or a signal.
+This ensures tasks are executed efficiently.
+Overall, the RTE is a critical component in the AUTOSAR architecture, performing essential operations
+that are key to both application functionality and system and software design efficiency. This sets the
+foundation for understanding how the RTE layer is instantiated in the system. In essence, the RTE
+serves as the binding layer that ensures seamless communication and interaction between various
+SWCs within the AUTOSAR framework.
+Having grasped the fundamental operations of the RTE, the next question that arises is how this layer
+comes into existence.
+Generation of RTE
+The creation of the RTE within an AUTOSAR system is a structured procedure that converts the
+software architecture into a functional framework for the ECUs. Here’s a general overview of how it
+operates, including an example and details on some of the critical output files.
+The generation of the RTE utilizes various tools and input files to transform the AUTOSAR VFB
+specifications into operational code that functions on an ECU. This process ensures that all SWCs are
+capable of interacting with one another and with fundamental software modules, such as the Operating
+System (OS) and communication services, exclusively through interfaces defined by AUTOSAR.
+For example, the input for RTE generation would be as follows:
+• SWC descriptions: This includes information about the SWC’s ports (data interfaces), interfaces
+(communication mechanisms like client-server), runnables (functional units), and events
+(triggers for execution).
+• ECU configuration: This details the BSW modules available on the target ECU, such as the
+OS, communication stacks, and any of the BSW-provided services.
+• Toolchain: This refers to the software tools used for RTE generation. Popular options include
+tools from AUTOSAR or third-party vendors such as Vector DaVinci Configurator.
+
+
+=== Page 97 ===
+78 Working with Software Components and RTE
+RTE non-reusable nature
+Due to its configuration-specific nature, the RTE is not reusable across different ECUs or
+projects. If the SWC deployment or communication patterns change, the RTE needs to be
+regenerated to reflect those changes.
+Phases of RTE generation
+The generation of the RTE in AUTOSAR is a two-phase process that transforms the high-level
+configuration of your SWCs into the specific code that manages communication and execution on
+the target ECU. These phases work together to ensure a tailored RTE for your system:
+1. RTE contract phase: In this initial phase, the interactions between SWCs and the RTE are
+defined first. Limited information about the components’ capabilities and communication
+needs is available. The main output of this phase is the application header file, which establishes
+a contract between the SWCs and the RTE. This contract specifies how the components will
+interact with the RTE and outlines the necessary interfaces and data types.
+2. RTE generation phase: Following the contract phase, the RTE generation phase commences
+once all the relevant information about the SWCs, their deployment on ECUs, and their
+communication links is finalized. In this phase, the actual RTE code is generated. This code
+integrates all the specified interactions and ensures that the communication across SWCs, as
+well as between SWCs and BSW modules, adheres to the defined AUTOSAR standards.
+The RTE isn’t hand-coded, but rather automatically generated based on your project’s specific
+configuration. Here’s a look at the tools that handle this process.
+Tools for RTE generation
+A variety of specialized tools are used to support the RTE generation process. These tools are crucial
+for configuring, integrating, and generating the SWCs and RTE. They assist in establishing mappings,
+defining configurations, and ultimately producing the RTE code that will be implemented in the ECU.
+Here are the toolchain options:
+• Vector DaVinci Configurator
+• ETAS RTA-RTE
+• EB tresos
+• KPIT K-SAR
+All these tools a powerful RTE generators that take ARXML files as input and produce the RTE code.
+It ensures that the generated code complies with AUTOSAR standards.
+
+
+=== Page 98 ===
+Understanding the significance of the RTE 79
+Choosing the right tool
+The selection of the best tool depends on your specific needs and preferences. Here are some factors
+to consider:
+• Project requirements: Some tools might cater to specific ECU architectures or offer advanced
+features for complex communication scenarios
+• Vendor support: Consider the level of support and training offered by the tool vendor
+• Integration with existing workflow: If you’re already using other development tools, ensure
+compatibility and smooth integration with the chosen RTE generation tool
+• Cost and licensing: Both AUTOSAR and third-party tools may have different licensing models
+and pricing structures
+Having selected the right tools, let’s now review how the RTE output will be generated. Note that all
+vendors will produce similar files, as the generated file structure and content are largely defined by
+the AUTOSAR standard. Although there may be slight variations in implementation, these files will
+have more similarities than differences.
+Outputs of RTE generation
+The output of the RTE generation process includes several key files that are critical for the software
+to function correctly within the ECU:
+• Rte.c: This file contains the implementation code for the RTE, including the necessary
+function definitions, event handling, and data transformations.
+• Rte.h: This file sets out fixed elements that don’t need to be generated for every ECU, and
+are therefore not repeatedly generated by the RTE generator software. However, this file can
+be customized as per our application requirements if necessary. The Std_Types.h file is
+included in this file.
+• Rte_<swc_name>.h: This file is a header generated, specific to each SWC. It defines the
+interface between the SWC and the RTE, facilitating communication and service access. This
+file houses the function prototypes of RTE APIs, data structures, and function prototypes of
+runnables used in the associated SWC. Rte_Type.h: This file is populated with RTE-specific
+type declarations that are based on the implementation data type configured during the SWC
+setup process. It also houses AUTOSAR data types that are beneficial for RTE APIs. The Rte.h
+file is included within this file.
+• Rte_<swc_name>_Type.h: This file, often called the Application types header file, houses
+the constants related to the application, such as range values or enumeration values utilized
+within the SWC. The SWC name is always included within the file name as a spacer. The
+Rte_Type.h file is included in this file.
+
+
+=== Page 99 ===
+80 Working with Software Components and RTE
+Additional files may be generated depending on the specific requirements and configurations of the
+project, such as RTE configuration files or additional header files for specific SWCs or modules.
+Figure 4.12 shows the RTE generation steps with respect to SWC and RTE generator software:
+Figure 4.12 – Output RTE generation
+Here is an overview of how this process goes:
+1. Extract ECU-specific information:
+Process: ECU-specific information is extracted from the system configuration description.
+Output: This information is used to generate individual ECU configurations.
+
+
+=== Page 100 ===
+Summary 81
+2. Generate the ECU configuration:
+Process: The ECU configuration values are generated based on the extracted information.
+Output: The ECU configuration values are stored in ARXML files.
+3. Generate RTE:
+Process: The RTE is generated from the ECU configuration values.
+Output: This step produces RTE code files (.c and .h).
+4. Compile RTE:
+Process: The generated RTE code is compiled.
+Output: RTE object files (.obj) are compiled.
+5. Compile SWCs and BSW:
+Process: The SWCs and BSW are compiled.
+Output: SWC object files and compiled BSW object files (.obj) are compiled.
+6. Generate Executable:
+Process: The compiled RTE, SWCs, and BSW object files are linked together to generate the
+final executable.
+Output: The ECU executable file (.elf/.hex/.bin, etc.) is the output.
+We’ve now come to the conclusion of this chapter, where we attempted to demystify the intricate
+relationship between SWCs and RTE. It’s important to note that we couldn’t cover all the intricate
+details since this topic is quite extensive and goes beyond the scope of an introductory book. At this
+point, I hope you’ve gained an understanding of what SWCs are, how they integrate within an ECU,
+and their interplay within compositions, as well as the significance of ports and the methods by which
+these components connect.
+Summary
+This chapter dove into the world of AUTOSAR SWCs and their critical role in the AUTOSAR framework.
+We explored the structure, functionality, and key components of SWCs, gaining a solid foundation
+in the elements that drive automotive ECUs. SWCs were introduced as encapsulated, reusable units
+tailored to perform specific functions within an ECU. We also developed a thorough understanding
+of various SWC types, such as Application SWCs and complex device driver SWCs.
+Our exploration revealed how SWCs use ports to communicate and interact, enabling the smooth
+exchange of services and data. We further examined how specific tasks and operations are structured
+within components through runnable entities and their triggering conditions.
+
+
+=== Page 101 ===
+82 Working with Software Components and RTE
+Additionally, we understood the significant role of the RTE and its features, highlighting its essential
+connection with the VFB. With the introduction to fundamental SWC building blocks such as
+ports, interfaces, and internal behavior that this chapter has provided, developers are equipped to
+conceptualize complex systems.
+In the next chapter, we will explore the design and implementation details of events and interfaces.
+We’ll explore how ARXML models are structured and examine the internal characteristics of these
+interfaces, providing another layer of understanding of their role and functionality in the automotive
+software architecture.
+Questions
+1. What is a software component?
+2. How is a SWC modeled in AUTOSAR?
+3. What does internal behavior describe?
+4. Discuss the function and features of RTE.
+5. What is the difference between a sender-receiver interface and a client-server interface?
+6. What does a port mean in AUTOSAR?
+7. Describe the generation process for RTE and what inputs are needed.
+
+
+=== Page 102 ===
+5
+Designing and Implementing
+Events and Interfaces
+The interplay of events and interfaces constitutes the backbone of system communications and
+synchronization. In this chapter, we intend to dive deeper into how software components (SWCs)
+envelop diverse functions within the building blocks of automotive software, and employ events and
+interfaces to establish communication channels. Building on the foundation discussed in Chapter 4,
+we will explore the essential conduits of communication within SWCs: ports, interfaces, and events.
+We will unravel how they function and look at their various types, as well as their role in ensuring
+seamless data flow, providing a comprehensive insight into their roles and functionalities. Through
+this, you will gain a deeper understanding of the mechanisms that enable efficient and reliable
+communication in software systems.
+We will be covering the following main topics:
+• Introducing the communication model
+• Understanding events and interfaces in AUTOSAR
+Introducing the communication model
+In the previous chapter, we discussed the concept of the runtime environment (RTE) a bit and
+highlighted the significance of SWCs as the foundational elements of any application within the
+AUTOSAR framework. We touched upon the idea that these components communicate and exchange
+information through specific channels known as ports and interfaces, which dictate the nature and
+format of the data being transferred.
+In this section, we will try to understand the communication aspects within AUTOSAR. We will be
+discussing the communication model’s key components, such as communication ports, interfaces,
+and the mechanisms through which SWCs interact with each other. This section will provide you with
+an understanding of how information flows within the AUTOSAR framework.
+

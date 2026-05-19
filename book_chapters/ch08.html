@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第8章 使用 Crypto 与安全栈</title><link rel="stylesheet" href="style.css"></head><body><div class="container">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;background:#f5f5f0;color:#2c2c2c;line-height:1.8;font-size:15px}.container{max-width:780px;margin:0 auto;padding:40px 24px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.06);min-height:100vh}h1{font-size:22px;text-align:center;margin:30px 0 10px}h2{font-size:18px;margin:28px 0 12px;color:#333;border-bottom:2px solid #e0e0e0;padding-bottom:6px}h3{font-size:16px;margin:20px 0 8px;color:#444}p{margin:8px 0;text-align:justify}ul,ol{margin:8px 0 8px 24px}li{margin:3px 0}.page-marker{text-align:right;color:#bbb;font-size:12px;margin:24px 0 0;border-top:1px dashed #e8e8e8;padding-top:4px}.page-marker:first-child{border-top:none;margin-top:0}.figure{text-align:center;margin:16px 0;padding:12px;background:#fafaf7;border:1px solid #eee;border-radius:4px}.figure img{max-width:100%;height:auto;border:1px solid #e0e0e0;border-radius:4px}.figure p{margin-top:6px;font-weight:bold;color:#555;font-size:14px}.note{margin:12px 0;padding:12px 16px;background:#f0f7ff;border-left:4px solid #4a90d9;border-radius:0 4px 4px 0;font-size:14px}.note::before{content:"📝 注意 ";font-weight:bold;color:#4a90d9}.questions,.summary{margin:16px 0;padding:16px 20px;border-radius:6px}.summary{background:#f0fff0}.summary h3{margin-top:0;color:#2d7d2d}.questions{background:#f5f0ff}.questions h3{margin-top:0;color:#6b3fa0}.subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:24px}pre{background:#2d2d2d;color:#e0e0e0;padding:14px 18px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.5;margin:10px 0}code{font-family:Consolas,Monaco,Courier New,monospace}</style>
+<h1>第8章 使用 Crypto 与安全栈保护 AUTOSAR 系统</h1><p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+<div class="page-marker">第 182 页</div>
+<h2>汽车安全简介</h2>
+<p>想象一下驾驶一辆可以被远程入侵的汽车——不仅危及你的安全，还威胁到你的个人数据安全。这个噩梦般的场景凸显了在当今互联世界中汽车安全的至关重要性。近年来，汽车行业经历了显著的变革。现代车辆配备了先进功能，包括信息娱乐系统、远程信息处理和自动驾驶能力。虽然这些创新提高了便利性和安全性，但也引入了新的脆弱性。</p>
+<p>汽车安全为何备受关注，尤其是在 AUTOSAR 的背景下：</p>
+<ul>
+<li><strong>生命安全问题：</strong>车辆正日益成为轮子上的计算机，任何安全漏洞都可能产生危及生命的后果——例如黑客控制车辆制动系统导致碰撞</li>
+<li><strong>数据隐私：</strong>车辆收集从驾驶偏好到定位数据等大量信息，保护这些数据关乎用户信任和 GDPR 等法规遵从</li>
+<li><strong>财务影响：</strong>安全漏洞导致召回、法律赔偿和公司声誉损害的巨额损失</li>
+<li><strong>不断演变的威胁：</strong>黑客和网络犯罪分子持续开发新的攻击手段</li>
+<li><strong>法规遵从：</strong>全球各国政府正在引入严格的汽车网络安全法规</li>
+</ul>
+<div class="page-marker">第 183 页</div>
+<h2>汽车安全基础</h2>
+<div class="figure"><img src="images/p183_0.png" alt="图8.1"><p>图 8.1 – 安全的 CIA 目标</p></div>
+<p>汽车安全围绕 CIA 三要素构建：</p>
+<ul>
+<li><strong>机密性（Confidentiality）：</strong>只有授权方才能访问敏感数据和通信</li>
+<li><strong>完整性（Integrity）：</strong>数据在存储和传输过程中不被未授权篡改</li>
+<li><strong>可用性（Availability）：</strong>系统和数据在需要时可供授权用户使用</li>
+</ul>
+<div class="page-marker">第 184 页</div>
+<div class="figure"><img src="images/p184_0.png" alt="图8.2"><p>图 8.2 – 安全（Security）与功能安全（Safety）的重叠</p></div>
+<p>功能安全（ISO 26262）和网络安全（ISO 21434）在现代车辆中紧密交织。一次成功的网络攻击（如制动系统被劫持）可能导致功能安全失效。两者必须协同考虑——安全的车辆必须在功能安全和网络安全两个维度上都得到保护。</p>
+<div class="page-marker">第 185 页</div>
+<h2>AUTOSAR 安全栈架构</h2>
+<div class="figure"><img src="images/p185_0.png" alt="图8.3"><p>图 8.3 – AUTOSAR 安全栈架构</p></div>
+<p>AUTOSAR 加密栈通过软件和硬件两种方式实现。软件加密依赖 ECU 的 CPU 或微控制器执行算法，而硬件加密利用微控制器内的专用加密模块或协处理器，如硬件安全模块（HSM（Hardware Security Module，硬件安全模块），Hardware Security Module），专门设计用于加速加密操作，提供更快更高效的处理。</p>
+<div class="page-marker">第 187 页</div>
+<div class="figure"><img src="images/p187_0.png" alt="图8.4"><p>图 8.4 – 安全系统架构框图</p></div>
+<p>AUTOSAR 安全栈的关键模块：</p>
+<ul>
+<li><strong>CSM（Crypto Service Manager，加密服务管理器）：</strong>提供标准化的加密服务接口，抽象底层加密实现细节。为上层应用提供统一的加密、解密、MAC（Message Authentication Code，消息认证码）生成和哈希计算服务：</li>
+</ul>
+<pre><code>Std_ReturnType Csm_Encrypt(uint32 jobId, Crypto_OperationModeType mode,
+    const uint8* dataPtr, uint32 dataLength,
+    uint8* macPtr, uint32* macLengthPtr);
+
+Std_ReturnType Csm_MacGenerate(uint32 jobId, Crypto_OperationModeType mode,
+    const uint8* dataPtr, uint32 dataLength,
+    uint8* macPtr, uint32* macLengthPtr);
+
+Std_ReturnType Csm_Hash(uint32 jobId, Crypto_OperationModeType mode,
+    const uint8* dataPtr, uint32 dataLength,
+    uint8* resultPtr, uint32* resultLengthPtr);</code></pre>
+<div class="page-marker">第 189 页</div>
+<ul>
+<li><strong>CryIf（Crypto Interface，加密接口）：</strong>管理密钥和加密原语访问的统一接口层，在 CSM 和底层 Crypto Driver 之间提供抽象</li>
+<li><strong>Crypto Driver：</strong>底层加密驱动，直接与 HSM 或软件加密库交互，执行实际的加密操作</li>
+<li><strong>SecOC（Secure Onboard Communication，安全车载通信）：</strong>为 PDU 添加认证信息以验证消息的完整性和真实性。工作机制：发送方获取新鲜度值（Freshness Value）→构造认证数据→使用密钥生成 MAC→将 MAC 和新鲜度值附加到 PDU。接收方验证新鲜度值和 MAC 一致性，拒绝被篡改或重放的消息</li>
+</ul>
+<div class="page-marker">第 192 页</div>
+<h3>加密数据交换示例</h3>
+<div class="figure"><img src="images/p192_0.png" alt="图8.5"><p>图 8.5 – 两个 ECU 之间的加密数据共享</p></div>
+<p>SWC A（发送方）请求 CSM 使用指定算法和密钥加密数据→CSM 通过 CryIf 调用 Crypto Driver 执行加密→密文通过通信栈传输到另一个 ECU→SWC B（接收方）请求 CSM 解密密文→获取原始明文数据。</p>
+<div class="page-marker">第 194 页</div>
+<h3>SecOC 认证流程</h3>
+<div class="figure"><img src="images/p194_0.png" alt="图8.6"><p>图 8.6 – SecOC 认证流程</p></div>
+<p>SecOC 在发送端为每个安全 PDU 生成新鲜度值和 MAC，接收端通过验证 MAC 来确认消息未被篡改且不是重放攻击。</p>
+<div class="page-marker">第 196 页</div>
+<h3>安全诊断</h3>
+<div class="figure"><img src="images/p196_0.png" alt="图8.7"><p>图 8.7 – 安全诊断流程</p></div>
+<p>诊断访问需要安全认证——通过 seed/key 算法验证诊断工具的身份，防止未经授权的诊断操作修改 ECU 配置或刷写固件。</p>
+<div class="page-marker">第 198 页</div>
+<h3>安全启动（Secure Boot（安全启动））</h3>
+<div class="figure"><img src="images/p198_0.png" alt="图8.8"><p>图 8.8 – 安全启动流程</p></div>
+<p>ECU 上电启动时验证固件的数字签名：加载固件→计算哈希值→使用存储的公钥验证签名→签名有效则正常启动，无效则拒绝启动或进入安全恢复模式。这确保只有经过认证的固件能够在 ECU 上运行。</p>
+<div class="page-marker">第 200 页</div>
+<div class="figure"><img src="images/p200_0.png" alt="图8.9"><p>图 8.9 – 安全刷写流程</p></div>
+<p><strong>安全刷写（Secure Flashing（安全刷写））：</strong>在 ECU 固件更新期间，新固件必须先通过数字签名验证，确保其来源可信且未被篡改，然后才能写入 ECU 存储器。</p>
+<div class="summary"><h3>本章小结</h3><p>本章探讨了 AUTOSAR 中的汽车网络安全，涵盖 CIA 安全三要素（机密性、完整性和可用性）、安全与功能安全的交集，以及 AUTOSAR 安全栈的核心组件——CSM、CryIf、Crypto Driver 和 SecOC。通过加密数据交换、安全诊断、安全启动和安全刷写等实际用例，我们了解了加密栈如何保护现代汽车系统免受网络威胁。</p></div>
+<div class="questions"><h3>思考题</h3><ol><li>说明 SecOC 解决的问题及其实现机制。</li><li>CSM 和 CryIf 之间的区别是什么？</li><li>在 AUTOSAR 中使用 HSM 的优势有哪些？</li><li>描述安全启动的完整流程。</li></ol></div>
+<div class="page-marker">第 202 页</div>
+<h2>第9章 内存与模式管理</h2>
+<p>本章探索 AUTOSAR 内存栈（Memory Stack）和模式管理——NVM（Non-Volatile Memory，非易失性存储器）如何确保关键数据在电源周期中得以保存，以及模式管理（Mode Management）如何协调 ECU 工作状态的转换。</p>
+</div></body></html>

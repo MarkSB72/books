@@ -1,0 +1,399 @@
+=== Page 63 ===
+44 AUTOSAR Methodology and Data Exchange Formats
+What is ECU Configuration?
+ECU Configuration in AUTOSAR involves setting up both the software and hardware resources
+of an ECU to meet specific vehicle functions. This process includes selecting which AUTOSAR
+SWCs will be deployed on the ECU, establishing the foundational BSW layers, which handle
+communication, memory, and diagnostics, defining standardized protocols and interfaces for
+communication between the ECU, other ECUs, and external systems, and managing hardware
+resources, such as CPU, memory, and peripherals, to ensure the software components operate
+efficiently. This structured approach ensures that each ECU is tailored to perform its designated
+functions effectively within the vehicle’s overall system.
+While AUTOSAR offers various methodologies for different tasks, this discussion will focus on the
+most critical one, which involves the generation of a configured executable for each ECU based on
+software and hardware descriptions. This workflow is divided into three main parts, as shown in the
+following figure:
+Figure 3.1 – AUTOSAR workflow
+Let’s look at these in detail:
+• The first part of this workflow deals with template-based descriptions of hardware, software,
+and system constraints, resulting in a comprehensive system description that includes ECU
+software mapping.
+• The second part details the configuration of the basic software and runtime environment
+(RTE) for a single ECU.
+• The third phase involves generating the code and creating an executable for the ECU software.
+This executable is the outcome of compiling and linking various software components and
+basic software objects.
+
+
+=== Page 64 ===
+Understanding the AUTOSAR methodology 45
+Note
+While the methodology outlines the essential steps required to develop AUTOSAR systems,
+it does not describe a comprehensive process. For example, the methodology does not specify
+the frequency at which activities or activity sequences can be repeated, nor does it define roles
+or responsibilities involved in these activities.
+As we continue our exploration of AUTOSAR, we now turn our attention to system configuration.
+This focuses on the configuration of software components and their interactions within the system,
+as well as their mapping to the corresponding ECUs.
+Understanding the AUTOSAR methodology
+The AUTOSAR methodology is a structured approach for retrieving the executables of ECUs in
+automotive systems. It consists of three main steps:
+1. System Configuration: This step involves setting up the entire system. This includes defining the
+overall architecture, interconnections between ECUs, and specifying the communication protocols.
+2. ECU Configuration: This step focuses on individual ECUs. In this step, specific information
+related to each ECU is extracted and prepared for subsequent actions. This information is essential
+for customizing the configuration of each ECU according to its requirements and functionalities.
+3. Code Generation: In this step, the actual executable code for each ECU is generated. This code
+is derived from the configuration settings and specifications obtained in the previous steps. It
+ensures that each ECU operates according to its designated functionality within the system.
+Let’s look at these steps in greater detail.
+System Configuration
+An original equipment manufacturer (OEM) plays a pivotal role in developing an AUTOSAR
+system. The OEM is responsible for defining the system architecture, specifying the requirements,
+and overseeing the integration of software components from different suppliers.
+Note:
+In AUTOSAR, a System Extract represents a specific portion of a vehicle system, emphasizing
+certain aspects or configurations of particular ECUs. It originates from the comprehensive
+System Description and includes selected information about software components, interfaces,
+communication channels, and the mapping of components to ECUs.
+
+
+=== Page 65 ===
+46 AUTOSAR Methodology and Data Exchange Formats
+To create the System Extract in an AUTOSAR system, an OEM typically performs the following steps:
+1. Define system requirements: The OEM starts by defining the high-level requirements and
+functionalities for the automotive system. This may include performance, safety, security, and
+communication objectives.
+For example, in developing an advanced driver assistance system (ADAS), the OEM sets the
+requirements for functionalities, such as adaptive cruise control, lane departure warning, and
+emergency braking.
+2. Identify software components and interfaces: The OEM identifies the necessary software
+components and their interfaces based on the requirements. This may involve reusing existing
+components or developing new ones.
+For the ADAS, the OEM identifies components, such as sensor fusion, vehicle control, user
+interface, and corresponding interfaces.
+3. Design system architecture: The OEM designs the overall system architecture, specifying the
+interaction between software components and mapping them to ECUs.
+The OEM determines how the sensor fusion component communicates with the vehicle control
+component and maps these components to specific ECUs within the ADAS.
+4. Develop or procure software components: The OEM develops the required software components
+in-house or procures them from suppliers.
+For the ADAS, the OEM may develop the sensor fusion component internally while procuring
+the vehicle control component from a specialized supplier.
+5. Create system extract: The OEM combines the software components, hardware topology, and
+configuration parameters into the System Extract.
+The System Extract for the ADAS includes the software components, ECU mapping, and
+configuration parameters for communication, sensors, and actuators.
+The following figure illustrates an example of a System Extract involving multiple ECUs, showcasing
+the mapping of SWCs between them and the communication channels utilized by each ECU:
+
+
+=== Page 66 ===
+Understanding the AUTOSAR methodology 47
+Figure 3.2 – Example of a system description
+During the system configuration stage, the OEM assigns the software features to the ECUs within the
+system topology. While decisions about specific component implementations could be made at this
+point, these choices are typically not made at this high-level phase.
+Additionally, a communication matrix is created by the OEM during this step, detailing the
+communication medium between ECUs, data, and associated properties, such as timing, checksum, and
+more. The outcome of this step is stored as the System Configuration Description. You can observe
+from Figure 3.2 what would be the outcome of this step. Generally, a system consists of multiple ECUs
+and various communication channels. The communication between these ECUs is modeled, and if
+frames need to be gatewayed from one communication bus to another, an ECU can be the gateway.
+Numerous software tools are available to facilitate this process. With this understanding, let’s proceed
+to the next step: configuring a specific ECU.
+
+
+=== Page 67 ===
+48 AUTOSAR Methodology and Data Exchange Formats
+ECU Configuration
+In most cases, the ECUs are manufactured by different suppliers for a specific vehicle. So, the individual
+ECU-specific information will be extracted from the System Configuration Description and given to
+the suppliers. This extract is called the ECU extract, as shown in the following figure:
+Figure 3.3 – Single ECU extract description
+We use an AUTOSAR authoring tool to create a high-level design, which includes the Software
+Component Description, ECU Resource Description, and System Description files based on the
+templates discussed earlier (including the communication matrix, topology, and so on). Once we
+have these three components, the software development process using the AUTOSAR methodology
+can be largely broken into two pieces: application/SWC software development and the ECU
+Configuration process.
+Note
+AUTOSAR authoring tools are software applications designed to help create, modify, and visualize
+AUTOSAR system descriptions, software components, and their configurations. These tools
+play a vital role in the efficient development and management of AUTOSAR-based applications.
+In the application SWC development process, the SWC Description file, which describes the software
+component elements, such as ports, interfaces, and triggering events that need to be developed, is
+taken as input; note that SWC elements shall be discussed in detail in later chapters.
+We equip the ECU with all vital information necessary for implementation, including task scheduling,
+selection of appropriate BSW modules, configuration of the BSW, allocation of runnable entities
+to tasks, communication parameters, and various other configuration values that ensure optimal
+system performance. The output is an ECU Configuration Description file, which would contain
+the definition of micro-controller ports, pin assignment, clock config, and communication channel
+types, such as controlled area network (CAN), Ethernet, and FlexRay, in addition to specific service
+modules, such as communication module (COM) or specific peripherals such as serial peripheral
+
+
+=== Page 68 ===
+Understanding the AUTOSAR methodology 49
+interface (SPI), universal asynchronous receiver-transmitter (UART), inter-integrated circuit
+(I2C), or other peripherals.
+The development of SWCs will be taking place in parallel with this step, which we will discuss in
+further detail in Chapter 4. The ECU Configuration Description file is used to generate the RTE and
+certain portions of the BSW. These components are then compiled along with the SWCs, ultimately
+creating an executable for a single ECU, as illustrated in the following figure:
+Figure 3.4 – Executable generation process
+Moving forward, we will now introduce you to the code generation process in AUTOSAR. This
+essential step in the development cycle ensures efficient and accurate translation of configurations
+and templates into functional software.
+Code Generation
+The configuration tool generates code templates for the application software during this process.
+The interaction between these SWCs and the BSW layer determines the generation of the RTE code.
+Note
+In the context of AUTOSAR, configuration tools play a vital role in the software development
+process. These tools facilitate the generation of configuration files and code templates, allowing
+developers to customize software components and BSW modules. It is essential to be aware that
+various vendors offer their own configuration tools, each with distinct features and capabilities.
+Therefore, it is important for developers to choose the appropriate tool that best meets their
+specific requirements and aligns with their AUTOSAR-based development process.
+
+
+=== Page 69 ===
+50 AUTOSAR Methodology and Data Exchange Formats
+For each BSW module, configuration files are created that encompass all user-defined configurations
+made within the AUTOSAR configuration tool. It is also important to note that these configurations
+include subsets of types. These are known as configuration classes, which refer to the stages in the
+development process at which specific parameters can be set or modified. These classes determine
+when and how configuration parameters are defined and when they become fixed during the software
+development process. Let’s look at the differences between the three main configuration classes
+in AUTOSAR:
+• Pre-compile time: Parameters of this configuration class are set before the compilation process
+begins. They are usually hardcoded or defined as macros or constants in the source code. These
+parameters cannot be changed after the compilation.
+An example use case for pre-compile time parameters is enabling a macro for error tracing
+during development.
+• Link time: Parameters of this configuration class are used after the compilation but during the
+linking process. These parameters are usually specified as object code files and become fixed
+after the linking process, in contrast to pre-compile time configurations, which are established
+during the compiler preprocessor (e.g., the #define constants).
+An example use case for link time parameters is the usage of configuration structures that
+contain configurations of CAN communication, such as the channel identifier.
+• Post-build time: Parameters of this configuration class can be changed after the entire build
+process (compilation and linking) is completed. There are two alternatives for post-build
+time parameters:
+ Loadable: These parameters are stored in a non-executable binary file that can be downloaded
+to an ECU. The parameter values can be changed during the boot process of the ECU.
+ Selectable: These parameters are stored in multiple alternative configuration sets linked to
+the executable. The configuration settings can be selected during the boot process of the
+ECU and can be downloaded to an ECU during the boot.
+We have explored the three main configuration classes in AUTOSAR: pre-compile time, link time,
+and post-build time. Each class plays a role in determining when and how configuration parameters
+are defined and fixed during the software development process. By understanding these classes
+and their implications, developers can effectively manage and optimize the configuration of their
+AUTOSAR-based systems.
+In the next section, we will be introduced to the templates of AUTOSAR. We will also understand
+how the software and system are modeled and shared between different stakeholders.
+
+
+=== Page 70 ===
+Using templates for data exchange 51
+Using templates for data exchange
+AUTOSAR templates serve as formalized representations of information structures utilized in the
+AUTOSAR methodology and are used to define software components, modules, or configuration
+parameters. Templates ensure consistency, modularity, and efficiency across different ECUs and vehicle
+platforms by providing predefined frameworks that developers can instantiate and customize based
+on specific application needs; they ensure uniformity, standardization, and smooth data exchange
+throughout different phases of the development process. These templates are specified using the unified
+modeling language (UML) and rely on the AUTOSAR UML Profile. The profile introduces a series
+of stereotypes that convey AUTOSAR concepts, such as the hardware elements of ECUs, software
+components, ports, data types, or interface descriptions. These stereotypes are systematically arranged
+into packages based on their application within diverse templates.
+All templates rely on the AUTOSAR UML Profile. The template packages within the UML Profile are
+interrelated, as illustrated in the following figure. A connection between two packages indicates that
+one package reuses concepts defined in the other:
+Figure 3.5 – AUTOSAR UML Profile
+
+
+=== Page 71 ===
+52 AUTOSAR Methodology and Data Exchange Formats
+Let’s look at the components shown in the preceding figure in greater detail:
+• The Software Component Template describes the software aspect of the system. The template
+includes a general description of component types with port prototypes and port interfaces.
+In addition, it distinguishes between composite components, which leads to a hierarchical
+structure of the software components.
+• The ECU Resource Template outlines the hardware resources of an ECU, such as those
+found in an Engine Control Module (ECM), including physical communication media and
+peripherals, such as ADCs and General Purpose Input/Output (GPIOs). The information
+provided is crucial for configuring the ECU abstraction layer and the microcontroller to tailor
+them explicitly for that ECU.
+• The Basic Software Module Description Template addresses the elements of basic software. It
+encompasses all data related to basic software modules and clusters. There’s a connection between
+this template package and the Software Component Template, as both detail implementation
+features and resource usage.
+• The System Template serves as a link between the Software Component Template and the ECU
+Resource Template. It establishes a connection between the system’s software perspective and
+the physical layout of the ECUs. Furthermore, this template allows the description of constraints
+regarding this connection.
+Every template in AUTOSAR adheres to the Generic Structure, which establishes fundamental
+properties. For instance, one such property is that each element within a template possesses a distinct
+identifier or hierarchical organization; the Generic Structure organizes elements in a hierarchical
+manner, and elements within it are organized into packages based on their application in various
+templates. These packages help to group related elements together and maintain a logical organization
+within the AUTOSAR system. For example, in the following two snippets, we show how a CAN frame
+is modeled in AUTOSAR XML (ARXML); every frame would be described within the CanFrame
+parent node. Here is an example of defining a CAN frame in ARXML:
+<AR-PACKAGE>
+<SHORT-NAME>CanFrame</SHORT-NAME>
+<ELEMENTS>
+<CAN-FRAME>
+<SHORT-NAME>CanFrameExample</SHORT-NAME>
+<FRAME-LENGTH>8</FRAME-LENGTH>
+<PDU-TO-FRAME-MAPPINGS>
+<PDU-TO-FRAME-MAPPING>
+<SHORT-NAME>Cluster_0_Status_0</SHORT-NAME>
+<PACKING-BYTE-ORDER>MOST-SIGNIFICANT-BYTE-LAST</
+PACKING-BYTE-ORDER>
+<PDU-REF DEST="I-SIGNAL-I-PDU">/PDU/
+CanFrameExample</PDU-REF>
+
+
+=== Page 72 ===
+Using templates for data exchange 53
+<START-POSITION>0</START-POSITION>
+</PDU-TO-FRAME-MAPPING>
+</PDU-TO-FRAME-MAPPINGS>
+</CAN-FRAME>
+</ELEMENTS>
+</AR-PACKAGE>
+The ARXML snippet defines a CAN frame named CanFrameExample, which has a length of
+8 bytes. It includes a mapping of the CanFrameExample protocol data unit (PDU) to the CAN
+frame, starting at position 0, with the most significant byte placed last. The mapping is identified
+as Cluster_0_Status_0.
+CAN frame triggering is one of the ways to describe how messages are sent and received between
+ECUs using the CAN bus:
+<CAN-FRAME-TRIGGERING>
+<SHORT-NAME>FT_CanFrameExample</SHORT-NAME>
+<FRAME-PORT-REFS>
+<FRAME-PORT-REF DEST="FRAME-PORT">/ECU/MyECU/CAN/FP_
+CanFrameExample_Rx</FRAME-PORT-REF>
+</FRAME-PORT-REFS>
+<FRAME-REF DEST="CAN-FRAME">/CanFrame/CanFrameExample_OCAN</FRAME-
+REF>
+<PDU-TRIGGERINGS>
+<PDU-TRIGGERING-REF-CONDITIONAL>
+<PDU-TRIGGERING-REF DEST="PDU-TRIGGERING">/Cluster/CAN/
+CHNL/FT_CanFrameExample</PDU-TRIGGERING-REF>
+</PDU-TRIGGERING-REF-CONDITIONAL>
+</PDU-TRIGGERINGS>
+<CAN-ADDRESSING-MODE>STANDARD</CAN-ADDRESSING-MODE>
+<CAN-FRAME-RX-BEHAVIOR>ANY</CAN-FRAME-RX-BEHAVIOR>
+<CAN-FRAME-TX-BEHAVIOR>CAN-200</CAN-FRAME-TX-BEHAVIOR>
+<IDENTIFIER>1890</IDENTIFIER>
+</CAN-FRAME-TRIGGERING>
+This ARXML snippet outlines the triggering configuration for the PT_CanFrameExample
+CAN frame, detailing how it is linked to both the receive (CanFrameExample_Rx) and
+transmit (CanFrameExample_oCAN) ports of an ECU, and referencing its associated PDU
+(PT_CanFrameExample). It sets the addressing mode to STANDARD, defines specific receive and
+transmit behaviors, and assigns the frame a unique identifier (1809), which dictates how this CAN
+frame interacts within the CAN network during message communication.
+In the next section, we shall explore the different types of conformance classes in AUTOSAR and how
+this ensures compatibility and interoperability within the AUTOSAR ecosystem.
+
+
+=== Page 73 ===
+54 AUTOSAR Methodology and Data Exchange Formats
+Conformance classes for AUTOSAR
+The conformance classes define a minimum set of BSW modules that an ECU must support to be
+considered compliant with a specific conformance class. By adhering to a conformance class, ECU
+manufacturers can ensure their products are compatible with other AUTOSAR-compliant systems
+and components. Let’s list out the types of conformance classes:
+• Conformance Class 1 (CC1): This class represents the most basic level of AUTOSAR support,
+primarily focusing on essential features, such as communication and basic diagnostics. ECUs
+conforming to CC1 typically have limited resources and are used in simple applications.
+• Conformance Class 2 (CC2): ECUs conforming to CC2 provide more advanced features
+than CC1, such as support for complex device drivers, memory management, and advanced
+diagnostics. CC2 is suitable for ECUs with more resources and complex use cases.
+• Conformance Class 3 (CC3): This class is designed for high-performance ECUs with advanced
+capabilities, such as support for multicore processors, advanced scheduling, and complex
+communication protocols. CC3 is typically used in high-end, safety-critical applications.
+• Conformance Class 4 (CC4): CC4 represents the most advanced level of AUTOSAR support,
+incorporating features such as adaptive platform support, advanced cybersecurity, and support
+for new communication protocols. This class is intended for highly sophisticated ECUs that
+require cutting-edge technology and features.
+In summary, we have explored the various conformance classes of AUTOSAR, which define the minimum
+set of BSW modules required for an ECU to be considered compliant. From the basic features in CC1
+to the highly advanced capabilities of CC4, these classifications ensure compatibility among different
+AUTOSAR-compliant systems and components. With this understanding of the conformance classes,
+you are now better equipped to select the appropriate class for your specific ECU development needs
+and ensure seamless integration with other components in the automotive ecosystem.
+Summary
+In this chapter, we explored the AUTOSAR methodology, outlining a series of activities necessary for
+developing an AUTOSAR system, focusing on the independence of software component implementation
+from ECU Configuration. We also discussed the data exchange formats, specifically AUTOSAR
+templates, which are formalized representations of information structures used throughout development.
+Additionally, we delved into the process of system design and modeling, code generation and
+configuration, and the various conformance classes, which define a minimum set of BSW modules
+that an ECU must support to be considered compliant with a specific conformance class.
+
+
+=== Page 74 ===
+Questions 55
+By understanding these core concepts, you can utilize the AUTOSAR methodology for system design,
+ensure smooth data exchange using AUTOSAR templates, and adhere to the appropriate conformance
+classes for compatibility with other AUTOSAR-compliant systems and components.
+In the following chapter, we will begin our exploration of the software components and RTE as an
+initial step toward understanding more of the AUTOSAR building blocks.
+Questions
+1. Describe the steps involved in designing an automotive system with AUTOSAR methodology.
+2. What are conformance classes for AUTOSAR?
+3. Discuss the different configuration classes.
+
+
+=== Page 75 ===
+(blank)
+
+
+=== Page 76 ===
+Part 2:
+Investigating the Building
+Blocks of AUTOSAR
+This part delves into the core components of AUTOSAR, focusing on software components (SWCs)
+and the runtime environment (RTE). It explores the intricacies of events, interfaces, and the
+communication stack, including critical modules such as COM and PDUR. You will learn about the
+AUTOSAR operating system and its scheduling and task management features. By understanding the
+building blocks through several of the most important components, this section equips developers
+with the knowledge needed to design and implement robust, modular, and efficient automotive
+software systems.
+This part has the following chapters:
+• Chapter 4, Working with Software Components and RTE
+• Chapter 5, Designing and Implementing Events and Interfaces
+• Chapter 6, Getting Started with the AUTOSAR Operating System
+• Chapter 7, Exploring the Communication Stack
+
+
+=== Page 77 ===
+(blank)
+
+
+=== Page 78 ===
+4
+Working with Software
+Components and RTE
+This chapter aims to elucidate how software components (SWCs) serve as encapsulating units for
+various functions within the system and communicate with other SWCs or BSW modules with well-
+defined interfaces. We will try to explore the diversity of SWCs, shedding light on the different types
+of SWCs. By understanding the spectrum of these components, we aim to provide readers with a
+holistic understanding of their function and importance in the AUTOSAR context.
+One of the key highlights of this chapter is the exploration of the AUTOSAR runtime environment
+(RTE). This critical aspect of the AUTOSAR framework serves as the communication hub for SWCs,
+ensuring data integrity and consistency during exchanges between the SWCs. We will guide you
+through its mechanics, giving you an understanding of how it facilitates effective communication
+within the system.
+This chapter focuses on understanding SWCs and how they are being designed. It will cover the
+following topics:
+• Understanding SWCs
+• Exploring AUTOSAR datatypes
+• Modeling an SWC
+• Communication between the SWCs
+• Understanding the significance of the RTE
+First, let’s explore what a software component really means.
+

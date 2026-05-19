@@ -1,0 +1,420 @@
+=== Page 203 ===
+184 Dealing with Memory and Mode Management
+Memory stack in AUTOSAR
+Before delving into NVM, it’s important to understand the concept of a memory stack and how NVM
+fits into this context within the AUTOSAR framework. Imagine the memory stack as a library’s storage
+system, where each book represents a piece of data that needs to be stored, cataloged, and retrieved
+efficiently. In this analogy, the memory stack in AUTOSAR is the librarian that manages this system,
+ensuring that essential information is preserved across power cycles and system resets.
+Just as a librarian ensures that important books are safely stored and readily accessible, the memory
+stack in AUTOSAR manages data storage and retrieval. It ensures that critical information remains
+intact even when the system is turned off or restarted. This section will provide an overview of the
+memory stack, introduce the significance of NVM, and explain its integration within the memory stack
+to enhance system reliability and data integrity. We will explore the structure and functionality of the
+memory stack, detailing its layers and modules, and then discuss the different types of NVM blocks
+and their specific use cases. By the end of this section, you will have a comprehensive understanding
+of the memory stack’s architecture, its components, and how it ensures data availability and integrity
+in automotive systems.
+Significance of non-volatile memory in AUTOSAR
+The memory stack safeguards vital data and configurations throughout power cycles and system resets.
+In an electronic control unit (ECU), it is usually needed to preserve critical information, such as
+vehicle settings, calibration parameters, diagnostic trouble codes (DTCs), and other indispensable
+data necessary for optimal operation. Similarly, the need to retrieve stored information persists after
+power cycles. To ensure seamless storage and maintenance of such data, the BSW incorporates an
+NVM stack, which can utilize electrically erasable programmable read-only memory (EEPROM)
+or flash memory for storage. Certain configurable settings control how and when data is written to
+and read from memory. These settings determine whether data is written immediately after it changes
+or deferred until the system shuts down and whether data is automatically retrieved at startup or only
+when specifically requested. The NVM stack manages these configurations to ensure data integrity
+and availability, making sure that critical information is securely stored and accessible when needed.
+Understanding the memory stack
+The memory stack in AUTOSAR consists of several layers and modules, each serving a specific
+purpose in managing non-volatile data storage and retrieval. Figure 9.1 illustrates the architecture
+of the memory stack in an AUTOSAR ECU, showing the interaction between different layers and
+components involved in managing NVM:
+
+
+=== Page 204 ===
+Memory stack in AUTOSAR 185
+Figure 9.1 – Memory stack architecture
+In the following subsections, we will discuss the functionality of each module within a layer in brief.
+Service layer
+Within the service layer, the non-volatile random access memory (NVRAM) Manager module
+serves as the core component of the memory stack in AUTOSAR. It provides standardized interfaces
+and services for managing NVM operations within the AUTOSAR framework.
+Key functionalities of this layer include data block management, read and write operations, and
+error handling.
+The NVM module acts as an interface between upper-layer SWCs and the underlying hardware,
+abstracting the complexities of NVM management.
+Abstraction layer
+In embedded devices, data storage can occur in emulated flash or an external EEPROM. The Flash
+EEPROM Emulation (FEE) and EEPROM Abstraction (EA) modules in AUTOSAR serve to abstract
+the lower storage devices, offering a standardized interface for managing data storage in embedded
+devices. These modules not only manage read/write/erase operations but also ensure reliability and
+efficient utilization of storage resources. Both provide interfaces for read, write, erase, and block
+management tasks and wear leveling.
+
+
+=== Page 205 ===
+186 Dealing with Memory and Mode Management
+The Memory Abstraction Interface (MemIf) abstracts the underlying FEE and EA modules, acting as
+a routing layer to their functions as it shall provide an abstraction from the number of underlying FEE
+or EA modules and provide upper layers with a virtual segmentation on a uniform linear address space.
+MCAL
+EEPROM and flash memory are integral components of the Microcontroller Abstraction Layer
+(MCAL). The EEPROM driver provides services for reading, writing, and erasing data blocks. Internal
+drivers directly access microcontroller hardware within the MCAL, while external drivers use handlers
+(typically serial peripheral interface (SPI)). Both types have identical functional requirements and APIs.
+Figure 9.2 illustrates the interaction between the memory stack modules on the flow of write
+operations from the NVM module through the NVM and FEE modules, and ultimately to the FLS
+module, which handles the actual writing process to NVM in case the underlying physical memory
+is emulated flash memory.
+Figure 9.2 – Memory stack architecture
+Next, we will explore the storage object types of NVM, examining their roles and how they contribute
+to the realization of the functionality of the NVM operations.
+Storage objects
+The NvmM module defines fundamental storage units known as blocks or NVRAM blocks. These
+blocks act like individual compartments in a storage facility where your NVM data is securely stored
+and organized. Just as each compartment in a storage facility keeps your items safe and easily retrievable,
+these blocks ensure that your data remains intact and accessible even when the power is turned off.
+Figure 9.3 defines the basic storage objects.
+
+
+=== Page 206 ===
+Memory stack in AUTOSAR 187
+Figure 9.3 – Memory stack architecture
+The NvmM module’s component model defines four types of basic storage objects, which constitute
+the NVRAM block management types: the NV block, RAM block, ROM block, and Administrative
+block. Each of these blocks serves a specific function and collectively realizes the basic storage objects.
+We will discuss these in brief:
+• RAM block: This provides temporary storage for active data, to be accessed/used directly by
+a user example Application.
+• NV block: This handles non-volatile data storage, in the physical device flash or EEPROM.
+• ROM block: This provides default data for the NV block as provided by the application, in case
+an error occurs reading a block.
+• Administrative block: This manages metadata and control information, such as block ID, block
+size, and so on. It is not accessible to any other module outside the NvmM.
+
+
+=== Page 207 ===
+188 Dealing with Memory and Mode Management
+In the preceding section, we discussed storage objects. These block types can be combined in different
+configurations to create various types of NVRAM blocks. In the following section, we will cover the
+various block management types in NVRAM. A typical NVRAM block comprises one or more NV
+blocks that are allocated in physical storage, such as EEPROM or flash memory, an optional RAM
+block associated with the application and synchronized with the NV block, and an optional ROM
+block to store default data. Understanding these blocks is helpful for efficient memory management
+and ensuring the integrity and longevity of stored data in automotive applications.
+Block types
+By the end of this section, you will understand the characteristics and use cases of Native NVRAM
+blocks, Redundant NVRAM blocks, and Dataset NVRAM blocks, along with their importance in
+maintaining data integrity and system reliability.
+Native NVRAM block type
+This is the simplest form of an NVRAM block, consisting of a single instance of an NV block, a RAM
+block, a ROM block, and an Administrative block. This block stores non-critical information that does
+not require redundancy, data integrity is not as critical, and data can be easily reconstructed if lost.
+Use case: Consider an automotive ECU for a vehicle infotainment system storing configuration
+parameters that control user settings, such as audio volume, display brightness, and preferred radio
+stations. These settings are easy to recreate or reset to default if lost, making native blocks suitable for
+this purpose due to their simplicity and minimal overhead.
+Redundant NVRAM block type
+Redundant blocks provide an additional layer of data protection by maintaining multiple copies of
+the same data. Thus, two NV blocks are used to realize this type. This redundancy ensures that even
+if one copy becomes corrupted or lost, the system can still retrieve the data from another copy.
+Use case: In safety-critical systems, such as an electronic brake system (EBS), where data integrity
+is paramount, redundant block management is required. Two copies of the NV block are maintained
+to ensure redundancy. For instance, if one copy of the brake calibration data becomes corrupted due
+to a fault, the EBS ECU can switch to the redundant copy, thereby maintaining continuous operation
+without compromising safety.
+Dataset NVRAM block type
+Dataset blocks are more complex and involve managing multiple versions of the data. These blocks
+allow the storage of different datasets within the same NVRAM block, each representing a different
+version or state of the data. This is particularly useful for applications that need to keep track of historical
+data or configurations, providing the ability to revert to previous states or compare different datasets.
+
+
+=== Page 208 ===
+Memory stack in AUTOSAR 189
+Use case: In an automotive climate control system, a dataset block management approach can be
+employed to store personalized air conditioning temperature settings for different users of the car. Each
+user can have their preferred temperature settings saved as a separate dataset. When a user enters the
+car and selects their profile, the climate control system retrieves and applies their preset temperature
+from the corresponding dataset block.
+Managing block types
+Managing block types effectively is crucial for extending the EEPROM lifespan and ensuring
+data safety. Since each memory location has physically limited write cycles, it’s important to
+choose block types wisely based on write frequency and data importance. Strategic selection
+of block types helps maintain data integrity and maximizes memory longevity.
+After discussing the various types of NVRAM blocks, it is important to understand how these blocks
+are accessed.
+Block properties
+We will define how these blocks can be read and written, focusing on two of the most common parameters
+that can be configured: NvMSelectBlockForReadAll and NvMSelectBlockForWriteAll:
+• NvMSelectBlockForReadAll: The read_all flag, when enabled, indicates whether the
+block can be included in a read all operation, where all NVM blocks are read sequentially.
+This is useful for initializing the system state by reading all necessary configuration data at once.
+Behavior: If the read_all flag is enabled for a block, the NVM module will read all data
+stored within that block:
+• NvMSelectBlockForWriteAll: The write_all flag, when enabled, indicates whether
+the block can be included in a write all operation, where all NVM blocks are written
+sequentially. This is beneficial for saving the current state of the system by writing all relevant
+data to NVM at once usually during shutdown.
+• NvMNvBlockLength: This is a configuration parameter that defines the size of an NVM
+block in bytes. This parameter specifies how much data the block can store, determining the
+memory allocation for that block within the NVM. The size of the block is crucial for ensuring
+that it can hold all necessary information and align with the memory layout and management
+strategies of the system.
+NvM Block Descriptor configuration parameters
+For more detailed information about the configuration parameters, you can refer to the NvM
+AUTOSAR specifications, such as release R20-11, specifically section 10.2.3 NvMBlockDescriptor.
+This section provides comprehensive insights into the various parameters and their configurations.
+
+
+=== Page 209 ===
+190 Dealing with Memory and Mode Management
+In the following table, we will discuss the API provided by NvmM for accessing an NV Block:
+API Description
+NvM_ReadBlock Reads data from a specified data block in NVM.
+NvM_WriteBlock Writes data to a specified data block in NVM.
+NvM_SetRamBlockStatus Sets the status of a RAM block, indicating whether it is valid.
+NvM_GetErrorStatus Retrieves the error status of a specified block.
+NvM_ReadAll Request for reading all for all blocks marked for “read all”.
+NvM_WriteAll Request for writing all data marked for “write all”.
+Table 9.1 – NvmM API functions and descriptions
+In the next section, let’s explore an example of how the memory stack is utilized in an ECU.
+Use case
+Scenario: In an automotive ECU responsible for engine control, there’s a crucial need to store calibration
+parameters persistently across power cycles. These parameters include fuel injection timing, ignition
+timing, and air-fuel ratio settings, which directly impact engine performance and emissions control. The
+ECU interacts with a SWC, let’s call it EngineControlSWC, to manage these calibration parameters.
+The SWC utilizes functions provided by the NVM module to read and write calibration data.
+NVM configuration: The NVM module is configured with multiple data blocks, each serving a specific
+purpose. For this use case, let’s consider a native block management approach. There’s one NVM block
+dedicated to storing all calibration parameters. Additionally, the read_all flag is selected for this
+block, ensuring that all calibration parameters are read during startup. Similarly, the write_all
+flag is chosen, indicating that all blocks marked for write_all will be written during shutdown.
+Startup sequence: Upon system startup, the following sequence of events takes place:
+1. EngineControlSWC initializes its data structures and registers with the NVM module.
+2. EngineControlSWC requests the NVM module to read all calibration parameters stored
+in the designated data block.
+3. Since the read_all flag is selected, the NVM module reads all calibration parameters from
+the block and provides them to EngineControlSWC.
+4. EngineControlSWC utilizes the retrieved calibration parameters for engine control algorithms
+and initialization routines.
+
+
+=== Page 210 ===
+Memory stack in AUTOSAR 191
+Shutdown sequence: During system shutdown, the following sequence of events takes place:
+1. EngineControlSWC finalizes its operations and prepares for shutdown.
+2. EngineControlSWC requests the NVM module to write all calibration parameters back
+to the designated data block.
+3. As the write_all flag is chosen, the NVM module writes all calibration parameters to the
+block, ensuring that all changes made during runtime are persistently stored.
+4. The NVM module confirms the successful completion of the write operation, allowing
+EngineControlSWC to proceed with the shutdown process.
+Figure 9.4 shall show how this process or flow shall go.
+Figure 9.4 – Abstract sequence diagram for NVM usage in a system
+
+
+=== Page 211 ===
+192 Dealing with Memory and Mode Management
+Explanation: The selection of the read_all flag ensures that all calibration parameters are read
+during startup, guaranteeing that the ECU has access to the latest configuration.
+Similarly, choosing the write_all flag ensures that all changes made during runtime are written
+back to NVM during shutdown, maintaining data integrity across power cycles.
+By utilizing NVM in this manner, EngineControlSWC ensures that calibration parameters remain
+consistent and reliable, contributing to optimal engine performance and emissions control.
+Now that we have understood the NVM stack and the components of NVM, it is essential to explore
+the mode manager for BSW. Understanding the BSWM is crucial as it plays a vital role in managing
+the various modes of operation within the automotive software architecture.
+Mode management
+The BSWM in AUTOSAR handles mode management by processing mode requests from both BSW
+modules and application layers according to configured rules. It performs specific actions based on
+these rules. It coordinates the operational modes of various BSW modules and application layers,
+ensuring seamless communication and functionality across the system. For example, the BSWM
+manages ECU mode changes, activates/deactivates data units in the PDU router (PDUR) module,
+and coordinates with the Diagnostic Communication Manager (DCM) for mode switches. During
+startup and shutdown, the BSWM directs the NVM to read/write necessary data blocks, ensuring
+proper data handling and system functionality.
+The BSWM is highly configurable, allowing it to be tailored to specific application needs. It operates
+based on a set of rules defined during the configuration phase. These rules determine how the BSWM
+responds to mode requests and which actions to execute. The flexibility in configuration makes the BSWM
+adaptable to various automotive applications and ensures it can handle different operational scenarios.
+As a mode manager, the BSWM provides a framework mechanism. The specific functional logic mainly
+depends on the user’s configuration implementation. The BSWM is mainly divided into two parts:
+• Mode arbitration: This is used to determine which mode it is in
+• Mode control: This is used to perform corresponding actions
+Let’s learn more about them.
+Role and functionality
+The BSWM serves as an arbitrator for mode requests from different SWCs and BSW modules. It
+processes these requests based on pre-defined rules and executes corresponding actions. These
+actions include activating or deactivating communication protocols, managing diagnostic states, and
+controlling the state of the ECU.
+
+
+=== Page 212 ===
+Mode management 193
+The BSWM functionality is split into two different tasks:
+• Mode arbitration: This task involves receiving mode indications from SWCs or BSW modules
+and evaluating if a mode switch can be performed based on rule arbitration. The rules, which
+are simple Boolean expressions, determine if a switch can occur with minimal runtime impact.
+The results from these evaluations are stored internally to know which action lists to execute.
+• Mode control: This task executes mode switches by performing a set of actions, known as
+action lists, which include mode-switching operations for other BSW modules.
+Figure 9.5 illustrates the process of mode request handling and control within the BSWM in the
+AUTOSAR framework. It shows how a mode request from an SWC is processed through the runtime
+environment (RTE), evaluated in the Mode Arbitration block, and executed through the Mode
+Control block.
+Figure 9.5 – Mode request handling and control in the BSWM
+
+
+=== Page 213 ===
+194 Dealing with Memory and Mode Management
+Here is how the process goes:
+1. Mode request: An SWC initiates a mode switch request (e.g., mode A) through the RTE.
+2. Mode arbitration: The BSWM evaluates the mode switch request against predefined rules.
+These rules determine if the requested mode change can occur.
+3. Action execution: Based on the evaluation, the BSWM triggers the corresponding action list
+in mode control, such as RteSwitch(mode A) or RteSwitch(mode X).
+4. Notification: The mode change is communicated to the relevant SWC that utilizes the
+requested mode
+The typical implementation of the BSWM and the configuration involved are as follows:
+• BSW mode condition: This checks if the mode request or indication from the SWC or BSW
+module matches a configuration mode.
+• BSWM logical expression: This combines mode conditions using logical operations, such as
+AND, OR, XOR, NOT, and NAND.
+• BSWM action: This executes predefined actions based on the logical expression’s result.
+• BSWM action list: Logical grouping of several actions to be executed.
+• True action list: Actions to perform if the rule passes.
+• False action list: Actions to perform if the rule fails.
+• BSWM rule: A logical expression comprising mode request conditions. The rule’s result (True
+or False) determines the execution of the corresponding mode control, as shown in Figure 9.6:
+Figure 9.6 – Mode request handling and control in the BSWM
+
+
+=== Page 214 ===
+Mode management 195
+In BSWM mode, conditions are evaluated like an if statement. The mode condition checks if a
+request matches a configured mode. Logical expressions combine these conditions (e.g., using AND
+or OR) to form rules. If the rule evaluates to true, specific actions (such as function calls) are executed
+from the TRUE action list; if false, actions from the FALSE action list are executed. This structured
+process ensures efficient and accurate mode management. Figure 9.7 illustrates an arbitration rule
+within the BSWM of the AUTOSAR framework, highlighting the decision-making process based on
+logical conditions.
+Figure 9.7 – Mode request handling and control in the BSWM
+The BSWM uses these rules to manage the mode and state transitions of BSW modules. The arbitration
+rule evaluates two logical expressions: whether the operation mode is in normal mode and whether
+the evaluation for the Controlled Area Network (CAN) channel is Bus_Off. Depending on the
+evaluation, the BSWM executes either the True action list if both conditions are met or the False
+action list if they are not. This mechanism ensures appropriate actions are taken based on the current
+system state, maintaining system reliability and correct operation. Now, let’s jump into a use case and
+learn about how the BSWM fits into a system.
+
+
+=== Page 215 ===
+196 Dealing with Memory and Mode Management
+Note
+The BSWM evaluates modes and considers inputs from other modules. Modules such as CAN
+State Manager (CANSM), Communication Manager (COMM), and NVM Manager (NvmM)
+report their internal modes to the BSWM example communication channel state. These BSW
+module modes can be utilized to create different rules based on various modes, either from
+BSW modules or from the application SWCs. This approach allows for flexible and robust
+arbitration and decision-making processes within the automotive ECU.
+Use case for the BSWM – Vehicle shutdown process
+Scenario: Managing the shutdown process of an automotive ECU.
+Objective: Ensuring a smooth and safe shutdown sequence, preserving critical data, and transitioning
+all modules to a safe state.
+Here is the step-by-step use case:
+1. Mode request:
+I. An application SWC has decided that the ECU must shut down when the driver turns
+off the ignition.
+II. The SWC requests Shutdown via the RTE switch port.
+III. This mode request is sent to BSWM for arbitration.
+2. Mode arbitration:
+I. The BSWM evaluates the request based on predefined rules, such as ensuring the vehicle
+is stationary.
+II. If conditions are met, the BSWM proceeds with the shutdown transition.
+3. Action execution:
+I. The BSWM triggers the corresponding action list for the Shutdown mode, once
+conditions are evaluated to be true.
+II. This includes instructing the NvmM to save any critical data to EEPROM or flash memory
+to preserve it across power cycles.
+4. Coordination with other modules:
+I. The BSWM coordinates with the Communication Manager (ComM) to safely deactivate
+communication channels.
+II. It also interacts with the ECU State Manager (ECUM) to transition the ECU to a
+low-power state (If required).
+
+
+=== Page 216 ===
+Mode management 197
+5. SWC notification:
+I. The RTE notifies relevant SWCs about the mode switch.
+II. SWCs perform necessary pre-shutdown tasks, such as saving user settings or stopping
+ongoing processes.
+6. Finalization:
+I. The BSWM ensures that all modules confirm the successful completion of their
+shutdown tasks.
+II. The ECU can then transition to a complete shutdown state.
+Figure 9.8 shows the sequence diagram for the preceding use case:
+Figure 9.8 – Sequence diagram for a safe ECU shutdown
+Ensuring a safe and orderly shutdown process, protecting critical data through NVM management,
+and enhancing overall system reliability by coordinating the shutdown sequence across all modules is
+helpful as it prevents data loss, maintains system integrity, and ensures that all components transition
+smoothly to a safe state, ultimately improving the vehicle’s reliability and user experience.
+
+
+=== Page 217 ===
+198 Dealing with Memory and Mode Management
+Summary
+This chapter on the NVM stack within the AUTOSAR framework provided developers with a
+comprehensive understanding of how NVM is managed in automotive software development. It
+highlighted the critical role of NVM in ensuring the persistence and integrity of vital data, configurations,
+and diagnostic information across power cycles and system resets.
+By delving into the architecture and functionalities of the NVM stack, you gained insights into the
+mechanisms by which automotive SWCs interact with NVM. The chapter elucidated the process of
+data storage and retrieval through the NvmM module, emphasizing the importance of efficient storage
+mechanisms and error-handling strategies.
+The discussion on basic storage objects, block management types, and common flags offered you
+practical insights into configuring NVM for diverse automotive applications. By illustrating use
+cases and providing examples, the chapter enabled you to grasp the significance of NVM in ensuring
+data integrity, reliability, and fault tolerance in automotive ECUs. Additionally, this chapter covered
+the BSWM and its rule-based mode management in BSW, explaining how it manages modes and
+coordinates actions.
+The next chapter will discuss some of the best practices, other use cases, and hints on how to navigate
+further into AUTOSAR, serving as the concluding chapter of the book.
+Questions
+1. What is the purpose of implementing NVM in an automotive ECU?
+2. How does a SWC request for data storage?
+3. What are the advantages of selecting a redundant block management approach for NVM?
+4. What is an NVM block?
+5. How does the read_all flag influence startup behavior in the context of NVM?
+6. How does the write_all flag influence shutdown behavior in the context of NVM? What
+is the role of a BSWM module?
+
+
+=== Page 218 ===
+10
+Wrapping Up and
+Extending Knowledge
+with a Use Case
+In the intricate ecosystem of AUTOSAR, where reliability, performance, and safety are paramount,
+mastering the development and configuration of an automotive Electronic Control Unit (ECU)
+reveals the true power of standardized software architecture. This chapter aims to bring together
+the essential concepts covered throughout this book, extending your knowledge by exploring areas
+such as the diagnostics stack and the time synchronization stack—stacks that are invaluable but have
+previously been unexamined.
+Beyond revisiting these advanced topics, this chapter will empower you with practical guidance on
+navigating and interpreting AUTOSAR documentation, a useful skill for any developer seeking to
+deepen their understanding and stay at the forefront of this evolving standard. Moreover, we’ll discuss
+the next steps you should consider as you progress in your AUTOSAR journey.
+To anchor these concepts to a tangible context, we’ll explore an abstract use case: the design of an
+auto-parking system. This example will illustrate how the diagnostics and time synchronization stacks,
+along with other components of the AUTOSAR architecture, can be applied to a real-world project,
+demonstrating the seamless integration of these layers. Although this use case has intentionally
+been summarized to serve as a focused illustration, it effectively bridges the gap between theoretical
+knowledge and practical application. By the end of this chapter, you’ll have a clearer vision of how to
+continue your AUTOSAR journey, equipped with both the foundational knowledge and the practical
+insights necessary for future challenges.
+

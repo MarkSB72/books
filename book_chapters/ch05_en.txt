@@ -1,0 +1,832 @@
+=== Page 103 ===
+84 Designing and Implementing Events and Interfaces
+Explaining the information flow
+Let’s consider a simple embedded example. Imagine a very simple temperature monitoring component
+within an ECU. This system reads the temperature from a sensor, processes the data, and then displays
+the temperature on the car’s dashboard by sending a CAN message to the infotainment ECU.
+To translate this continuously varying analog signal into a format that software can understand, an
+embedded device would utilize an analog-to-digital converter (ADC). The ADC periodically converts
+the signal into digital values and provides it to the users, such as another software module.
+Figure 5.1 shows briefly how such a system would look from an abstract view:
+Figure 5.1 – Example of temperature sensor
+The abstracted ECU software might utilize the ADC peripheral to acquire the signal value (Temperature).
+This process is likely handled by the ADC reading software module. The ADC values are expected to
+undergo a filtration process, and the filtered value will be forwarded to a temperature conversion SW
+module. This specific SW module is responsible for converting the filtered ADC value into a physical
+temperature value, which will eventually be presented on the display Module.
+
+
+=== Page 104 ===
+Introducing the communication model 85
+Let’s get acquainted with the different SW modules and their roles:
+• ADC reading module: This reads the ADC value, applies conversion, and provides it to a
+temperature conversion SWC. The following code snippet illustrates how a system is implemented
+outside of the AUTOSAR context. It includes an analog_to_digital function that
+converts analog signals to digital by reading a specific ADC channel. The adc_task_10ms
+task retrieves analog values from a temperature sensor, converts them into digital values, and
+sends them to a temperature processing module through TCM_ProcessTemperature:
+#define ADC_RESOLUTION 1024 // Assuming a 10-bit ADC
+#define TEMP_SEN_CHANNEL 2
+int analog_to_digital(int channel) {
+// Convert analog value to digital
+int digital_value = (int)(rREG_ADC[channel].rawval * ADC_
+RESOLUTION);
+return digital_value;
+}
+void adc_task_10ms() {
+int digital_value=analog_to_digital(TEMP_SEN_CHANNEL);
+TCM_ProcessTemperature(digital_value);
+}
+• Temp conversion module: This takes in the digital value, applies calibration and conversion,
+and prepares it for display. When there is a temperature change, it sends a request to the display
+module to show the updated value on the car’s dashboard. The code defines a function for
+processing temperature values obtained from the ADC Reading Module, applies calibration
+if needed, and sends updated temperature values to a display module. This process avoids
+redundant updates if the temperature remains unchanged:
+#define CALIBRATION_FACTOR 1.0
+#define TEMPERATURE_CONVERSION_FACTOR 0.01
+float current_temperature=0;
+std_return TCM_ProcessTemperature (int digital_value) {
+float calibrated_value = digital_value * CALIBRATION_FACTOR;
+float temperature = calibrated_value * TEMPERATURE_
+CONVERSION_FACTOR;
+current_temperature = temperature;
+return(E_OK);
+}
+void processing_task_10ms() {
+static float previous_temperature = -1;
+Static T_TState current_state= RUNNING_STATE;
+If .... some code
+
+
+=== Page 105 ===
+86 Designing and Implementing Events and Interfaces
+If ((current_temperature != previous_temperature) &&
+someothercondition()) {
+DIS_UpdateTemp(temperature , &current_state);
+previous_temperature = temperature;
+}
+}
+• Display SW module: This displays the temperature value on the car’s dashboard. The following
+code showcases functionalities for displaying temperature readings. The display_task_50ms
+task runs every 50 ms, retrieves current temperature values, and sends them as a CAN message
+to the display unit if some conditions were satisfied:
+float updated_temperature=0;
+void DIS_UpdateTemp(float temperature, unsigned char* state) {
+updated_temperature= temperature;
+/*some code to use state*/
+............
+}
+void display_temperature(float temperature) {
+uint8_t *temp_ptr = (uint8_t*)&temperature;
+Uint8 data[8] =0;
+data[0] = temp_ptr[0]
+......
+if (getsomestate() == TRUE) {
+SendSignalOverCAN(0x7A1,&data);
+}
+}
+void display_task_50ms() {
+If(somecondition == TRUE) {
+display_temperature(temperature);
+}
+}
+• CANDrv: This is a low-level driver CAN implementation to send a message to the physical
+display module.
+• ADCDrv: This is a low-level driver ADC implementation to configure and read ADC channels
+
+
+=== Page 106 ===
+Introducing the communication model 87
+Figure 5.2 shows how different software modules interact to read, process, and display temperature
+data in an automotive system.
+Figure 5.2 – Sequence diagram showing Temp Sensor module interaction
+Information flows can be categorized based on their nature. Like outputs from an analog to a digital
+converter, streams of values might use sender-receiver (SR) interfaces. For behavior requests and their
+responses, client-server interfaces are employed. These are the primary types, and we will discuss
+them in the following sections. Other information flow methods, such as the mode-switching and
+parameter interfaces, are outside the scope of this discussion.
+Note
+Please take a moment to thoroughly review the example provided. While it’s a simple illustration,
+it’s important for our upcoming exploration of AUTOSAR interfaces. This example will serve
+as a practical reference point, helping to understand the concepts we’ll discuss. Ensuring a clear
+understanding now will make the subsequent sections much more accessible and meaningful. The
+same example will be used again to re-design it following AUTOSAR interfaces and methodology.
+Sender-receiver communication
+SR interfaces manage data exchange between SWCs in AUTOSAR. These interfaces support various
+communication patterns, including the 1-to-N model where one sender transmits data to multiple
+receivers, and the N-to-N model where multiple senders can transmit data to multiple receivers.
+There are two types:
+• Sender (P Port): Sends out information; the interface is referenced by a providing port
+• Receiver (R Port): Awaits incoming information; the interface is referenced by a required port
+
+
+=== Page 107 ===
+88 Designing and Implementing Events and Interfaces
+For example, Figure 5.3 demonstrates a 1-to-N configuration, an SWC responsible for calculating
+vehicle speed (sender) can send this data to multiple other SWCs (receivers). This data exchange can
+be periodic or event-driven.
+Figure 5.3 – SR 1-to-N example
+Within the context of an SR interface, data elements are the fundamental units of information
+exchange. You can think of a data element as a virtual wire transmitting information such as vehicle
+speed, yaw rate, acceleration, and other data between SWCs. While it’s common to see a single data
+element being transmitted, the SR interface is flexible enough to accommodate multiple data elements,
+allowing for a richer and more comprehensive data exchange.
+Note on data elements
+For simplicity, you can think of a data element in an SR interface as a global variable that is
+accessible to multiple SWCs through a defined interface. A group of data elements can be
+viewed as a structured set of data shared among these components.
+For instance, consider a vehicle’s onboard system that measures speed. The speed data, once captured,
+can be sent to multiple components:
+• One component might use it to display the current speed on the dashboard
+• Another might use it to adjust the vehicle’s adaptive cruise control
+• A third might log the data for diagnostic purposes
+This multicast nature of the SR interface ensures that all these components receive the speed data
+simultaneously and can act upon it in almost real time. By now, you have grasped that software can be
+described in an XML format to define the software configuration, interfaces and behaviour for software units.
+Let’s explore how the SR interface is modeled in AUTOSAR XML (ARXML).
+
+
+=== Page 108 ===
+Introducing the communication model 89
+AUTOSAR XML (ARXML) modeling
+In this section, we explore the structure and syntax of AUTOSAR XML (ARXML) files, providing
+examples to help readers understand how data elements and interfaces are modeled in AUTOSAR systems.
+Note
+The ARXML code that follows is provided as an example for illustration purposes and to help
+you become familiar with the ARXML syntax. It may not be entirely accurate and could differ
+slightly depending on the specific AUTOSAR schema.
+This ARXML snippet defines a specific SR interface named If_SR_SenderReceiverTest, which
+is intended to handle the sending or receiving of the speedVehicle data element of type uint32.
+<SENDER-RECEIVER-INTERFACE>
+<SENDER-RECEIVER-INTERFACE UUID="2DABF647-F234-404A-9669-
+58A29FABF1BC">
+<SHORT-NAME>If_SR_SenderReceiverTest</SHORT-NAME>
+<IS-SERVICE>false</IS-SERVICE>
+<DATA-ELEMENTS>
+<VARIABLE-DATA-PROTOTYPE UUID="D1368B17-1925-4F77-B4A8-
+520A992CED1D">
+<SHORT-NAME>VehicleSpeed</SHORT-NAME>
+<SW-DATA-DEF-PROPS>
+<SW-DATA-DEF-PROPS-VARIANTS>
+<SW-DATA-DEF-PROPS-CONDITIONAL>
+<SW-CALIBRATION-ACCESS>NOT-ACCESSIBLE</SW-
+CALIBRATION-ACCESS>
+</SW-DATA-DEF-PROPS-CONDITIONAL>
+</SW-DATA-DEF-PROPS-VARIANTS>
+</SW-DATA-DEF-PROPS>
+<TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/AUTOSAR_
+Platform/ImplementationDataTypes/uint32</TYPE-TREF>
+</VARIABLE-DATA-PROTOTYPE>
+</DATA-ELEMENTS>
+</SENDER-RECEIVER-INTERFACE>
+As a developer, you won’t typically write ARXML code directly, but having a basic understanding of
+the format is helpful for debugging implementations. Here is an explanation:
+• <SENDER-RECEIVER-INTERFACE>: This tag marks the beginning of the SR interface definition.
+• UUID: This unique identifier helps distinguish this interface from others within the project.
+• SHORT-NAME: This provides a user-friendly name for the interface, making it easier to
+understand its purpose.
+
+
+=== Page 109 ===
+90 Designing and Implementing Events and Interfaces
+• IS-SERVICE: This attribute indicates whether the interface offers a service (typically true for
+service-oriented communication) or simply facilitates data exchange (usually false for SR). In
+this example, it’s set to false, signifying data exchange.
+• <DATA-ELEMENTS>: This section defines the data that can be transmitted through the interface.
+• <VARIABLE-DATA-PROTOTYPE>: This tag defines a specific variable within the interface.
+• UUID: Like the UUID interface, each variable data prototype has its own unique identifier.
+• SHORT-NAME: This provides a name for the data variable, making it clear what type of data
+is being exchanged.
+• SW-DATA-DEF-PROPS: This section can contain various properties related to the data
+definition, but in this example, it focuses on calibration access.
+• <SW-DATA-DEF-PROPS-VARIANTS>: This section allows for defining different variants
+or access rights for the data under specific conditions.
+• <SW-DATA-DEF-PROPS-CONDITIONAL>: Here, the SW-CALIBRATION-ACCESS is
+set to NOT-ACCESSIBLE, indicating that the data cannot be modified through calibration
+tools. This might be appropriate for read-only sensor data.
+• TYPE-TREF: This element specifies the data type of the variable. Here, it references a data type
+named uint32 located under the /AUTOSAR_Platform/ImplementationDataTypes/
+path. This suggests the data being exchanged is a 32-bit unsigned integer.
+Building on the previous example, we have seen how an SR interface is modeled using ARXML. Now, let’s
+explore how a sender (provider) port is modeled and how it references the SR interface we discussed earlier.
+Provided Port as Sender
+This ARXML snippet defines a port prototype named in Example_SenderPort, which uses a
+non-queued sender communication specification to transmit the VehicleSpeed data element
+through the SR interface located at /PortInterfaces/If_SR_SenderReceiverTest/:
+<P-PORT-PROTOTYPE>
+<SHORT-NAME>Example_SenderPort</SHORT-NAME>
+<PROVIDED-COM-SPECS>
+<NONQUEUED-SENDER-COM-SPEC>
+<DATA-ELEMENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/
+PortInterfaces/If_SR_SenderReceiverTest/VehicleSpeed </DATA-ELEMENT-
+REF>
+</NONQUEUED-SENDER-COM-SPEC>
+</PROVIDED-COM-SPECS>
+<PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-
+INTERFACE">/PortInterfaces/ If_SR_SenderReceiverTest/ </PROVIDED-
+INTERFACE-TREF>
+</P-PORT-PROTOTYPE>
+
+
+=== Page 110 ===
+Introducing the communication model 91
+The required port ARXML syntax example would be quite similar to the provided port. However,
+instead of <P-PORT-PROTOTYPE>, it would use <R-PORT-PROTOTYPE>, and the <NONQUEUED-
+SENDER-COM-SPEC> communication specification would be replaced with <NONQUEUED-
+RECEIVER-COM-SPEC>. In exploring the ARXML Schema, you will encounter different options
+and properties for the communication channel that provide more flexibility. For example, you might
+find options for queued communication specifications such as <QUEUED-RECEIVER-COM-
+SPEC>, which can handle buffered communication. The required port ARXML syntax example
+would be quite similar to the provided port. Perhaps, rather than P-Port, it would be R-Port and a
+different property for the <NONQUEUED-SENDER-COM-SPEC> communication channel would
+be <NONQUEUED-RECEIVER-COM-SPEC>. To understand the syntax more deeply, you need to
+refer to the XMLSchema for AUTOSAR.
+Note
+An XML schema defines the structure, content, and constraints of XML documents. In AUTOSAR,
+an ARXML (AUTOSAR XML) schema follows the general principles of XML schemas but
+includes specific rules and structures to model automotive software components and interfaces.
+In the next section, we will explore the different communication types available for the SR interface
+within the AUTOSAR framework. By communication types, we mean the methods by which data is
+exchanged between SWCs using the SR model.
+Communication types
+The SR interface can be utilized in two different ways: explicit and implicit communication mechanisms.
+Let’s explore the properties of each mechanism and why it might be preferred to use one over the other.
+Implicit SR communication
+There are two types of this communication model:
+• IMPLICIT_SEND: When a runnable uses IMPLICIT_SEND to publish a data element, once
+the runnable concludes, the run-time environment (RTE) ensures that the most recent value
+of the data element becomes accessible to the data-element receivers.
+• IMPLICIT_RECEIVE: Typically, when a runnable intends to read a data element, it does so by
+explicitly calling the RTE. However, with IMPLICIT_RECEIVE, the runnable directly accesses
+the value of the data element that was available at the start of its execution. The transmitted
+is stored in a buffer, so its value remains unchanged during the lifetime of the runnable. The
+following sequence diagram, Figure 5.4, illustrates the behavior of the implicit SR interface,
+where SWC B publishes data and SWC A receives the data.
+
+
+=== Page 111 ===
+92 Designing and Implementing Events and Interfaces
+Note
+Runnable B has a higher priority than Runnable A. Thus, Runnable B can interrupt Runnable
+A and modify/read the data. We will be introduced to the concept of priority and tasks when
+we explore the AUTOSAR operating system within Chapter 6.
+Figure 5.4 – Implicit write sequence diagram
+Do you recall seeing the RTE described as the glue layer for communication? Next, we’ll explore
+the generation of RTE APIs. Understanding how these APIs are created and managed will help you
+effectively debug, understand, and implement them.
+How RTE APIs are generated
+Here is the syntax for RTE APIs for the sender and receiver interfaces:
+Rte_IRead : DataElementType Rte_
+IRead_<RunnableName>_<PortName>_<DataItemName>()
+Rte_IWrite : Rte_
+IWrite_<RunnableName>_<PortName>_<DataItem>(DataElemementType Data)
+The following details explain the components of the RTE API syntax used for sender and receiver interfaces:
+• DataElementType: The type of data being read.
+• Rte_IRead: The prefix indicates it’s an RTE read function.
+• <RunnableName>: The name of the runnable where this read operation is performed.
+• <PortName>: The name of the port from which data is read through.
+• <DataItemName>: The specific data item being accessed.
+Let’s look at an example. If you have a runnable named ReadSensorData, a port
+named SensorPort, and a data item named Temperature, the function will look like
+float Rte_IRead_ReadSensorData_SensorPort_Temperature().
+
+
+=== Page 112 ===
+Introducing the communication model 93
+Use case for Implicit Read
+Consider a control algorithm that requires consistent temperature data throughout its execution.
+When the algorithm (runnable) starts, it reads the initial temperature value. This value is buffered,
+and the control algorithm uses this stable data throughout its operation, ensuring reliable processing
+without mid-execution changes.
+Explicit SR communication
+There are two types of this communication model:
+• EXPLICIT SEND: When a runnable uses EXPLICIT SEND, once data is updated, it will
+be published to all users at once, ensuring the last available data is always ready.
+• EXPLICIT RECEIVE: Explicit calls are forwarded to RTE to retrieve the latest available data,
+if any. Transmitted values are not buffered; whenever the runnable reads the data elements,
+the most recent value is obtained.
+Explicit sender/receiver communication can be queued or unqueued, but both methods result in the
+most recent data being published and read immediately. You can think of explicit communication
+as a global buffer within the RTE, where both senders and receivers have access to it when read and
+write operations are performed.
+In the context of explicit communication, Figure 5.5 shows the relation between two SWCs. SWC B
+utilizes the RTE to write a data element to a shared buffer. Concurrently, SWC A features a runnable that
+continuously reads from this buffer. The sequence diagram vividly illustrates the crucial relationship,
+where the data written by SWC B is precisely what SWC A’s runnable reads.
+Figure 5.5 – Explicit unqueued write and read example
+Figure 5.5 presents a similar example to the one discussed in Figure 5.6, but in this case, the example
+involves queuing. The data buffer in the RTE has a size of 3. Pay attention to the relationship between
+reading from and writing to the buffer and observe how the queue behaves.
+
+
+=== Page 113 ===
+94 Designing and Implementing Events and Interfaces
+Figure 5.6 – Explicit queued send and receive example
+Similarly to implicit SR communication, the RTE generates the APIs differently.
+Here’s how RTE APIs are generated:
+Rte_Read : DataElementType Rte_Read_<Runnable>_<Port>_<DataItem>()
+Rte_Write : Rte_Write_<Runnable>_<Port>_<DataItem>(DataElemementType
+Data)
+The following details explain the components of the RTE API syntax used for explicit sender and
+receiver interfaces:
+• Rte_Write: The prefix indicating that this is an RTE write function.
+• <Runnable>: The name of the runnable that is performing the write operation.
+• <Port>: The name of the port where the data will be written.
+• <DataItem>: The specific data item being updated.
+• DataElementType Data: The data being written, with its type specified.
+Note
+When it comes to the unqueued variant of the Explicit sender-receiver, it is Rte_Write for
+sending and Rte_Read for receiving. For the queued variant, it’s Rte_Send and Rte_
+Receive, respectively.
+Use case for Explicit read
+Consider a system that monitors battery voltage. The monitoring system needs to check the battery
+voltage at specific intervals to ensure it remains within safe limits. When the monitoring system
+(runnable) initiates a voltage check, it explicitly requests the latest battery voltage through an RTE
+API call. This allows the system to obtain the most current data exactly when needed.
+
+
+=== Page 114 ===
+Introducing the communication model 95
+After exploring the SR interface, which primarily deals with periodic data streams, it’s essential to
+recognize that not all interactions between SWCs are based on continuous data flows. There are
+scenarios wherein a component might need a distinct service or action from another. This is where
+the need for the client-server interface arises, which we will discuss next.
+Client-server communication
+Often abbreviated as C/S interfaces, this facilitates service-oriented communication between SWCs
+in AUTOSAR. These interfaces support a request-response communication pattern, whereby a client
+sends a service request to a server, which processes the request and returns a response. For example,
+in a client-server configuration, a SWC responsible for controlling vehicle lights (client) can request
+the status of the lights or send a command to turn them on or off. The server component processes
+these requests and provides the necessary responses. This interaction can be synchronous, where the
+client waits for the server’s response, or asynchronous, where the client continues processing and
+handles the response later.
+This is the client-server model, which is a fundamental concept in software design. Here, one SWC
+(the server) offers functionalities for another SWC (the client) to utilize:
+• Client (R Port): This is the component that initiates a request for a service. It acts as the
+consumer in the interaction.
+• Server (P Port): This component responds to the client’s request by providing the desired
+services. It acts as the provider in the interaction.
+This model is structured in a service-oriented manner, emphasizing the interaction between the client
+and server. Operations within the client-server interface are the specific functionalities or services that
+the server provides. These operations can have arguments, which are essentially the data or parameters
+required for the operation to execute. Arguments can be categorized based on their direction:
+• Set (in): These are input arguments. They provide the necessary data to the server. For example,
+in a calculator operation to add two numbers, the numbers themselves are in arguments.
+• Get (out): These are output arguments. The server returns these after processing the input.
+Using the calculator example, the sum of the two numbers would be an out argument.
+• Bi-directional (in-out): These arguments can both accept input and provide output. They are
+useful in scenarios where data needs to be both received and sent back after processing.
+
+
+=== Page 115 ===
+96 Designing and Implementing Events and Interfaces
+Figure 5.7 shows a client-server interface interaction, wherein two SWCs are exchanging information
+through calling operations or services provided by a SWC:
+Figure 5.7 – Client-server interface
+Let’s explore how a client-server interface is modeled in AUTOSAR.
+ARXML modeling
+Let’s take a look at the ARXML modeling of client-server interfaces in AUTOSAR. This ARXML snippet
+defines a specific client-server interface named If_CS_LightControl, which is responsible for
+controlling vehicle lights by providing operations to turn the lights on or off. This will provide a visual
+and conceptual understanding of the modeling of the C/S interface.
+The following ARXML snippet defines a specific client-server interface named If_CS_
+ClientServerTest. This interface is not marked as a service (IS-SERVICE is set to false).
+It includes a single operation named RunService, which takes two arguments: Arg1 (an input
+argument of the uint8 type) and Arg2 (an output argument of the uint8 type). This setup illustrates
+how client-server interactions are modeled, where the client requests the RunService operation,
+passing Arg1, and receives a response in Arg2:
+<CLIENT-SERVER-INTERFACE>
+<SHORT-NAME>If_CS_ClientServerTest</SHORT-NAME>
+<IS-SERVICE>false</IS-SERVICE>
+<OPERATIONS>
+<CLIENT-SERVER-OPERATION>
+<SHORT-NAME>RunService</SHORT-NAME>
+<ARGUMENTS>
+<ARGUMENT-DATA-PROTOTYPE>
+<SHORT-NAME>Arg1</SHORT-NAME>
+<TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/
+
+
+=== Page 116 ===
+Introducing the communication model 97
+AUTOSAR_Platform/ImplementationDataTypes/uint8</TYPE-TREF>
+<DIRECTION>IN</DIRECTION>
+<SERVER-ARGUMENT-IMPL-POLICY>USE-ARGUMENT-TYPE</
+SERVER-ARGUMENT-IMPL-POLICY>
+</ARGUMENT-DATA-PROTOTYPE>
+<ARGUMENT-DATA-PROTOTYPE>
+<SHORT-NAME>Arg2</SHORT-NAME>
+<TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/
+AUTOSAR_Platform/ImplementationDataTypes/uint8</TYPE-TREF>
+<DIRECTION>OUT</DIRECTION>
+<SERVER-ARGUMENT-IMPL-POLICY>USE-ARGUMENT-TYPE</
+SERVER-ARGUMENT-IMPL-POLICY>
+</ARGUMENT-DATA-PROTOTYPE>
+</ARGUMENTS>
+</CLIENT-SERVER-OPERATION>
+The following examples demonstrate how the ARXML syntax appears for both a service provider
+(server) and service consumer (client).
+The ARXML snippet defines a provided port prototype for a client-server interface in an AUTOSAR
+SWC. The port, named P_If_CS_ClientServerTest, includes communication specifications
+under PROVIDED-COM-SPECS, detailing a server communication specification (SERVER-COM-
+SPEC) with an operation reference to /SWCA/PortInterfaces/ If_CS_ClientServerTest
+/RunService and a queue length of 1. Additionally, the PROVIDED-INTERFACE-TREF references
+the /SWCA/PortInterfaces/If_CS_ClientServerTest client-server interface:
+<P-PORT-PROTOTYPE>
+<SHORT-NAME>P_If_CS_ClientServerTest</SHORT-NAME>
+<PROVIDED-COM-SPECS>
+<SERVER-COM-SPEC>
+<OPERATION-REF DEST="CLIENT-SERVER-OPERATION">/SWCA/
+PortInterfaces/If_CS_ClientServerTest/RunService</OPERATION-REF>
+<QUEUE-LENGTH>1</QUEUE-LENGTH>
+</SERVER-COM-SPEC>
+</PROVIDED-COM-SPECS>
+<PROVIDED-INTERFACE-TREF DEST="CLIENT-SERVER-INTERFACE">/SWCA/
+PortInterfaces/If_CS_ClientServerTest</PROVIDED-INTERFACE-TREF>
+</P-PORT-PROTOTYPE>
+Let’s take a closer look at the communication modes in a client-server interface to understand their unique
+functionalities, how they operate, and the typical scenarios wherein they are most effectively applied.
+Communication types
+Communication between a client and a server can occur in two modes: synchronous or asynchronous,
+based on the timing and specific usage needs of the designed function.
+
+
+=== Page 117 ===
+98 Designing and Implementing Events and Interfaces
+Synchronous client-server communication
+This refers to a communication method whereby the client sends a request to the server and waits
+for a response before proceeding further. In this mode, the client is blocked or waits until it receives
+a complete response from the server, which might involve a delay if the server takes time to process
+the request. The interaction is tightly coupled, and each request is followed by an immediate response
+before the client can continue with the next action:
+• Direct request and response: In synchronous communication, when a client requests a service
+from the server, it waits for the server to process the request and send back a response before
+continuing its own processing.
+• Blocking nature: The client is effectively blocked until the server completes the service and
+sends a response. This means the client cannot perform other tasks during this waiting period.
+• Immediate feedback: The client immediately gets feedback from the server, whether it’s the
+result of a computation, data retrieval, or acknowledgment.
+• Typical use: Synchronous communication is suitable for scenarios wherein the client needs
+immediate results from the server to proceed. For example, a SWC might request a specific
+calculation and need the result before it can continue its operations.
+As shown in Figure 5.8, the sequence diagram demonstrates a synchronous communication pattern
+whereby a client sends a request to a server, then waits for the server to complete its processing before
+receiving and acknowledging the response. This synchronous interaction ensures that the client and
+server operate in a coordinated and blocking manner, with the client actively waiting for the server’s
+actions to complete before continuing its own tasks.
+Figure 5.8 – Synchronous client-server call
+
+
+=== Page 118 ===
+Introducing the communication model 99
+Asynchronous client-server communication
+This refers to a method whereby the client sends a request to the server but doesn’t wait for an immediate
+response. Instead, the client continues its operation without halting for a reply from the server. The
+server processes the request separately and sends a response back when it’s ready. This mode allows the
+client to perform other tasks or send additional requests without waiting for each individual response,
+leading to potentially increased efficiency and flexibility in handling multiple tasks concurrently:
+• Independent request and response: In asynchronous communication, the client sends a service
+request to the server and then continues its own processing without waiting for a response. The
+server will process the request and send a response at a later point in time.
+• Non-blocking nature: The client isn’t blocked after sending a request. It can perform other
+tasks and handle the server’s response whenever it arrives.
+• Delayed feedback: The feedback from the server might be delayed, and the client typically uses
+mechanisms such as callbacks, events, or interrupts to handle the response when it’s available.
+• Typical Use: Asynchronous communication is ideal for scenarios wherein the client doesn’t need
+immediate results from the server or when the server’s processing might take an unpredictable
+amount of time. For instance, a SWC might request data from a server that requires extensive
+computation or retrieval from a slow storage medium.
+As shown in Figure 5.9, the sequence diagram illustrates an asynchronous communication pattern
+whereby the client initiates a request to the server and continues its execution without waiting for the
+server to complete processing. The server processes the request independently and sends the response
+asynchronously. This asynchronous interaction allows the client and server to operate concurrently
+and perform tasks independently.
+Figure 5.9 – Asynchronous client-server call
+
+
+=== Page 119 ===
+100 Designing and Implementing Events and Interfaces
+Now is the perfect time to revisit the example discussed at the beginning of this chapter in the Explaining
+the information flow section. We will use the same example to demonstrate how it is implemented
+in AUTOSAR.
+Rethinking temperature sensor design
+Let’s revisit the example we initially mentioned in this chapter for temperature monitoring. We could
+rethink the example using interfaces and ports as follows:
+Figure 5.10 – Software composition for temperature monitoring SW
+Figure 5.10 and Table 5.1 illustrate a potential design of the SWCs and ports.
+SWC Port or interface Type Description
+SWC1 - ADC PP_Temp Provider port Provides the digital
+Reader temperature value to
+other SWCs
+Interface Sender Interface for sending the
+digital temperature value to
+the connected required port
+
+
+=== Page 120 ===
+Introducing the communication model 101
+SWC Port or interface Type Description
+SWC2 - Temperature RP_Temp Required port Receive the digital
+Conversion temperature value from the
+connected Provider port
+Interface Receiver SR Interface for receiving
+a digital temperature
+value from the connected
+provider port
+RP_Display Required port Required Port to use
+the service to display
+the temperature
+Interface Client-server Interface for accepting
+display requests from
+the client port of the
+display module
+SWC3 - Display PP_Display Server port Provides the service to
+SWC accept display requests and
+display the temperature data
+Interface Client-server Interface for receiving
+display requests and
+displaying the temperature
+data from SWC2
+Table 5.1 – Temperature monitoring example with AUTOSAR Interfaces and Ports.
+Let’s look at how the communication flow really takes place based on the proposed design:
+1. SWC1 reads the temperature value and sends it to SWC2 using the SR interface.
+2. SWC2 processes the temperature value and then requests SWC3 to display it using the
+client-server interface.
+3. SWC3 receives the request and displays the temperature on the dashboard by using a sender-
+receiver interface to send a CAN message through the COM module.
+You might be wondering when to select SR versus client-server interfaces, how to choose between
+Provide and Require ports, and how to decide between SR or client-server interfaces. These
+choices depend largely on the nature of the communication and the kind of interaction required.
+
+
+=== Page 121 ===
+102 Designing and Implementing Events and Interfaces
+When deciding between a Provide or Require port in AUTOSAR, consider whether the SWC
+is providing or consuming data or operations. A Provide port is used by the component that
+broadcasts data or offers a service, such as a sensor module sending ADC values or a module providing
+a temperature conversion service. Conversely, a Require port is used by the component that needs
+to consume data or request a service, such as a module receiving sensor data for calculations or a
+client requesting an algorithm execution. The choice is determined by whether the component is the
+source (Provide) or the consumer/requester (Require) of data or services.
+SR is fitting for broadcasting data asynchronously, where a module needs to provide continual updates
+without knowing who the recipients are or expecting any return. For example, streaming sensor values
+to multiple components fits well here.
+Client-server is used when a component must initiate an action or retrieve data from another component,
+often with the need for feedback or confirmation. This approach suits cases such as starting a process,
+executing an algorithm, or getting specific data where a response is necessary.
+In some situations, it’s possible to use either interface to share data depending on the requirements.
+However, an SR is typically used for ongoing data updates where responses are not required, while
+client-server is usually chosen when an interaction or command must be explicitly executed with an
+expected outcome.
+Note
+In this example, we have selectively focused on the ADC Reading Module, Temp Conversion
+Module, and Display Module, specifically illustrating the use of interfaces for providing ADC
+and temperature values, as well as display values. The detailed design of how the ADC Reading
+Module reads data from the driver is beyond the scope of this discussion. The goal is to give
+a glimpse of when to use SR interfaces, such as for continuous data transfer, and when to use
+client-server interfaces for direct service requests and responses.
+As we transition from our discussion on ports and interfaces, it’s essential to introduce the concept
+of events within the RTE.
+Understanding events in AUTOSAR
+An event can be looked at as an identifiable occurrence or state change in a system that may require
+a corresponding action or reaction. Events in AUTOSAR are specific occurrences or conditions that
+trigger certain actions or reactions within the system. They act as signals, informing SWCs that a
+particular condition has been met, and prompting them to execute specific functionalities.
+Events not only facilitate synchronization and communication among SWCs but also significantly
+influence the system’s overall performance and functionality. This section will explore the interdependent
+relationship between ports, interfaces, and events, highlighting their combined impact on the
+AUTOSAR ecosystem.
+
+
+=== Page 122 ===
+Understanding events in AUTOSAR 103
+Various sources can generate events, such as external inputs, timers, or even other SWCs. They are
+typically handled by dedicated event handlers or interrupt service routines. Figure 5.11 illustrates
+the sequence in which RTE events can be generated from various sources. These sources could include
+an OS alarm, a change in signals, or other triggers. The diagram demonstrates how the RTE processes
+and triggers the event, and finally, how the SWC executes the corresponding runnable.
+Figure 5.11 – RTE event generation and processing
+To fully grasp the role of events in AUTOSAR, it’s essential to understand how they interact with
+the ports and interfaces, which are the fundamental channels of communication between SWCs.
+Let’s explore how these elements work together to ensure data flow and functionality within the
+AUTOSAR environment.
+How do ports, interfaces, and events interact with each other?
+Ports and interfaces define the pathways for information flow. They determine how different SWCs
+or modules communicate with each other and the external world. They also specify the data elements
+or operations that can be exchanged or invoked.
+However, merely having these pathways is not enough. We need a mechanism to trigger actions based
+on the information received or changes in the system state. This is where events come into play. Events
+are triggers that cause certain actions to occur within the SWCs. They are associated with ports and
+interfaces to manage the flow of data or invocation of services.
+For instance, an event can be generated when a sensor detects a specific condition such as a car door
+opening. This event then triggers a series of actions, such as turning on the interior lights. Therefore,
+an event is a trigger to an action, which is usually runnable in AUTOSAR, that defines (part of) the
+internal behavior of a component. The RTE controls this operation and requires a connection between
+your component and something else, which can be the OS, an SWC, and/or BSW modules.
+
+
+=== Page 123 ===
+104 Designing and Implementing Events and Interfaces
+Consider an abstracted scenario within an ECU wherein a temperature sensor’s SWC detects a drastic
+temperature rise. The sensor SWC (SWC 1) periodically sends temperature data through its sender
+port using an SR interface. The main function in SWC 2, which is responsible for monitoring this data,
+performs periodic checks that are triggered by timing events. During one of these periodic checks,
+it detects the temperature rise. Upon detecting the critical temperature, SWC 2 immediately uses a
+client-server interface to request an emergency response from SWC 3. This request triggers an event
+in SWC 3, which then activates the cooling system without delay. This example, while simplified for
+clarity, illustrates how ports, interfaces, and events work together within an ECU to manage critical
+interactions between SWCs, ensuring prompt responses to important system changes.
+You have now glimpsed how events play a central role in orchestrating the seamless functioning of
+the automotive ECU. To further understand this intricate system, let’s delve deeper into events and
+get a closer look at their types.
+Types of RTE events in AUTOSAR
+The table provided offers a comprehensive overview of RTE events within the context of AUTOSAR. It
+presents a structured compilation of key RTE events, featuring columns detailing their abbreviations,
+event names, and comprehensive descriptions. The table aims to serve as a reference resource, providing
+a clear and concise breakdown of RTE events along with their respective functionalities and purposes.
+Abbreviation Event Description
+T TimingEvent Event based on a timer period
+BG BackgroundEvent Recurring events perform background
+activities similarly to timer events but
+do not have a fixed period and have
+low priority
+DR DataReceivedEvent Receive and process a signal received on
+an SR interface
+DRE DataReceiveErrorEvent Triggered to collect the error status on
+the reception (SR Communication only)
+DSC DataSendCompletedEvent Receive and process acknowledge
+transmission notifications (explicit SR
+communication only)
+DWC DataWriteCompletedEvent Receive and process acknowledge
+transmission (implicit SR communication
+only)
+OI OperationInvokedEvent Issued to run a server-side runnable;
+invoked by the client
+
+
+=== Page 124 ===
+Understanding events in AUTOSAR 105
+Abbreviation Event Description
+ASCR AsynchronousServerCallReturnsEvent Collect the result and status of an
+asynchronous CS operation
+MS SwcModeSwitchEvent This event is raised upon a received
+mode change
+MSA ModeSwitchedAckEvent Receive and process mode switched
+acknowledgment notifications
+MME SwcModeManagerErrorEvent Triggered to react on errors occurred
+during mode handling
+ETO ExternalTriggerOccurredEvent Triggered by the occurrence of an
+external event
+I InitEvent Activate runnable for initialization
+purposes in case of RTE start or restart
+of a partition
+THE TransformerHardErrorEvent Raised when during the transformation
+of received data, a hard transformer
+error occurs
+Table 5.2 – RTE events
+In this exploration, we will focus exclusively on three specific events within AUTOSAR: TimingEvent,
+OperationInvokedEvent, and DataReceivedEvent. These events have been chosen for their widespread
+use and significance in the AUTOSAR ecosystem:
+• TimingEvent: This event stands out as a beacon of consistency and predictability. It serves as the
+metronome of the system, ensuring that specific functionalities are executed at regular intervals.
+Consider an automotive system where the engine control unit (ECU) needs to monitor the
+engine temperature every 10 milliseconds. In such a scenario, a TimingEvent can be created
+to trigger the temperature monitoring function of the ECU precisely at these intervals. This
+ensures the engine operates within safe temperature limits and any anomalies are detected
+and addressed in real time. Through this example, which we illustrate in the following figure,
+we can understand the role of TimingEvent events in maintaining the rhythm and reliability
+of automotive systems:
+
+
+=== Page 125 ===
+106 Designing and Implementing Events and Interfaces
+Figure 5.12 – TimingEvent in AUTOSAR
+• OperationInvokedEvent: These events ensure that operations requested by clients are acted
+upon or initiated by the server provider. In essence, they facilitate the execution or initiation
+of requested operations by the server in response to client requests. Unlike events that operate
+on a set schedule, these events are all about immediacy, springing into action when a particular
+operation is invoked. They ensure that the system remains agile, as well as capable of responding
+to on-the-spot demands and executing functionalities based on real-time inputs.
+Figure 5.13 illustrates how the Sensor SWC (SWC_B) requests a temperature calculation via
+the RTE, which schedules and triggers the R_CalculateTemp runnable in the Controller
+SWC (SWC_A), and then returns the calculated result back to the Sensor SWC.
+Figure 5.13 – OperationInvokedEvent sequence diagram
+
+
+=== Page 126 ===
+Understanding events in AUTOSAR 107
+• DataReceivedEvent: This event plays a crucial role in ensuring the system reacts promptly to
+incoming data. This event is all about vigilance, and involves constantly monitoring specific data
+or signals and initiating actions as soon as they are detected. It ensures that the system remains
+alert and ready to respond to vital information, safeguarding both the vehicle’s functionality
+and the safety of its occupants.
+Envision a situation in a vehicle where a sudden collision is detected. The sensors send a signal
+to the airbag ECU, indicating the immediate need for deployment. A DataReceivedEvent event
+is triggered as soon as this signal is received, instructing the airbag to deploy without delay.
+This instantaneous response can make the difference between safety and injury, highlighting
+the importance of DataReceivedEvent events in ensuring timely reactions to critical situations.
+Through this example, we grasp the life-saving potential of such events in the automotive domain.
+Figure 5.14 illustrates the sequence of utilizing data-received events. An SWC equipped with
+an SR interface publishes data to the RTE. Meanwhile, another SWC, labeled SWC A, acts as a
+user of the published data and desires a notification upon data reception to initiate a series of
+events. Therefore, SWC B writes data, and the RTE, recognizing SWC A’s need for notification,
+triggers an event to commence the execution of a runnable within SWC A.
+Figure 5.14 – DataReceivedEvent sequence diagram
+
+
+=== Page 127 ===
+108 Designing and Implementing Events and Interfaces
+Note
+We have only discussed the most common events in this context. For a deeper understanding
+of how various events are used and what their specific applications are, please refer to the RTE
+Events chapter in the AUTOSAR documentation. Additionally, there are more details related
+to the events we have discussed, such as offsets for event scheduling and other advanced
+configurations. However, these advanced details are out of the scope of this discussion.
+Now that we have discussed these events, let’s revisit the temperature monitoring example and identify
+the types of events that would fit the design.
+Events for temperature monitoring example
+This table outlines the different SWCs, the types of events they use, the names of these events, and a
+brief description of their function within the temperature monitoring design.
+SWC Event type Event name Description
+SWC 1 – ADC TimingEvent TI_ReadADCValue Triggers the ADC reading
+Reader at regular intervals (every
+10 ms) to read the digital
+sensor value
+SWC2 – DataReceiveEvent DRE_ ReceiveDigitalValue Triggered when SWC
+Temperature 1 sends the digital
+Conversion temperature value to
+SWC 2
+TimingEvent TI_ProcessTask10ms Triggers the Temperature
+Calculation task every
+10 ms
+SWC3 – OperationInvokedEvent OIE_ ProcessTemperature Triggered when SWC 2
+Display invoked the operation
+Module on SWC 3 to request
+an update on the
+temperature value
+TimingEvent TI_DisplayTask50ms Triggers the display task
+to send a CAN message
+every 50 ms
+Table 5.3 – Event types and functions in a temperature monitoring system example
+
+
+=== Page 128 ===
+Summary 109
+Note
+This is just an example, and the specific events, ports, and operations used can vary depending
+on the design choices.
+In this section, we explored the critical role of events in AUTOSAR and their interaction with ports
+and interfaces, providing a comprehensive design for seamless communication and synchronization
+among SWCs. We discussed key events such as OperationInvokedEvent events, which trigger
+runnables when specific operations are called; DataReceiveEvent events, which trigger runnables
+upon receiving new data; and TimingEvent events, which trigger runnables at regular intervals. These
+events, integrated with ports and interfaces, act like an engine, orchestrating the smooth operation
+of the AUTOSAR architecture.
+Summary
+This chapter unraveled the complexities of events and interfaces within the AUTOSAR framework.
+The narrative commenced by highlighting the role of events and interfaces in automotive systems,
+underscoring their importance in facilitating smooth data transitions, ensuring real-time responses, and
+upholding safety standards. As the chapter progressed, it delved deeper into advanced communication
+models, shedding light on both SR and client-server interfaces and further distinguishing between
+synchronous and asynchronous communication paradigms. An illustrative example of a car’s temperature
+monitoring system served to contextualize these advanced features.
+Now, we should be able to architect and establish robust communication pathways for automotive
+SWCs. Building upon the foundation laid in this chapter, the next chapter dives into the intricacies of the
+AUTOSAR operating system. We’ll dissect its inner workings, exploring how it manages tasks, prioritizes
+execution, and interacts with hardware to ensure real-time performance. This in-depth exploration
+will equip you with the knowledge to design and implement robust automotive software solutions.
+Questions
+1. What is the primary role of events and interfaces within the AUTOSAR framework?
+2. How do the SR and client-server interfaces differ in their communication models?
+3. What is the significance of synchronous and asynchronous communication types in the
+AUTOSAR framework?
+4. What are the different events provided by AUTOSAR?
+
+
+=== Page 129 ===
+(blank)
+
+
+=== Page 130 ===
+6
+Getting Started with the
+AUTOSAR Operating System
+Building on our understanding of AUTOSAR and its multi-layered architecture, we are now prepared to
+examine more closely the pivotal role of the AUTOSAR operating system (OS) within this innovative
+framework and how it contributes to the overall process of automotive software development, from
+initial system design to performance tuning and fault management.
+By exploring the role of the AUTOSAR OS and understanding its implications in automotive software
+development, readers will be equipped with a solid foundation to design, develop, and optimize
+software systems within the AUTOSAR framework. This chapter adds value by providing practical
+insights and a holistic understanding of the AUTOSAR OS and its contributions to the overall process
+of automotive software development. In this chapter, we focus on unraveling the complexity and
+functionality of the AUTOSAR OS by exploring the following main topics:
+• A brief overview of the AUTOSAR OS
+• Exploring the AUTOSAR OS architecture
+A brief overview of the AUTOSAR OS
+The core of the AUTOSAR platform is the AUTOSAR OS, which is responsible for efficiently managing
+the execution of software components on electronic control units (ECUs). With meticulous design,
+the AUTOSAR OS handles crucial functions such as task scheduling, resource allocation, event
+management, and alarm functionalities.
+

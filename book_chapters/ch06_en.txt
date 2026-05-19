@@ -1,0 +1,613 @@
+=== Page 131 ===
+112 Getting Started with the AUTOSAR Operating System
+The AUTOSAR OS is positioned strategically within the AUTOSAR stack, interacting closely with
+all basic software (BSW) layers, managing and utilizing the hardware (HW) directly if needed. Let’s
+take a look at the structure again:
+Figure 6.1 – The AUTOSAR OS in AUTOSAR architecure
+The upcoming sections provide essential insights into the significance of real-time operating systems
+(RTOS) in embedded systems and the evolution of the Offene Systeme und deren Schnittstellen
+für die Elektronik in Kraftfahrzeugen/Vehicle Distributed Executive (OSEK/VDX) standard,
+which laid the foundation for the development of the AUTOSAR OS. Let’s delve into these topics to
+understand the critical role of RTOS and the seamless integration of automotive software applications
+within the AUTOSAR framework.
+Introduction to real-time operating systems
+RTOS are specialized OS designed for embedded systems that require precise timing and deterministic
+behavior. Unlike general-purpose OS that prioritize maximizing throughput and user interactivity,
+an RTOS is engineered to provide predictability and ensure specific tasks are executed within strict
+time constraints. It excels at managing time and system resources accurately, delivering rapid response
+times to critical events.
+The key difference between an RTOS and a regular OS lies in their primary focus. While a regular
+OS aims to provide a wide range of functionalities and services for diverse applications, an RTOS
+prioritizes deterministic behavior and real-time responsiveness. It guarantees that system tasks,
+particularly those with critical timing requirements, are executed within their designated time limits.
+
+
+=== Page 132 ===
+A brief overview of the AUTOSAR OS 113
+This unique characteristic makes RTOS crucial for systems where timing is critical, such as automotive
+control units. In the automotive industry, real-time performance requirements and absolute reliability
+are essential. Vehicles incorporate numerous ECUs that must seamlessly interact with one another, and
+safety-critical functions, such as how braking and engine control rely on precise timing and deterministic
+behavior. In the automotive industry, an RTOS is essential due to real-time performance requirements
+and absolute reliability. Modern vehicles incorporate numerous ECUs that must seamlessly interact
+with one another. In addition, safety-critical functions, such as braking, engine control, advanced
+driver assistance systems (ADAS), and others necessitate real-time operations to ensure safety and
+optimal performance. An RTOS, such as the AUTOSAR OS, provides the necessary features and
+services for these operations, including priority-based scheduling, fast interrupt processing, and
+inter-task communication and synchronization mechanisms and this has to be achieved within a
+small and deterministic memory footprint.
+Now that we have explored the importance and unique characteristics of RTOS, let’s explore the
+connection between RTOS and the OSEK/VDX standard, which played a significant role in establishing
+a consistent software architecture for ECUs in vehicles. We will explore how the foundational principles
+of the OSEK standard were adopted and further developed in the AUTOSAR OS to accommodate
+the evolving complexities of automotive software applications.
+Introduction to OSEK
+Emerging in the 1990s, the OSEK/VDX standard represented an automotive industry-led initiative.
+Its purpose was to create a consistent software architecture applicable across the multitude of ECUs
+deployed within a vehicle. With the advent of the AUTOSAR OS, the foundational principles of the
+OSEK standard were adopted and further developed to accommodate the evolving intricacies of
+automotive software applications.
+Building on the groundwork laid by the OSEK OS standard, the AUTOSAR OS was designed for the
+particular needs of automotive control units. This included understanding and addressing automotive
+applications’ unique constraints and real-time necessities. Essential features, such as preemptive and
+non-preemptive scheduling, were implemented for effective task management, promoting the optimal
+utilization of processing resources. In addition, strategies for resource management were integrated to
+mitigate challenges, such as priority inversion, a situation where lower-priority tasks might obstruct
+the completion of higher-priority ones. The AUTOSAR OS also incorporated mechanisms for event-
+driven task synchronization, delivering a more agile and efficient system for coordinating multiple tasks.
+The AUTOSAR OS further enhances system performance through features such as support for multiple
+cores and flexible scheduling policies, enabling concurrent execution of tasks on distinct cores. It
+also upholds the principle of stack monitoring, a tool used to identify and prevent stack overflows,
+a frequent issue in real-time and embedded systems. Thus, the AUTOSAR OS builds on and extends
+the OSEK/VDX standard, effectively catering to the growing complexity and requirements of present
+and upcoming automotive software applications.
+
+
+=== Page 133 ===
+114 Getting Started with the AUTOSAR Operating System
+The following figure depicts the OS as the central engine of a computer system, illustrating its interactions
+with various modules and its relationship to driver layers:
+Figure 6.2 – Role of OS in an embedded software
+The AUTOSAR OS configuration is a crucial step in the overall methodology, particularly during system
+integration. It involves configuring and integrating software components, the run-time environment
+(RTE), BSW modules, and the AUTOSAR OS itself.
+Configuring the AUTOSAR OS
+The configuration of the AUTOSAR OS happens during the integration phase of the AUTOSAR
+methodology. The configuration of the OS is crucial because it determines how it will manage system
+resources, handle interrupts, schedule tasks, and communicate with software components.
+The AUTOSAR OS is closely related to the RTE, a middleware layer that enables communication
+between software components. These software components are typically developed independently
+and need a common way to communicate and exchange data. The RTE provides this capability and
+uses the services of the AUTOSAR OS to do so.
+Software components, RTE, BSW modules, and the AUTOSAR OS are configured and integrated. The
+RTE generates a description file for each software component, outlining its interfaces and behavior.
+This information is used to generate the appropriate communication mechanisms (such as sending/
+receiving functions). The RTE also interacts with BSW modules, implementing low-level, hardware-
+dependent functionality, such as communication protocols and I/O management. BSW modules, as
+well as the OS, are configured based on the system requirements.
+
+
+=== Page 134 ===
+Exploring the AUTOSAR OS architecture 115
+The following figure provides a visual representation of the OS configuration step within the AUTOSAR
+methodology, showcasing the process of configuring and integrating the OS and software components
+in an ECU:
+Figure 6.3 – Configuring the AUTOSAR OS
+Now that you are familiar with what the AUTOSAR OS is, let’s delve deeper into its architecture.
+Exploring the AUTOSAR OS architecture
+The AUTOSAR OS consists of several interconnected objects, each serving a specific purpose in
+managing the system resources and providing services to the software applications. These objects
+include the following:
+• Tasks: In the AUTOSAR OS, tasks form the fundamental building blocks of execution.
+Essentially, these tasks are C functions invoked by the OS. They are distinct software elements
+that carry out specific functions and operate in a predetermined sequence, often activated by
+particular events or stimuli.
+• Alarms: Alarms are time-based triggers that can be used to schedule the execution of tasks or
+activate events at specific points in time. They enable the AUTOSAR OS to implement time-
+driven behavior and meet strict timing requirements.
+
+
+=== Page 135 ===
+116 Getting Started with the AUTOSAR Operating System
+• Events: Events represent occurrences or conditions that can trigger the execution of tasks.
+Further, tasks, interruptions, or other system components can in turn generate events.
+• Services: Services are pre-defined functions provided by the AUTOSAR OS to facilitate common
+operations, such as inter-task communication, memory management, and timing services.
+They offer a standardized interface for software components to access the OS functionality.
+• Scheduling: The AUTOSAR OS includes a scheduling mechanism that determines the order and
+priority of task execution. It ensures that tasks with higher priority are executed before lower-
+priority tasks, enabling the system to meet timing requirements and guarantee real-time behavior.
+• Resources: Resources are shared entities that multiple tasks can access and manage. They include
+hardware peripherals, memory, communication channels, and timers. The AUTOSAR OS
+provides mechanisms for controlling access to these resources, ensuring proper synchronization,
+and preventing conflicts.
+Having provided a brief overview of the OS objects, let us now explore each component more deeply.
+Tasks
+The AUTOSAR OS offers two distinct task concepts for effectively subdividing and executing complex
+control software based on real-time requirements: basic tasks and extended tasks. By implementing
+tasks, the software can be conveniently divided into manageable parts, each with its framework for
+executing functions. In addition, the OS enables concurrent and asynchronous execution of these
+tasks, and the scheduler ensures an organized sequence of task execution.
+Let’s explore these two types of tasks in greater detail.
+Basic tasks
+Basic tasks only release the processor when certain conditions are met. These conditions include
+the following:
+• The task terminating
+• The OS switching to a higher-priority task
+• The occurrence of an interrupt that triggers the processor to switch to an interrupt service
+routine (ISR)
+
+
+=== Page 136 ===
+Exploring the AUTOSAR OS architecture 117
+Let’s look at the task state model of a basic task. The task state model consists of a state machine that
+governs the behavior of tasks within the AUTOSAR framework. The following figure shows the state
+model for a basic task:
+Figure 6.4 – Basic task state machine
+Let’s explore the components shown here:
+• Running: When a task is running, the CPU is actively executing the instructions of that
+particular task within the embedded system. For instance, if you have an embedded system
+controlling the engine of a car, the task associated with the engine control module is actively
+running, continuously monitoring and controlling various engine parameters to ensure optimal
+performance and efficiency.
+• Suspended: When a task is suspended, it is temporarily paused and not executed by the CPU.
+For example, this could happen when another task takes priority or when the task voluntarily
+yields control.
+• Ready: A task in the ready state is prepared to be executed by the CPU but is currently waiting
+for its turn. The task is loaded into memory, and all its necessary resources are allocated.
+To summarize the example, during normal driving, the engine management task remains running,
+continuously optimizing engine performance. However, if a potential collision is detected, the engine
+management task may be suspended temporarily to prioritize collision avoidance. Meanwhile, the
+braking task stays ready, monitoring inputs and waiting for the driver’s command or an event that
+requires braking intervention.
+It’s important to note that in real automotive systems, numerous tasks may handle different functions
+simultaneously, and their states can dynamically change based on system requirements, priorities,
+and events.
+
+
+=== Page 137 ===
+118 Getting Started with the AUTOSAR Operating System
+Extended tasks
+Extended tasks in the AUTOSAR framework provide added functionality compared to basic tasks.
+They have the capability to utilize the OS’s WaitEvent call, enabling them to enter a waiting state.
+This waiting state allows the processor to be released and assigned to a lower-priority task without
+terminating the currently running extended task. However, the management of extended tasks is more
+complex for the OS, requiring additional system resources compared to basic tasks.
+The states of an extended task are analogous to those of a basic task, with the inclusion of an additional
+state known as the waiting state, as shown in the following figure:
+Figure 6.5 – Basic task state machine
+The waiting state is an extended task-specific state in OS. In this state, a task is waiting for a particular
+event, condition, or resource before it can proceed with its execution. The task remains in the waiting
+state until the expected event or condition occurs, at which point it can transition to the running state
+to continue its operations.
+In our example, in the embedded automotive domain, extended tasks can have additional states, such
+as waiting and blocked. The sensor data processing task runs continuously, the communication task
+may be suspended temporarily in case of errors, the diagnostics task waits for trigger events, the input
+handling task waits for user input, and a task can be blocked if it requires exclusive access to a shared
+resource. These extended states allow for more nuanced control and coordination of tasks within the
+embedded automotive system.
+
+
+=== Page 138 ===
+Exploring the AUTOSAR OS architecture 119
+Interrupts play a crucial role in handling time-critical events and ensuring timely responsiveness within
+the automotive software system. In the next section, we will dive into the concept of interrupts, their
+types, and how they are managed within the AUTOSAR framework.
+Interrupts
+In embedded development, interrupts refer to signals or events that pause the normal execution of a
+program and temporarily transfer control to a specific section of code called an ISR. Interrupts are a
+fundamental mechanism for handling time-sensitive events and external interactions in embedded systems.
+When an interrupt occurs, it interrupts the current execution of the program and diverts the processor’s
+attention to the ISR associated with that particular interrupt. As a result, the ISR performs the necessary
+actions to respond to the event or signal, such as reading sensor data, servicing a hardware device,
+or handling an external input.
+Interrupts are essential in embedded development, enabling efficient handling of time-sensitive
+events, responsiveness to external stimuli, and multitasking capabilities in embedded systems. They
+help ensure the system’s stability, real-time performance, and effective utilization of system resources.
+In the AUTOSAR OS, the functions for processing an interrupt are subdivided into two ISR categories:
+• ISR category 1: ISRs in this category operate independently of OS services. Once the ISR
+completes its execution, processing resumes precisely from the instruction where the interrupt
+originated. This implies that the interrupt does not impact task management. Such ISRs have
+minimal overhead and operate efficiently within the system.
+• ISR category 2: ISRs in this category interact with the OS. Once an ISR in category 2 finishes
+execution, the OS may perform a task switch or adjust task priorities. This is because category
+2 ISRs can invoke OS services, such as activating tasks or setting events.
+
+
+=== Page 139 ===
+120 Getting Started with the AUTOSAR Operating System
+The following figure illustrates the presence of these two types of ISRs:
+Figure 6.6 – ISR categories
+In category 1 ISRs, they are not managed by the OS and operate independently. On the other hand,
+category 2 ISRs are managed by the OS through an OS frame. This differentiation allows for distinct
+handling and management of ISRs based on their type within the AUTOSAR framework.
+Events
+In the AUTOSAR OS, events are signaling mechanisms that provide vital cues to extended tasks about
+various state changes or happenings within the system. Essentially OS-managed entities, these events
+are closely linked to extended tasks, not as standalone elements but as auxiliary objects that complement
+these tasks. Each extended task is associated with a distinct set of events, effectively becoming the
+proprietor of these events. Events in AUTOSAR are characterized by two key attributes: the owning
+task and the unique identifier, often referred to as the name or mask. After activating an extended
+task, the OS systematically clears the related events, thereby readying them for their next assignment.
+Events serve as conduits for binary communication, encapsulating various types of information, such
+as a timer’s expiration, availability of a resource, and reception of a message, among other system-
+
+
+=== Page 140 ===
+Exploring the AUTOSAR OS architecture 121
+level occurrences. Therefore, the utility of events is pivotal in managing non-periodic situations that
+warrant an immediate response.
+AUTOSAR’s communication model is deeply rooted in this event-centric design, primarily aimed at
+fostering efficient task synchronization and communication in real-time environments. An event can
+be linked with multiple tasks, while a task can await several events. When a task is in a waiting state
+for a certain event, it remains blocked until the event is set, enabling precise coordination among
+other system-level occurrences. Therefore, the utility of events is pivotal in managing non-periodic
+situations that warrant an immediate response.
+The AUTOSAR OS provides API functions for managing and manipulating events. These functions
+include the following:
+• SetEvent: This function can be used to set an event for a particular task. When the event is
+set, the task waiting for this event will be unblocked and ready for execution.
+• ClearEvent: This function is used to clear a specified event for a task.
+• WaitEvent: This function blocks the execution of the calling task until one of its events is set.
+• GetEvent: This function reads the currently pending events of a task.
+Let’s consider an example where we have two tasks, Task1 and Task2. Task1 sets an event
+(Event1), and Task2 waits for this event to occur:
+#define Event1 0x01
+TASK(Task1)
+{
+// ... Task1's processing ...
+// Set the Event1 for Task2
+SetEvent(Task2, Event1);
+// Terminate Task1
+TerminateTask();
+}
+TASK(Task2)
+{
+// Wait for the Event1
+WaitEvent(Event1);
+// If the execution reaches this point, it means Event1 occurred
+// ... Task2's processing ...
+// Clear the Event1
+ClearEvent(Event1);
+// Terminate Task2
+TerminateTask();
+}
+
+
+=== Page 141 ===
+122 Getting Started with the AUTOSAR Operating System
+In this example, Task2 uses the WaitEvent function to wait for Event1. Until Event1 is set,
+Task2 remains in the waiting state. Task1 uses SetEvent to set Event1 when it completes
+its processing. Once Event1 is set, Task2 moves from the waiting state to the ready state, and its
+execution continues. After handling the event, Task2 uses ClearEvent to clear Event1 and
+then terminates.
+This mechanism allows tasks to synchronize their execution based on specific system states or
+occurrences, thus enabling efficient real-time system management.
+The following figure provides a visual representation of events in the AUTOSAR framework, showcasing
+their setting, clearing, and sharing mechanisms among tasks or through the scheduler. It offers insights
+into how events are utilized to facilitate communication and synchronization between various tasks
+or executable entities:
+Figure 6.7 – Events between tasks
+In the next section, we will explore the scheduling mechanisms employed by the AUTOSAR OS to
+ensure efficient task execution and resource allocation.
+Scheduling
+Scheduling in the AUTOSAR OS refers to the mechanism that determines the order and priority of
+task execution within the system. It plays a crucial role in managing the allocation of processor time
+and resources among different tasks, ensuring that the system meets its timing requirements and
+achieves real-time behavior.
+The AUTOSAR OS supports different scheduling policies based on the specific needs of the system.
+Two common scheduling policies in AUTOSAR are as follows:
+• Full preemptive scheduling: This type of scheduling enables a running task to be rescheduled
+at any instruction based on pre-defined trigger conditions set by the OS. With full preemptive
+scheduling, when a higher-priority task becomes ready for execution, the currently running
+task is placed in the ready state, and its execution context is saved. The higher-priority task
+is then scheduled and allowed to execute. This preemptive behavior ensures that tasks with
+
+
+=== Page 142 ===
+Exploring the AUTOSAR OS architecture 123
+higher priority are given immediate access to the processor, allowing critical tasks to meet
+their timing requirements. Once the higher-priority task completes its execution or becomes
+blocked, the previously preempted task can resume execution from the exact location where
+it was preempted.
+Figure 6.8 – Full preemptive scheduling
+• Non-preemptive scheduling: The non-preemptive scheduling policy, also referred to as
+cooperative scheduling, enables tasks to continue execution until they willingly give up control
+or encounter explicit rescheduling points. In this policy, task switching occurs only through
+explicitly defined system services or specific rescheduling points. Under non-preemptive
+scheduling, a task retains control of the processor until it completes its execution, switches to
+a higher-priority task, or an interrupt occurs that triggers the execution of an ISR. However,
+non-preemptive scheduling imposes specific constraints on timing requirements. Notably, when
+a lower-priority task enters a non-preemptable section, it can cause a delay in the execution of
+higher-priority tasks until the next rescheduling point is reached.
+Figure 6.9 – Non-preemptive scheduling
+
+
+=== Page 143 ===
+124 Getting Started with the AUTOSAR Operating System
+Timing protection is ensured through the scheduling policy implemented in AUTOSAR, which
+incorporates a mechanism known as highest priority first. Under this policy, tasks with the same
+priority are grouped together and placed in a first in, first out (FIFO) stack. These tasks share a
+common resource. To maintain timing integrity, only one task within the group is allowed to occupy
+the shared resource at a time. When a task completes its operation and releases the resource, the next
+task in the FIFO stack can then acquire the released resource. This sequential access to the resource
+prevents multiple tasks from concurrently accessing it and ensures orderly execution.
+Importantly, the scheduling policy based on the highest priority first does not allow one task to preempt
+another task within the same priority group. This means that tasks within a priority level are executed
+in a cooperative manner, without interrupting each other. These preemption rules, combined with
+the sequential access to shared resources, work together to provide timing protection for the system.
+By adhering to these rules, the system can effectively meet all its timing requirements, ensuring the
+timely execution of critical tasks and maintaining overall system reliability.
+In the next section, we will delve into various task trigger mechanisms and their significance in
+facilitating efficient task execution, event handling, and inter-task communication.
+Task trigger mechanisms
+In AUTOSAR, task trigger mechanisms are used to activate tasks based on specific conditions or
+events. These mechanisms provide a way to initiate the execution of tasks in response to pre-defined
+triggers. There are two common task trigger mechanisms used in AUTOSAR: alarms and schedule
+tables. Let’s explore these in detail in the following sections.
+Alarms
+The AUTOSAR OS provides functionalities for handling repetitive events. These events can include
+timers that generate interruptions at regular intervals, for example, triggering a timing event to the
+application or generating an activation event to a task. Alarms are pivotal time-driven entities in the
+AUTOSAR OS, designed to meet real-time systems’ timing demands. They are intimately tied to
+counters, which are software timers that count in ticks. A tick can represent any time period, although,
+in practice, it’s often set to match the OS’s scheduler tick. Counters can be incremented in different
+ways, such as at fixed time intervals (system counter), via hardware interrupts (hardware counter), or
+manually by application software (software counter). Using counters provides a mechanism to handle
+time-based events. The relationship between counters and alarms is such that, when a counter hits a
+predetermined count value, the associated alarm expires and performs a pre-defined action. These
+actions primarily include the following:
+• Activation of a task: Upon expiration, an alarm can activate a specific task. This allows for
+precise scheduling of tasks and implementing time-based behavior in AUTOSAR applications.
+For instance, a task could be activated every 100 milliseconds to check the status of a sensor.
+
+
+=== Page 144 ===
+Exploring the AUTOSAR OS architecture 125
+• Setting an event: An alarm can also set an event for a particular task when it expires. This provides
+a way for tasks to synchronize their execution based on specific system states or occurrences.
+The AUTOSAR OS oversees counters and associated alarms, ensuring that when a counter value
+reaches a specific threshold, the corresponding alarm triggers the configured action. This mechanism
+allows for efficient handling of timing requirements, resource optimization, and the implementation
+of time-dependent behavior in automotive applications.
+The following is a pseudocode example demonstrating how an alarm can be used:
+#define ALARM_CYCLE 10
+TASK(Task1)
+{
+// Task1 processing here
+// Terminate Task1
+TerminateTask();
+}
+void setup(void)
+{
+// Start the alarm; it will expire after ALARM_CYCLE counter ticks,
+and then every ALARM_CYCLE ticks
+SetRelAlarm(Alarm1, ALARM_CYCLE, ALARM_CYCLE);
+}
+void main(void)
+{
+setup();
+while(1)
+{
+// Increment the counter
+IncrementCounter(Counter1);
+// Handle the alarms
+AlarmCheck();
+if (CheckAlarmExpired(Alarm1)) {
+// Activate Task1 when Alarm1 expires
+ActivateTask(Task1);
+}
+}
+}
+
+
+=== Page 145 ===
+126 Getting Started with the AUTOSAR Operating System
+In this code, the SetRelAlarm function configures Alarm1 to start after the ALARM_CYCLE
+counter ticks and to expire after every ALARM_CYCLE counter ticks. When the alarm expires, it
+triggers the activation of Task1 in the main loop.
+Next, let’s discuss schedule tables.
+Schedule tables
+Schedule tables in the AUTOSAR OS are advanced timing mechanisms that provide a powerful way
+to define complex timing behaviors. They offer a higher level of abstraction than alarms and counters,
+allowing the precise scheduling of tasks and the setting of events based on time.
+A schedule table can be thought of as a timetable of actions. It consists of multiple steps, each step
+corresponding to a point in time. When the time arrives for a specific step, the scheduled action (such
+as the activation of a task or the setting of an event) takes place.
+The following figure showcases schedule tables and expiry points, highlighting their significance in
+orchestrating task execution and timing within the AUTOSAR framework. It emphasizes that each
+expiry point can possess an offset, enabling the activation of tasks and the setting of events at specific
+time instances:
+Figure 6.10 – Schedule table example
+The AUTOSAR OS supports both relative and synchronized schedule tables. Relative schedule tables
+begin running as soon they are started, with the timing of each step relative to the start of the table.
+Synchronized schedule tables, on the other hand, are synchronized to an external time source.
+Synchronized schedule tables play a vital role in inter-ECU synchronization. Multiple ECUs in a vehicle
+often need to coordinate their actions to achieve overall system objectives. For instance, different
+ECUs controlling various aspects of engine management (fuel injection, spark timing, etc.) need to
+act in a coordinated manner.
+
+
+=== Page 146 ===
+Exploring the AUTOSAR OS architecture 127
+The following pseudocode is a simplified example of how schedule tables can be used for this purpose.
+Imagine we have two ECUs, ECU1 and ECU2, each running an instance of the AUTOSAR OS. ECU1
+is the master, generating a synchronization signal every 100 milliseconds, and ECU2 is the slave,
+needing to perform certain actions synchronized to this signal:
+// On ECU1 (master)
+#define SYNC_CYCLE 100 // Sync signal every 100 ms
+TASK(SyncTask)
+{
+// Generate the sync signal
+SendSyncSignal();
+// Schedule the Task to run again in 100 ms
+SetRelAlarm(SyncAlarm, SYNC_CYCLE, SYNC_CYCLE);
+TerminateTask();
+}
+// On ECU2 (slave)
+#define TABLE_START 0
+#define TASK_STEP 50 // Task to be run 50 ms after receiving the
+sync signal
+TASK(SlaveTask)
+{
+// Do something here...
+TerminateTask();
+}
+// When the sync signal is received...
+void OnSyncSignalReceived(TickType syncTime)
+{
+// Synchronize the schedule table to the received sync signal
+SyncScheduleTable(SlaveScheduleTable, syncTime);
+}
+In the preceding example, ECU1 generates a synchronization signal periodically using a task and
+an alarm. Upon receiving the sync signal on ECU2, the SyncScheduleTable function is used
+to synchronize the SlaveScheduleTable schedule table to the sync signal. This ensures that
+SlaveTask is activated 50 ms after receiving the sync signal, synchronizing the task execution on
+ECU2 to the actions on ECU1.
+
+
+=== Page 147 ===
+128 Getting Started with the AUTOSAR Operating System
+Through this, schedule tables in the AUTOSAR OS provide a powerful way to synchronize the operations
+of different ECUs, facilitating complex, time-coordinated behaviors across the whole vehicle system.
+Now, let’s shift our focus to OS resources; understanding how the OS manages and allocates resources
+is crucial for ensuring the efficient utilization of system capabilities. In the next section, we will explore
+the concept of OS resources and discuss their significance in the AUTOSAR framework.
+OS resources
+Resource management in the AUTOSAR OS plays an instrumental role in synchronizing shared
+resource access across tasks with varying priorities. These resources can encompass a broad spectrum,
+including scheduler management entities, sequential programs, memory regions, or specific hardware
+areas. The resource management system is a requisite across all conformance classes and can optionally
+be extended to include task and ISR coordination.
+Let’s now look at OS resources within AUTOSAR that represent critical elements, such as CPU power,
+memory, I/O devices, and communication channels:
+Figure 6.11 – Shared resource between two tasks
+The core principles of resource management in the AUTOSAR OS are as follows:
+• Exclusive access: The system ensures that two tasks cannot occupy the same resource
+simultaneously, preventing data inconsistency and corruption
+• Priority inversion prevention: The AUTOSAR OS employs a priority inheritance protocol to
+prevent priority inversion – a situation where a higher-priority task is blocked, waiting for a
+lower-priority task holding a shared resource
+• Deadlock avoidance: The OS ensures that deadlocks, situations where tasks mutually block
+each other waiting for resources, do not occur
+• Non-blocking access: Access to resources in the AUTOSAR OS never results in a waiting state,
+allowing for efficient task execution without unnecessary delays.
+
+
+=== Page 148 ===
+Exploring the AUTOSAR OS architecture 129
+The following code snippet illustrates the usage and locking of resources within the AUTOSAR
+framework, specifically highlighting the implementation of a critical section to ensure exclusive access
+to a particular resource:
+#define RESOURCE_ID 1
+TASK(Task1)
+{
+GetResource(RESOURCE_ID);
+// Critical section, access the shared resource here...
+ReleaseResource(RESOURCE_ID);
+TerminateTask();
+}
+In this example, Task1 acquires the resource using GetResource(), accesses the shared resource,
+then releases it using ReleaseResource(). During the time Task1 holds the resource, no other
+task can acquire the same resource, ensuring exclusive access.
+In summary, resource management in the AUTOSAR OS is a critical feature that guarantees safe and
+efficient sharing of resources across tasks and ISRs, paving the way for effective, concurrent execution
+in real-time systems.
+Hooks
+Hooks in AUTOSAR are callout functions that users can implement to customize and extend the
+behavior of the OS at specific points during its execution. These hooks serve as entry points for user-
+defined code and are designed to be called by the AUTOSAR OS when certain events or conditions
+occur. Hooks are particularly useful for detecting issues, debugging, and performing additional actions
+in response to critical events.
+Hooks can be used in various scenarios and are typically categorized based on the specific state or
+event they are associated with. Some of the commonly used hooks in AUTOSAR include shutdown
+hooks, task execution hooks, and error hooks. Let’s take a look at these:
+• Task/ISR execution hooks: Task execution hooks are called before and after the execution of
+each task within the AUTOSAR OS. These hooks provide insight into the task execution flow
+and can be used to monitor task behavior, collect run-time information, or perform additional
+checks. Task execution hooks are useful for profiling, performance monitoring, and detecting
+anomalies or errors during task execution.
+• Shutdown hooks: Shutdown hooks are called when the system is shutting down or entering
+a low-power state. They allow users to perform cleanup tasks, save critical data, or gracefully
+shut down system components before the system powers off. Shutdown hooks can be used to
+trigger data storage in non-volatile memory (NVM), release resources, or ensure the system
+is in a safe state for shutdown.
+
+
+=== Page 149 ===
+130 Getting Started with the AUTOSAR Operating System
+• Error hooks: Error hooks are triggered when an error condition occurs within the AUTOSAR
+OS or when critical errors are detected. These hooks allow users to capture error information,
+perform error-handling routines, and take appropriate actions to mitigate the impact of
+errors. Error hooks can be used to log error messages, generate error reports, or initiate error
+recovery procedures.
+Hooks are beneficial in AUTOSAR systems as they provide a means to extend the functionality of the
+OS and incorporate user-defined code at critical points. They enable users to monitor system behavior,
+gather diagnostic information, and take corrective actions when necessary. By implementing hooks,
+developers can enhance system observability, facilitate troubleshooting, and improve the overall
+reliability and robustness of the AUTOSAR-based software.
+It is important to note that the implementation and usage of hooks should be carefully considered,
+as they introduce additional code and execution overhead. Hooks should be designed to be efficient,
+non-blocking, and have minimal impact on system performance. Careful testing and validation of
+hook functions are essential to ensure they do not introduce unintended side effects or compromise
+system stability.
+Summary
+In this chapter, we explored the role of the AUTOSAR OS in automotive software development. We
+discussed its architecture, RTOS, and the OSEK standard. By understanding the role of RTOS in the
+automotive industry, you have gained a deeper understanding of the importance of precise time and
+resource management. The AUTOSAR OS, with its priority-based scheduling, fast interrupt processing,
+and inter-task communication capabilities, equips you to develop high-performance and time-critical
+automotive software systems. Exploring the influence of the OSEK standard on the AUTOSAR OS
+has provided you with insights into addressing automotive constraints through preemptive and
+non-preemptive scheduling, as well as event-driven task synchronization. These features enable you
+to design and optimize the execution and timing requirements of tasks, ensuring optimal performance
+within automotive systems.
+Furthermore, you have familiarized yourself with essential elements of the AUTOSAR OS, such as
+tasks, alarms, events, services, scheduling, resources, and interrupts. This knowledge empowers you
+to effectively configure and manage these components, facilitating task execution, synchronization,
+and resource allocation in ECUs. You can synchronize and handle state transitions of extended tasks
+through assigned events, enhancing the overall functionality and coordination of your software
+components. Additionally, understanding resource management ensures coordinated access and
+conflict prevention in shared resources, optimizing system efficiency and reliability.
+
+
+=== Page 150 ===
+Questions 131
+You are now well equipped to apply your expertise in real-world automotive software development
+scenarios. Your understanding of the AUTOSAR OS, RTOS, task management, synchronization,
+and resource allocation will contribute to the design and development of robust, efficient, and safe
+automotive systems.
+The next chapter will delve into an in-depth exploration of the application layer, the RTE, and how
+software components are designed within the AUTOSAR framework.
+Questions
+1. Describe the main objects an AUTOSAR OS consists of.
+2. What is the difference between a basic task and an extended task?
+3. When do you select FULL or NON as a task property in the OS configurator?
+4. How can we protect a shared resource?
+
+
+=== Page 151 ===
+(blank)
+
+
+=== Page 152 ===
+7
+Exploring the
+Communication Stack
+The communication stack is a central pillar of the AUTOSAR framework, intricately weaving together
+diverse modules to create a harmonious symphony of data exchange and functional integration. As
+we navigate through this chapter, our expedition will concentrate on the various modules constituting
+the AUTOSAR communication stack and their significance in facilitating communication protocols
+within an automotive electronic control unit (ECU).
+At the heart of our discourse lies the intricate design, organization, and functional dynamics of these
+modules. Delving into their very fabric, we aspire to uncover how they interface with one another. This
+chapter focuses on dissecting each layer of the communication stack and shedding light on its purpose
+and design considerations, examining its modules, unraveling their intricate interdependencies, and
+introducing key terms such as messages, frame, protocol data unit (PDU), and signal.
+We will be covering the following topics:
+• What is the COM stack?
+• COM stack overview
+• Network management
+Let’s dive in and explore what the COM stack is and why it’s one of the most essential stacks in an
+automotive ECU.
+

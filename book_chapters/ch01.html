@@ -3,54 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第1章 探索 AUTOSAR 的起源与目标 — AUTOSAR 基础与应用</title>
-<link rel="stylesheet" href="styles.css">
+<title>AUTOSAR 基础与应用 — 第1章 探索 AUTOSAR 的起源与目标</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: #f5f5f0;
+    color: #2c2c2c;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.06);
+    min-height: 100vh;
+  }
+  h1 { font-size: 22px; text-align: center; margin: 30px 0 10px; color: #1a1a1a; }
+  h2 { font-size: 18px; margin: 28px 0 12px; color: #333; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 20px 0 8px; color: #444; }
+  p { margin: 8px 0; text-align: justify; }
+  ul, ol { margin: 8px 0 8px 24px; }
+  li { margin: 3px 0; }
+  .page-marker {
+    text-align: right;
+    color: #bbb;
+    font-size: 12px;
+    margin: 24px 0 0;
+    border-top: 1px dashed #e8e8e8;
+    padding-top: 4px;
+  }
+  .page-marker:first-child { border-top: none; margin-top: 0; }
+  .figure {
+    text-align: center;
+    margin: 16px 0;
+    padding: 12px;
+    background: #fafaf7;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+  }
+  .note {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: #f0f7ff;
+    border-left: 4px solid #4a90d9;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .note::before { content: "📝 注意 "; font-weight: bold; color: #4a90d9; }
+  .case-study {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: #fffdf0;
+    border-left: 4px solid #e6a817;
+    border-radius: 0 4px 4px 0;
+  }
+  .case-study::before { content: "📋 案例研究 "; font-weight: bold; color: #b8860b; }
+  .questions {
+    margin: 16px 0;
+    padding: 16px 20px;
+    background: #f5f0ff;
+    border-radius: 6px;
+  }
+  .questions h3 { margin-top: 0; color: #6b3fa0; }
+  .summary {
+    margin: 16px 0;
+    padding: 16px 20px;
+    background: #f0fff0;
+    border-radius: 6px;
+  }
+  .summary h3 { margin-top: 0; color: #2d7d2d; }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+</style>
 </head>
 <body>
-<div class="sidebar">
-  <div class="sidebar-header">
-    <a href="index.html" class="book-title">AUTOSAR 基础与应用</a>
-  </div>
-  <nav class="nav-list">
-    <ul>
-        <li><a href="ch01.html" class="nav-chapter active">第1章 探索 AUTOSAR 的起源与目标</a></li>
-        <li><a href="ch02.html" class="nav-chapter">第2章 AUTOSAR 软件层简介</a></li>
-        <li><a href="ch03.html" class="nav-chapter">第3章 AUTOSAR 方法论与数据交换格式</a></li>
-        <li><a href="ch04.html" class="nav-chapter">第4章 使用软件组件与 RTE</a></li>
-        <li><a href="ch05.html" class="nav-chapter">第5章 设计与实现事件和接口</a></li>
-        <li><a href="ch06.html" class="nav-chapter">第6章 AUTOSAR 操作系统入门</a></li>
-        <li><a href="ch07.html" class="nav-chapter">第7章 探索通信栈</a></li>
-        <li><a href="ch08.html" class="nav-chapter">第8章 使用 Crypto 与安全栈保护 AUTOSAR 系统</a></li>
-        <li><a href="ch09.html" class="nav-chapter">第9章 内存与模式管理</a></li>
-        <li><a href="ch10.html" class="nav-chapter">第10章 总结与知识拓展用例</a></li>
-    </ul>
-  </nav>
-</div>
-
-<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="切换导航">☰</button>
-
-<div class="main-content">
-  <div class="chapter-page">
 <div class="container">
 
 <h1>第1章 探索 AUTOSAR 的起源与目标</h1>
 <p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
 
 <div class="page-marker">第 23 页</div>
-
-<p>AUTOSAR（AUTomotive Open System ARchitecture，汽车开放系统架构）是汽车电子系统开发的标准化规范。它为车辆中的电子控制单元（ECU）提供了通用的软件架构，使得新功能的集成和开发更加便捷。AUTOSAR 是由主要汽车制造商和供应商组成的合作组织，其目标是提升汽车软件开发过程的整体效率和灵活性。</p>
-
-<p>在本章中，我们将讨论 AUTOSAR 发展的动机、合作组织的架构，以及其宗旨与目标。本章将涵盖以下主要主题：</p>
-<ul>
-<li>汽车行业的演变</li>
-<li>AUTOSAR 框架介绍</li>
-<li>理解 AUTOSAR 标准</li>
-<li>软件架构与设计</li>
-</ul>
-
-<h2>汽车行业的演变</h2>
-
-<p>在过去的几十年里，汽车工业已从一种简单的交通工具演变为堪比"轮上智能手机"的复杂机器。这一转变源于先进技术的集成，以及设计开发方式的日益成熟。</p>
 
 <p>汽车的演变可以追溯到20世纪初第一辆汽车问世之时。那时的车辆简单实用，主要设计目标就是将人从A点运到B点。然而，随着技术的进步，汽车也在不断发展。在20世纪50年代和60年代，我们看到了安全带、安全气囊和防抱死制动系统等先进安全功能的出现。到了80年代，车载计算机开始被引入，实现了更先进的发动机管理和诊断功能。在90年代，车辆集成了更复杂的电子系统，例如电子稳定控制（ESC（Electronic Stability Control，电子稳定控制））和高级驾驶辅助系统（ADAS）。进入21世纪，汽车经历了巨大的变革。如今的车辆配备了曾经仅属于高端豪华车的先进功能。</p>
 
@@ -422,9 +464,7 @@
 <li>运行时环境</li>
 <li>基础软件层</li>
 </ul>
-  </div>
-</div>
 
-<script src="scripts.js"></script>
+</div>
 </body>
 </html>

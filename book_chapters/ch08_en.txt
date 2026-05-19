@@ -1,0 +1,630 @@
+=== Page 182 ===
+8
+Securing the AUTOSAR System
+with Crypto and Security Stack
+In this chapter, we will embark on a journey through the aspects of automotive cybersecurity, beginning
+by providing an overview of the security landscape within the AUTOSAR framework.
+Then we will explore the core components of the Crypto Stack Design, examining the principles and
+configurations for safeguarding sensitive data and ensuring secure communication between vehicle
+components. This introduction aims to get us familiarized with the concepts of security in automotive
+systems and demonstrate how AUTOSAR tackles these issues through its robust crypto stack. Let’s
+embark on this journey together.
+In this chapter, we will discuss the following:
+• Introduction to automotive security
+• Fundamentals of automotive security
+• Security stack in AUTOSAR architecture
+• Crypto Stack use cases and examples
+Introduction to automotive security
+Imagine driving a car that can be hacked remotely, jeopardizing not only your safety but also the security
+of your personal data. This nightmare scenario underscores the critical importance of automotive
+security in today’s interconnected world.
+The automotive industry has witnessed a remarkable transformation in recent years. Modern vehicles
+are equipped with advanced features, including infotainment systems, telematics, and autonomous
+driving capabilities. While these innovations have improved convenience and safety, they have also
+introduced new vulnerabilities. Just as we secure our homes and personal information, we must
+safeguard our vehicles against malicious actors seeking to exploit these vulnerabilities.
+
+
+=== Page 183 ===
+164 Securing the AUTOSAR System with Crypto and Security Stack
+So, why is automotive security in the spotlight, especially in the context of AUTOSAR? Here are some
+points to consider:
+• Safety and lives at stake: Beyond being a mode of transportation, vehicles are increasingly
+becoming computers on wheels. Any security breach can have life-threatening consequences.
+For example, imagine a scenario where a hacker gains control over a vehicle’s braking system,
+causing a collision if the ECU is hijacked.
+• Data privacy: Vehicles collect vast amounts of data, from driver preferences to geolocation
+data. Protecting this information is not just a matter of compliance with regulations such as
+GDPR; it’s a matter of trust between consumers and automakers.
+• Financial implications: Security breaches can result in significant financial losses, including
+recalls, legal liabilities, and damage to a company’s reputation, as well as protection of the
+company IP.
+• Evolving threat landscape: Hackers and cybercriminals continually develop new tactics and
+techniques to exploit vulnerabilities in automotive systems. As AUTOSAR evolves, so do the
+attack vectors. Staying ahead of these threats is crucial.
+• Regulatory compliance: Governments worldwide are introducing stringent regulations and
+standards, mandating automotive cybersecurity. Non-compliance can result in severe penalties
+and market exclusion.
+Now that you understand the importance of automotive security in today’s interconnected world, let’s
+explore the fundamental aspects of how this security is achieved within the AUTOSAR framework.
+In this section, we will explore the essential cryptographic mechanisms that safeguard data and
+communication in automotive systems.
+Fundamentals of automotive security
+In AUTOSAR, cryptographic mechanisms are indispensable for ensuring the security of data and
+communication within automotive systems. These mechanisms encompass both software and
+hardware cryptographic processing approaches, each offering distinct advantages and use cases.
+While software crypto relies on algorithms executed by the ECU’s central processing unit (CPU) or
+microcontroller, hardware crypto leverages dedicated cryptographic modules or co-processors within
+the microcontroller or secure hardware components. These hardware modules, such as hardware
+security modules (HSM), are specifically designed to accelerate cryptographic operations, providing
+faster and more efficient processing. In AUTOSAR, cryptographic algorithms can be implemented
+using a combination of hardware and software components (SWCs), offering flexibility and tailored
+solutions to meet the diverse security requirements of automotive systems.
+
+
+=== Page 184 ===
+Fundamentals of automotive security 165
+Figure 8.1 – Goals of security CIA
+The primary objective of automotive security is to ensure the confidentiality, integrity, and availability
+of vehicle systems and data, which are discussed as follows:
+• Confidentiality involves protecting sensitive information, such as user data and vehicle
+diagnostics, from unauthorized access and disclosure
+• Integrity ensures that data and software remain accurate and trustworthy, preventing unauthorized
+modifications and tampering
+• Availability guarantees that critical vehicle systems are operational and accessible when needed,
+defending against disruptions such as denial-of-service attacks
+Additionally, robust authentication and authorization mechanisms are implemented to verify the
+identity of users and devices, granting appropriate access privileges based on their roles. These
+objectives collectively ensure that automotive systems are secure, reliable, and resilient against both
+accidental failures and malicious attacks.
+Security in AUTOSAR
+AUTOSAR recognizes the critical role of security in modern vehicles and has developed its set of
+security requirements and guidelines. These are designed to complement industry standards such as
+ISO 21434 and ISO 26262, providing specific guidance for implementing security measures within
+the AUTOSAR architecture.
+ISO 21434 is a comprehensive cybersecurity standard specifically designed for the automotive sector.
+It outlines the requirements for assessing and managing cybersecurity risks during the development
+and production of vehicles. ISO 21434 provides a structured framework for integrating security into
+the automotive development life cycle, ensuring that security is considered from the initial design
+phase through production and beyond.
+ISO 26262 focuses on functional safety within the automotive industry. While it primarily addresses
+safety concerns, it also acknowledges the interplay between safety and security. A secure system can
+enhance safety by preventing malicious interference. ISO 26262 includes provisions for risk assessment
+related to cybersecurity, highlighting the importance of security considerations alongside safety.
+
+
+=== Page 185 ===
+166 Securing the AUTOSAR System with Crypto and Security Stack
+Differentiating between safety and security
+The two Ss, safety and security, are closely related terms in automotive software development. They
+often overlap, as a security breach or attack can have serious safety implications, such as compromising
+the functionality of critical systems such as brakes or steering.
+Figure 8.2 – Safety and security overlapping
+Next, we will examine how AUTOSAR manages these intertwined aspects of safety and security.
+Safety in AUTOSAR
+Safety in AUTOSAR primarily concerns the prevention and mitigation of accidents and hazards. It
+encompasses mechanisms and processes that address physical failures and malfunctions in the vehicle’s
+systems. Safety measures are designed to protect occupants, pedestrians, and the environment.
+Security in AUTOSAR
+In contrast, security in AUTOSAR is concerned with protecting the vehicle’s systems from intentional
+attacks, unauthorized access, and data breaches. It encompasses measures to prevent cyber threats
+that can compromise the vehicle’s functionality, privacy, and safety.
+AUTOSAR security requirements cover a broad spectrum, including secure communication, cryptographic
+services, and access control. These requirements are designed to ensure that AUTOSAR-based systems
+can effectively counter various cyber threats. Rather than offering direct implementation guidelines,
+AUTOSAR provides building blocks to help secure ECU software. These building blocks support
+engineers in integrating robust security features, ensuring that automotive systems meet high-security
+standards and are resilient against potential cyber threats.
+In the next section, we’ll explore the BSW architecture of the crypto stack and its services within
+AUTOSAR, focusing on how it secures communication and data protection in automotive systems.
+We’ll also examine the security stack’s core components, highlighting its role in addressing the unique
+challenges of automotive security.
+
+
+=== Page 186 ===
+Security stack architecture in AUTOSAR 167
+Security stack architecture in AUTOSAR
+In this section, we will explore the security modules offered by AUTOSAR architecture, focusing
+on the modules that provide security functionality. AUTOSAR offers a toolbox of building blocks
+designed to help achieve security objectives in software. These tools enable engineers to integrate
+robust security features, ensuring that automotive systems meet high-security standards and are
+resilient against potential cyber threats.
+The key security features in AUTOSAR are listed here:
+• Cryptographic services: AUTOSAR provides a range of cryptographic services, including
+encryption, decryption, hashing, and digital signatures. These services are used for protecting
+data and ensuring its authenticity.
+• Access control: AUTOSAR allows for fine-grained access control, specifying who can access
+specific functions, services, or data within the system. This enhances security by minimizing
+the attack surface.
+• Secure communication: The architecture facilitates secure communication between ECUs,
+ensuring that data exchanged between components remains confidential and tamper-proof.
+• Secure boot: AUTOSAR supports secure boot mechanisms, which help in verifying the integrity
+of SWCs during the boot-up process, safeguarding against unauthorized code execution.
+Note on AUTOSAR security features
+The security features provided by AUTOSAR are specified through detailed requirements,
+not directly as code implementations. These requirements outline the necessary security
+measures and functionalities that need to be integrated into automotive systems to ensure
+robust protection against cyber threats. For instance, AUTOSAR defines requirements for
+secure communication, cryptographic services, access control, and secure boot, among others.
+These requirements act as guidelines for engineers to design and implement security features
+in their ECU software, ensuring that the systems meet high-security standards and are resilient
+against potential cyber threats.
+Cryptographic techniques
+Cryptography forms the foundation of secure communication in AUTOSAR. The following cryptographic
+techniques are commonly used:
+• Encryption: Data is encrypted before transmission, making it unreadable without the
+correct decryption key. This ensures data confidentiality, even if the data is intercepted by
+unauthorized entities.
+
+
+=== Page 187 ===
+168 Securing the AUTOSAR System with Crypto and Security Stack
+• Digital signatures: Digital signatures are used to verify the authenticity and integrity of data.
+When data is signed, receivers can verify that it hasn’t been altered during transmission and
+that it originated from a trusted source.
+• Hash functions: Hash functions generate fixed-size values (hashes) based on input data. These
+hashes are used to verify data integrity. If the received hash matches the calculated hash of the
+received data, it’s likely that the data has not been tampered with.
+The following diagram, Figure 8.3, describes the BSW architecture the components of the crypto stack:
+Figure 8.3 – Security Stack Architecture with in AUTOSAR
+
+
+=== Page 188 ===
+Security stack architecture in AUTOSAR 169
+In AUTOSAR, the Crypto Stack is like a Swiss army knife that is used to ensure the security and
+integrity of data within automotive systems. It consists of several key modules, including the Crypto
+Stack Manager (CSM), Crypto Interface (CryptoIf), and the Crypto module. Each module serves a
+distinct purpose and contributes to the overall security architecture of AUTOSAR.
+Crypto service manager module
+The CSM is responsible for coordinating and managing cryptographic operations within the AUTOSAR
+system. Its primary functions include the following:
+• Request handling: CSM receives cryptographic requests from various SWCs, services, or modules
+within the system. These requests can include operations such as encryption, decryption, hash
+generation, and digital signature creation or verification.
+• Resource management: CSM manages cryptographic resources, such as cryptographic keys
+and algorithms. It ensures that keys are securely stored and that the appropriate cryptographic
+algorithms are available for use.
+• Key handling: CSM oversees key management, including key generation, distribution, and
+revocation. It ensures that cryptographic keys are used securely and in compliance with
+security policies.
+• Error handling: CSM handles cryptographic errors and exceptions. If a cryptographic operation
+fails or encounters an issue, CSM provides error codes and information for diagnostics and recovery.
+Job concept in CSM
+The Crypto Service Manager (CSM) in AUTOSAR acts as a service provider where users, such as
+SWCs and basic software modules such as Secure Onboard Communication (SecOC), request
+cryptographic operations such as encryption and decryption. The Crypto Service Manager manages
+these requests by prioritizing them as jobs to ensure efficient processing.
+A job refers to an instance of a static cryptographic operation that has been configured and could be
+submitted for execution. Each job involves specific parameters and operations related to cryptographic
+tasks such as encryption, decryption, Message Authentication Code (MAC) generation, and verification.
+Here are some API examples:
+• Csm_Encrypt:
+ Description: Encrypts data using a specified cryptographic algorithm
+ Syntax:
+Std_ReturnType Csm_Encrypt( uint32 jobId, Crypto_
+OperationModeType mode, const uint8* dataPtr, uint32 dataLength,
+uint8* macPtr, uint32* macLengthPtr );
+
+
+=== Page 189 ===
+170 Securing the AUTOSAR System with Crypto and Security Stack
+• Csm_MacGenerate:
+ Description: This function is used to generate a MAC for the provided data
+ Syntax:
+Std_ReturnType Csm_MacGenerate ( uint32 jobId, Crypto_
+OperationModeType mode, const uint8* dataPtr, uint32 dataLength,
+uint8* macPtr, uint32* macLengthPtr );
+• Csm_Hash:
+ Description: Computes the hash value of the given data
+ Syntax:
+Std_ReturnType Csm_Hash( uint32 jobId, Crypto_OperationModeType
+mode, const uint8* dataPtr, uint32 dataLength, uint8* resultPtr,
+uint32* resultLengthPtr);
+Note
+Most of the service APIs for encryption, decryption, hashing, and MAC calculation in the
+AUTOSAR CSM use similar parameters. These parameters, which may vary slightly depending
+on the specific service, typically include the following:
+JobId: Holds the identifier of the job using the Crypto Service Manager service
+• Mode: Indicates which operation mode(s) to perform
+• DataPtr: Pointer to the plaintext data to be encrypted
+• data Length: Contains the number of bytes to encrypt
+• result LengthPtr: Length of the result data pointer
+• resultPtr: Pointer to the buffer where the ciphertext will be stored
+• KeyId: Identifier of the key to be used for encryption
+• Return Value: Status of encryption (e.g., E_OK, E_NOT_OK, CRYPTO_E_BUSY,
+CRYPTO_E_KEY_NOT_VALID, etc.)
+Crypto Service Manager process flow
+The Cryptographic Service Manager in AUTOSAR manages cryptographic operations through a
+structured sequence of steps to ensure secure data handling. This process includes:
+1. Job submission: The job is submitted to the Crypto Service Manager with all relevant parameters,
+such as SWC A, and would request CSM_Encrypt, referencing Job ID 1. This would include
+the key used for the encryption, as well as the cryptography primitive used.
+2. Validation: The CSM validates the job parameters, including key validity and data length.
+
+
+=== Page 190 ===
+Security stack architecture in AUTOSAR 171
+3. Driver selection: Based on the primitive type and key requirements, the CSM directs the job
+to the appropriate cryptographic driver.
+4. Execution: The cryptographic driver processes the job according to the specified operation mode.
+5. Completion: The result is returned, and the status of the job is updated (e.g., success or error).
+The Crypto Service Manager in AUTOSAR acts as a service provider where users, such as SWCs and
+basic software modules such as SecOC, request cryptographic operations such as encryption and
+decryption. The CSM manages these requests by prioritizing them as jobs to ensure efficient processing.
+The next layer of the crypto stack within the ECU abstraction layer would be the CryptoIf.
+Crypto Interface module
+The CryptoIf serves as an intermediary layer between the CSM and the actual crypto module responsible
+for performing cryptographic computations. Its key functions include the following:
+• Abstraction: CryptoIf abstracts the underlying cryptographic functionality provided by the
+Crypto module. This abstraction simplifies the interaction between CSM and the crypto module,
+allowing for flexibility in choosing and changing cryptographic algorithms and providers.
+• Standardization: CryptoIf standardizes the interface for cryptographic operations, making
+it easier to integrate different cryptographic libraries or HSMs into the AUTOSAR system.
+• Resource mapping: CryptoIf maps cryptographic resources requested by CSM, such as keys
+and algorithms, to the corresponding resources provided by the crypto module.
+Now it is time to move to the lowest layer in the stack. That’s the Crypto Driver, which could be an
+SW or a hardware implementation as we are going to see later.
+Crypto module
+The crypto module is the core component responsible for performing cryptographic operations, such
+as encryption, decryption, hashing, digital signatures, and key management. Its importance lies in
+its ability to execute these operations securely and efficiently. Key functions of the Crypto module
+include the following:
+• Cryptographic computations: The Crypto module implements cryptographic algorithms,
+ensuring that data is encrypted, decrypted, hashed, or signed as required.
+• Secure key storage: The module securely stores cryptographic keys, protecting them from
+unauthorized access. It may interact with HSMs for enhanced key protection or store them in
+Non-Volatile Memory (NVM).
+
+
+=== Page 191 ===
+172 Securing the AUTOSAR System with Crypto and Security Stack
+The Crypto Stack, comprising the CSM, CryptoIf, and the crypto module, is needed for establishing
+and maintaining a secure communication and data protection environment within AUTOSAR systems.
+It allows for flexible integration of cryptographic functionality while ensuring that cryptographic
+operations are performed reliably and securely, safeguarding the confidentiality, integrity, and
+authenticity of data exchanged within the automotive ecosystem.
+Since we are exploring the crypto driver, let’s briefly discuss the different variations of the essence of
+the driver.
+Hardware- and software-based implementations
+Two primary approaches to cryptographic processing are software and hardware crypto, each with
+its distinct advantages and use cases.
+Software crypto
+Software cryptographic processing relies on algorithms executed by the vehicle’s CPU or microcontroller.
+It offers flexibility and versatility, allowing cryptographic functions to be implemented in software
+libraries. Software crypto can adapt to different hardware platforms, making it a practical choice
+for systems with limited dedicated cryptographic hardware. However, it may consume more CPU
+resources and processing time compared to hardware-based solutions, potentially affecting overall
+system performance.
+Hardware crypto
+Hardware cryptographic processing, on the other hand, leverages dedicated cryptographic modules or
+co-processors within the microcontroller or secure hardware components. These hardware modules
+are specifically designed to accelerate cryptographic operations, providing faster and more efficient
+processing. Hardware crypto offers enhanced security by protecting cryptographic keys and operations
+from certain software-based attacks. It is particularly beneficial for performance-critical applications
+and systems with stringent security requirements.
+One notable feature within AUTOSAR is the ability to use multiple cryptographic modules, both
+software and hardware-based, and configure them as needed. Through configuration, users can
+determine which cryptographic module manages specific cryptographic primitives or operations.
+This flexibility allows AUTOSAR developers to tailor the security architecture to their system’s unique
+requirements, optimizing the balance between performance, security, and resource utilization. This
+capability empowers users to make informed decisions regarding the allocation of cryptographic
+tasks, ensuring that cryptographic operations are performed efficiently and securely within the
+AUTOSAR framework.
+Figure 8.4 shows a block diagram of a secure system architecture. The Secure Space encloses
+critical security components, ensuring that sensitive operations and data are protected. The other
+components are part of the general system architecture, interfacing with the secure space and handling
+standard operations.
+
+
+=== Page 192 ===
+Security stack architecture in AUTOSAR 173
+Figure 8.4 – Secure system architecture block diagram
+Utilizing a hardware component such as an HSM offers a significant edge over a solely software-based
+approach because it can establish a dedicated, highly secure environment encompassing essential
+elements such as the core, secure memory, and hardware accelerators. Within this secure environment,
+several key functions are facilitated:
+• Provision of security services to applications
+• Safe storage of keys and associated security assets.
+• Efficient management of keys and certificates
+• Execution of cryptographic algorithms, employing both hardware and software implementations
+to enhance performance and security
+Now that we’ve unraveled the core crypto stack modules, perhaps it’s time we scratch the surface of
+some of the other helper modules, as well as their description that are used with the crypto modules
+to enhance the overall ECU security.
+Other helper modules to achieve security
+Some of the helper modules we will discuss are located in other stacks (for example, IdsM and KeyM)
+are part of the Crypto stack. However, SecOC is part of the COM stack as it handles communication,
+yet it works closely with the Crypto Stack to achieve secure PDUs communication:
+• Key Management (KeyM): This is responsible for handling cryptographic keys. It ensures the
+secure generation, storage, distribution, and life cycle management of keys used for various
+cryptographic operations.
+
+
+=== Page 193 ===
+174 Securing the AUTOSAR System with Crypto and Security Stack
+• Intrusion Detection System Manager (IdsM): The Intrusion Detection System (IDS) functions
+as a guard in a vehicle, collecting data from security sensors distributed throughout the vehicle
+and sending it to a central system for detailed analysis. This analysis helps in formulating robust
+future security measures. IDS is composed of several key components working together to
+detect and respond to cyber threats. Software sensors, which are programmed algorithms,
+detect potential cyber threats and send this information to the IdsM. The IdsM acts as a filtering
+system, processing the incoming data to identify and isolate relevant information. This qualified
+data is then transmitted to the Intrusion Detection Reporter (IdsR) and stored in the Security
+Event Memory (SEM).
+• SecOC: This ensures secure data transmission within vehicle networks. It integrates with the
+Crypto Stack to provide cryptographic protection, safeguarding data integrity and authenticity
+as part of the communication stack.
+• Diagnostic Communication Manager (DCM ): This uses the Crypto Stack to manage security
+access levels by performing cryptographic operations, such as authentication and key verification.
+When a diagnostic session requires access to restricted functions, the DCM relies on the Crypto
+Stack to securely handle authentication challenges and responses, ensuring only authorized
+tools or users can access sensitive ECU operations.
+Now that we have highlighted the importance of security for automotive ECUs, let’s explore some
+common security use cases and examine how the crypto stack is used to achieve these use cases. This
+exploration will help us understand the practical applications and integration of cryptographic services
+in enhancing automotive security.
+Crypto Stack use cases and examples
+The Crypto Stack in AUTOSAR is a critical component that serves various use cases for securing data
+and communication within automotive systems. Some of the key use cases for the Crypto Stack in
+AUTOSAR include secure communication, data encryption, and digital signatures.
+Data encryption
+Let’s consider a scenario. In an AUTOSAR-based embedded application, SWC A needs to securely
+transmit sensitive data to SWC B over a Controller Area Network (CAN) bus. To ensure data
+confidentiality, SWC-A employs data encryption using the AUTOSAR Crypto Stack.
+Here’s a list of the actors:
+• SWC-A: The sender of sensitive data
+• SWC-B: The recipient of the encrypted data
+
+
+=== Page 194 ===
+Crypto Stack use cases and examples 175
+• AUTOSAR Crypto Stack: The cryptographic module responsible for data encryption
+and decryption
+• Security Key Management: The component responsible for managing cryptographic keys
+Here are the preconditions:
+• SWC-A and SWC-B are configured and operational within the AUTOSAR-based system
+• The AUTOSAR Crypto Stack is properly configured and integrated into the system
+• Encryption keys, including a shared secret key for SWC-A and SWC-B, have been securely
+established and stored by the Security Key Management component
+Figure 8.5 shows the data exchange process between SWC A and SWC B, located on two different ECUs.
+Figure 8.5 – Encrypted data shared between two ECUs
+Here’s the sequence for the main flow:
+1. SWC-A data preparation: SWC-A generates sensitive data that needs to be transmitted to
+SWC-B. Before sending the data, SWC-A initiates the data encryption process using the
+AUTOSAR Crypto Stack.
+2. Request for encryption: SWC-A sends a request to the AUTOSAR crypto service manager to
+encrypt the data for secure transmission. The request specifies the data to be encrypted and
+indicates that a specific key should be used for encryption, as shown in step 1 within Figure 8.5.
+3. Crypto Stack encryption: The AUTOSAR Crypto Stack receives the encryption request and
+uses the shared secret key to perform the encryption process.
+
+
+=== Page 195 ===
+176 Securing the AUTOSAR System with Crypto and Security Stack
+4. Encrypted data transmission: The Crypto Stack returns the encrypted data to SWC-A, as
+shown in step 2 within Figure 8.5. Only then can SWC-A securely transmit the encrypted data
+over the CAN bus to SWC-B using the communication stack shown in step 3.
+5. Data reception by SWC-B: SWC-B receives the encrypted data from SWC-A over the CAN
+bus. Since SWC-B is aware of the shared secret key, it is prepared to decrypt the incoming data.
+This is shown in step 5 and step 6 in Figure 8.5.
+6. Data decryption request: SWC-B sends a request to the AUTOSAR Crypto Stack, indicating
+that it needs to decrypt the received data using the shared secret key, shown in step 7.
+7. Crypto Stack decryption: The AUTOSAR Crypto Stack processes SWC-B’s decryption request,
+utilizing the shared secret key to perform the decryption operation. It reverses the encryption
+process, restoring the original sensitive data.
+8. Decrypted data usage: SWC-B now has access to the decrypted sensitive data, which can be
+processed and utilized as required for its intended purpose within the embedded system. This
+is shown in step 8 and step 9.
+Here are the post-conditions:
+• SWC-A successfully transmitted sensitive data to SWC-B in an encrypted form, ensuring data
+confidentiality during transmission
+• SWC-B received and decrypted the data, allowing it to access and utilize the original
+sensitive information
+There’s one exception. If the encryption or decryption process fails due to key-related issues or
+cryptographic errors, appropriate error-handling mechanisms within the AUTOSAR Crypto Stack
+are triggered to ensure the security and integrity of the data.
+Here are some important notes:
+• The use of a shared secret key for encryption and decryption between SWC-A and SWC-B
+highlights the importance of secure key management within the embedded AUTOSAR system
+• The AUTOSAR Crypto Stack abstracts the low-level cryptographic operations, simplifying
+the implementation of data encryption and decryption for SWCs while maintaining a high
+level of security
+Expanding on the previous example, we could then explore secure communication. This refers to
+the mechanisms and protocols used to ensure the integrity, authenticity, and confidentiality of data
+exchanged between various electronic control units (ECUs) within a vehicle’s network. The primary
+goals are to prevent unauthorized access, data manipulation, and eavesdropping.
+
+
+=== Page 196 ===
+Crypto Stack use cases and examples 177
+Secure communication
+Secure On-Board Communication (SecOC) in AUTOSAR is a critical component that ensures
+the confidentiality and integrity of data exchanged between ECUs within a vehicle’s network. It
+adds security features such as MACs and freshness values to Protocol Data Units (PDUs) before
+transmission. Let’s explore how SecOC works in the context of a CAN network between two ECUs,
+ECU 1 and ECU 2, with an example.
+Figure 8.6 illustrates how secure communication is managed between two ECUs using MAC. It will
+depict the interaction between the communication stack, the crypto stack, and the SecOc module to
+achieve this process.
+Figure 8.6 – SecOc
+The following steps show the flow from ECU 1, where data is being secured with MAC, and how the
+data is verified in ECU 2:
+1. Start by sending a PDU from SWC 1 in ECU 1:
+I. SWC 1 in ECU 1 generates a PDU that needs to be sent to ECU 2 over the CAN network.
+This PDU contains critical information, such as sensor data, that must be kept confidential
+and protected from tampering.
+II. The PDU is handed over to the Communication (COM) module within ECU 1. COM
+manages the transmission of PDUs between different ECUs.
+
+
+=== Page 197 ===
+178 Securing the AUTOSAR System with Crypto and Security Stack
+2. Next, secure the PDU with SecOC:
+I. The PDU is then passed from COM to the SecOC module within ECU 1. SecOC is
+responsible for adding security features to the PDU.
+II. SecOC interacts with the CSM to initiate the security process. CSM manages cryptographic
+operations in AUTOSAR.
+III. CSM, in turn, communicates with the CryptoIf module to request cryptographic services.
+IV. CryptoIf acts as an intermediary between CSM and the crypto module, abstracting the
+cryptographic functionality.
+V. The crypto module is responsible for performing the actual cryptographic operations,
+including MAC calculation and freshness value generation, using the cryptographic
+algorithms provided by the crypto stack.
+VI. Once the cryptographic operations are complete, the secured PDU, including the MAC
+and freshness value, is returned to SecOC.
+3. Then, send the secured PDU to the PDU Router (PDUR):
+I. SecOC passes the secured PDU, including the MAC and freshness value, back to the
+COM module.
+II. COM sends the secured PDU to the PDUR module. PDUR is responsible for routing
+and transmitting PDUs between different communication layers and buses.
+4. Send the secured PDU to the CAN network via CanIf:
+I. PDUR forwards the secured PDU to the CanIf module, which handles the transmission
+of data over the CAN network.
+5. Now, it’s time for receiving and verifying the secured PDU in ECU 2:
+I. ECU 2 receives the secured PDU via the CAN network through its CanIf module.
+II. The secured PDU is then handed over to ECU 2’s SecOC module.
+6. Verify and decode the secured PDU with SecOC:
+I. ECU 2’s SecOC module interacts with the CSM, CryptoIf, and crypto modules, similar to
+ECU 1, to verify the MAC and freshness value and ensure data integrity and authenticity.
+II. If the MAC and freshness value checks pass, the secured PDU is considered authentic
+and trustworthy.
+7. Pass the decoded PDU to SWC 2 in ECU 2:
+I. The decoded and verified PDU is then passed to ECU 2’s COM module.
+II. COM forwards the PDU to the intended SWC 2 in ECU 2.
+
+
+=== Page 198 ===
+Crypto Stack use cases and examples 179
+In this detailed process, we could examine how the CSM, CryptoIf, and the Crypto module secure and
+verify PDUs. Additionally, the PDUR is involved in routing the secured PDU to the CAN network.
+Secure diagnostics
+Secure diagnostics has become a key process in the maintenance and operation of modern vehicles.
+As cars evolve into highly connected and software-driven systems, the need to protect diagnostic
+processes from unauthorized access and cyber threats is more important than ever. It ensures that
+only authorized personnel can access and modify critical vehicle data.
+The process begins with the technician logging into a diagnostic tool using secure credentials, which
+are then verified by the ECU. Once authenticated, the technician securely communicates with the
+ECU to retrieve diagnostic data or perform necessary actions, such as software updates. Throughout
+the process, all data transmission is encrypted to prevent tampering or interception. The validation
+and verification of the keys or access control is handled through DCM module and the crypto stack
+services. Figure 8.7 shows a very brief sequence diagram on what happens in this process.
+Figure 8.7 – Secure diagnostics process
+Next, let's explore the concept of secure boot.
+
+
+=== Page 199 ===
+180 Securing the AUTOSAR System with Crypto and Security Stack
+Secure boot in AUTOSAR
+We’ll start with an overview. Secure boot is a critical security mechanism employed in AUTOSAR-
+based automotive systems to ensure the integrity and authenticity of SWCs during the boot-up process.
+It verifies that only trusted and unaltered software is loaded and executed on ECUs within the vehicle.
+Secure Boot relies on cryptographic techniques, and the AUTOSAR Crypto Stack plays a pivotal role
+in enabling and enhancing the security of this process.
+We’ll consider a scenario. Let’s explore a use case where Secure Boot is applied to ensure the integrity
+of the ECU software in an AUTOSAR-based vehicle.
+Here are the steps to make that happen:
+1. Initialization:
+I. The vehicle is powered on, and the ECU initiates the boot-up process.
+II. At this stage, the ECU’s hardware performs a minimal self-test to ensure its functionality.
+2. Secure boot sequence:
+I. Secure boot begins with the loading of the initial bootloader, which is stored in a read-
+only memory (ROM) of the ECU.
+II. A piece of code either within HSM or in a secure area called Root of Trust would try
+and verify the bootloader.
+3. Verification of bootloader:
+I. The bootloader contains a digital signature, generated during its development and
+embedded when flashing the bootloader into an ECU.
+II. Crypto Stack is used to verify the bootloader’s digital signature.
+III. If the signature verification fails, the boot process is halted, preventing the execution of
+unauthorized or tampered code.
+4. Loading the main application:
+I. Once the bootloader’s integrity is confirmed, it loads the AUTOSAR-compliant SW,
+which may also be signed and verified similarly as before.
+5. Chain of trust:
+I. Secure boot establishes a chain of trust by ensuring that each loaded component is
+trusted and unaltered.
+II. If any signature verification fails, the loading process is halted, and the compromised
+component is not executed.
+
+
+=== Page 200 ===
+Crypto Stack use cases and examples 181
+6. Secure execution:
+I. Once all SWCs have been verified and loaded, the ECU proceeds with the secure execution
+of the automotive applications.
+Figure 8.8 illustrates an example of how a secure boot process can be achieved using cryptographic
+functions within the AUTOSAR framework.
+Figure 8.8 – Secure Boot process
+Next, let’s look at the role of Crypto Stack. The AUTOSAR Crypto Stack is instrumental in enhancing
+the security of the Secure Boot process:
+• Key management: The Crypto Stack manages cryptographic keys used for verifying digital
+signatures, ensuring their confidentiality and integrity
+• Signature verification: It performs signature verification of bootloaders, operating systems,
+and SWCs using the stored public keys
+• Tamper detection: The Crypto Stack can also assist in detecting tampering attempts by
+monitoring the integrity of the SWCs and their signatures
+• Secure storage: Cryptographic assets, including keys and certificates, are securely stored and
+accessed by the Crypto Stack to prevent unauthorized manipulation
+In this use case, the combination of Secure Boot and the AUTOSAR Crypto Stack ensures that only
+trusted and unaltered software is executed, safeguarding the ECU’s functionality, reliability, and
+overall vehicle security. It provides a robust defense against unauthorized code execution and potential
+security breaches.
+
+
+=== Page 201 ===
+182 Securing the AUTOSAR System with Crypto and Security Stack
+Summary
+In this chapter, the focus was on automotive cybersecurity within the AUTOSAR framework. It
+began by highlighting the significant importance of automotive security in our interconnected
+world, emphasizing the potential risks associated with remote hacking and data breaches that can
+impact safety, data privacy, financial stability, and regulatory compliance. The chapter delved into the
+fundamental principles of automotive security, defining its objectives which include confidentiality,
+integrity, availability, and authentication. It also made a clear distinction between safety and security,
+underlining the necessity of addressing both aspects within the context of AUTOSAR.
+Furthermore, the chapter underscored the critical role played by security standards in the automotive
+industry, outlining key standards such as ISO 21434, ISO 26262, and AUTOSAR’s own security
+requirements and guidelines. It emphasizes the need for adherence to these standards to ensure
+uniformity and regulatory compliance across the industry.
+The chapter proceeded to explore the security features within the AUTOSAR architecture, with a
+particular focus on the Crypto Stack. It elaborated on the core components of the Crypto Stack,
+including the CSM, CryptoIf, and the crypto module, elucidating their roles in managing cryptographic
+operations securely.
+SecOC was highlighted as a critical component ensuring data confidentiality and integrity between
+ECUs within a vehicle’s network. The chapter offered a detailed explanation of the steps involved in
+securing and verifying data transmission.
+In conclusion, the chapter emphasized the importance of the information presented for developers and
+newcomers to AUTOSAR. It stressed that security is not only about safeguarding data and systems but
+also about protecting lives, financial stability, and complying with regulatory requirements. Developers
+were encouraged to adopt secure coding practices, recognize the existence of legacy systems, and
+consider supply chain security as an integral component of an effective automotive security strategy.
+In the next chapter, we shall explore the Memory and Mode management modules
+Questions
+1. Why is automotive security crucial within the AUTOSAR framework?
+2. What are the fundamental objectives of automotive security?
+3. How does safety differ from security in the context of AUTOSAR?
+4. What is the role of the Crypto Stack within AUTOSAR, and what are its core components?
+5. How does SecOC contribute to automotive security within AUTOSAR?
+
+
+=== Page 202 ===
+9
+Dealing with Memory and
+Mode Management
+In the ecosystem of AUTOSAR, where reliability, performance, and safety are paramount, the
+management of non-volatile memory (NvM) and the Basic Software Mode Manager (BSWM) emerge
+as a critical aspect of software development. This chapter dives into the mechanisms by which software
+components (SWCs) leverage NVM to ensure persistent storage of crucial data, configurations, and
+diagnostic information, while also exploring the role of the BSWM in managing the operational modes
+of basic software (BSW) modules.
+The discussion begins by exploring the fundamental concepts of NVM and its significance within
+the AUTOSAR framework. We highlight the architecture and functionalities of the memory stack,
+emphasizing its role in managing data persistence and integrity. Our exploration extends to understanding
+the design and implementation of NVM operations within SWCs, detailing the memory stack modules.
+Simultaneously, we introduce the concept of the BSWM, explaining its importance in coordinating the
+states and modes of various BSW modules. We delve into the mechanisms of the BSWM, exploring
+how it manages mode transitions, coordinates with other modules, and ensures a coherent operational
+state across the system.
+In this chapter, we will look at the following topics:
+• Memory stack in AUTOSAR
+• Mode management
+

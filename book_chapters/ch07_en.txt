@@ -1,0 +1,784 @@
+=== Page 153 ===
+134 Exploring the Communication Stack
+What is the COM stack?
+Imagine you’re a developer working on an ECU responsible for monitoring engine temperature in a
+vehicle. Your task is to ensure that the ECU can send alerts to other ECUs in the vehicle CAN network
+when the temperature exceeds a certain threshold.
+In a traditional embedded implementation, you would need to handle the entire communication
+process yourself. This involves configuring the hardware interfaces (such as CAN, FlexRay, or Lin)
+for communication, formatting the message data, managing the timing and synchronization of data
+transmission, and implementing error detection and recovery mechanisms. This process requires
+too much low-level coding and is highly dependent on the specific hardware and communication
+protocols used in the system.
+In AUTOSAR, communication between ECUs is abstracted through standardized interfaces and a layered
+communication stack. Here’s how the same scenario would be handled in an AUTOSAR-compliant system:
+• Application Layer: Your application running on the ECU generates a signal indicating the
+high engine temperature.
+Note
+A signal in AUTOSAR is a piece of information or data transmitted between different components
+or software modules within a vehicle’s electronic systems. Signals can represent various types
+of data, such as sensor readings, actuator commands, or status information.
+• Run-Time Environment (RTE) Layer: The signal is passed to the RTE Layer, which abstracts
+the application’s communication needs from the underlying hardware and protocols.
+• Communication stack: The communication stack, which consists of various layers, takes over
+the responsibility of packing and then transmitting the signal. It also handles the routing of
+the message to the appropriate destination ECU based on predefined communication routes.
+For example, is the message being sent over CAN, FlexRay, or any of the other automotive
+communication buses?
+The communication hardware interfaces, such as controller area network (CAN) controllers or
+Ethernet PHYs, handle the physical transmission of the message over the communication bus.
+In the next section, we will examine the software architecture of the COM stack in AUTOSAR.
+COM stack overview
+The Communication Stack is a suite of software modules that handle communication tasks in
+AUTOSAR-compliant systems. It is responsible for transmitting and receiving data across various
+in-vehicle networks, such as CAN, local interconnect network (LIN), Ethernet, and FlexRay, among
+others. Its structure facilitates modular and scalable communication across different automotive ECUs.
+
+
+=== Page 154 ===
+COM stack overview 135
+Figure 7.1 shows the main components of the COM stack:
+Figure 7.1 – COM layered architecture
+In Figure 7.1, the communication stack of AUTOSAR is segmented into three main components:
+• The data path handling signals and PDU and transmission (A)
+• The control path handling the state of the communication channels (B)
+• Network management (C)
+These parts of the communication stack are distributed across various layers: the Service Layer,
+the ECU Abstraction Layer, and the Hardware Layer. This distribution illustrates how AUTOSAR
+manages communication functions, from handling raw data transmission to more complex control
+and Network Management (NM) tasks.
+
+
+=== Page 155 ===
+136 Exploring the Communication Stack
+Here’s a brief breakdown of some of the layers and their responsibilities within the AUTOSAR COM stack:
+• Application Layer: This layer contains application-related software components. They create or
+consume the data that needs to be communicated. For instance, receiving the current Vehicle
+Speed (VehSpd), or transmitting the ECU state and control signals to other ECUs.
+• RTE Layer: As covered in Chapter 4 and Chapter 5, the RTE serves as a mediator between the
+Application Layer and lower communication stack layers, abstracting communication details
+for application components.
+Next, we turn our attention to the basic software, which, as mentioned earlier, is structured into three
+layers: Service, ECU Abstraction, and microcontroller abstraction layer (MCAL). Let’s now explore
+the modules that make up the Service Layer:
+• Communication Service Layer
+ COM: It abstracts the communication details further and provides services for protocol
+data unit (PDU) handling. The COM layer’s main responsibility is handling signal-based
+communication. COM abstracts the underlying communication protocols and hardware
+interfaces, allowing software components to communicate in a platform-independent
+manner. Later, we shall cover COM in more detail.
+ PduR: This module routes PDUs from one layer to another (e.g., from the COM layer to the
+appropriate bus-specific interface (CAN, FlexRay, LIN, etc)), or provides gateway functionality
+between two communication interfaces (e.g., CAN to Ethernet).
+ BUS-TP: The Transport Protocol Module in the COM stack manages reliable data transmission
+between ECUs, handling segmentation, flow control, error detection, and addressing
+(e.g., CAN-TP).
+ BUS State Manager (BUS-SM): The BUS-SM is a protocol-specific module in AUTOSAR’s
+COM stack. It manages communication mode transitions for each network, based on requests
+from the AUTOSAR Communication Manager (ComM). It handles mode change requests and
+state change notifications, manages bus-specific state machines, and performs error handling
+(e.g., bus-off conditions). It also notifies other modules such as Basic Software Module
+(BswM) and ComM about state changes, ensuring synchronized communication across the
+vehicle network (e.g. CAN State Manager (CanSM), Ethernet State Manager (EthSM)).
+Next, we will explore the ECU Abstraction Layer contents of the stack:
+• Communication ECU Abstraction Layer:
+ BUS Interface (BUS IF): These are network-specific modules for various in-vehicle
+communication protocols, such as CAN, LIN, FlexRay, and so on. It serves as the interface
+between the higher layers of the communication stack and the hardware-specific drivers.
+BUS-IF handles the adaptation of protocol-specific communication services for different
+
+
+=== Page 156 ===
+COM stack overview 137
+network types. It translates the generic communication requests from the PDU Router
+(PduR) and Communication Manager (ComM) into protocol-specific commands for the
+respective bus drivers. Examples include CAN Interface (CanIf), LIN Interface (LinIf),
+and FlexRay Interface (FrIf).
+Then lastly, the MCAL Layer part for the stack:
+• Communication Driver Layer:
+ Bus drivers: These are the lowest level in the communication stack, directly dealing with
+the hardware interfaces of the communication channels. Examples include the CAN Driver,
+LIN driver, and FlexRay driver.
+Note
+Network management will be discussed in more detail later, but these modules are key components,
+COMM, BUS-SM, and CanSM, which provide state machines for managing communication
+channels and overseeing initialization, configuration, and control of communication activities.
+They handle data transmission, monitor communication status, manage errors, control controller
+states, and manage sleep-wake-up operations.
+Together, these layers and modules ensure that data can be effectively packaged, transmitted, received,
+and unpacked across various ECUs in an automotive system, allowing for efficient and reliable
+communication in the vehicle.
+By now, we have a basic understanding of the functions of the communication stack. Before exploring
+the stack deeper, let’s clarify some of the fundamental concepts and terms.
+An overview of basic COM concepts
+To truly grasp the nuances and intricacies of the COM modules, one must first familiarize oneself
+with its foundational concepts. This section explains key concepts, setting the stage for a thorough
+understanding of AUTOSAR COM. We will explore the following:
+• Signals: The basic data units in AUTOSAR, which can represent sensor readings, actuator
+commands, or other pieces of information. They become the atomic units of communication
+within and between software components.
+Note
+VehSpd, potentially represented as a uint16 data type, and OdometerCount might
+be represented as uint32 are examples of signals. A signal can be any type of data that is
+incorporated into a message. For instance, in a CAN message, the initial two bytes might denote
+VehSpd, while subsequent bytes could signify another signal, perhaps referred to as signal X.
+
+
+=== Page 157 ===
+138 Exploring the Communication Stack
+• Signal groups: This refers to a collection of signals that are logically related and are treated
+as a single entity for certain operations, particularly during communication processes. Signal
+groups are useful for ensuring data consistency when multiple signals need to be transmitted
+together, enabling more organized and efficient data exchange.
+• Service Data Unit (SDU): This is the payload or data content that is passed between layers in
+a communication stack. Each layer in the AUTOSAR software stack may add its own headers
+to the SDU, transforming it into a PDU for the next layer.
+• PDU: An encapsulated data packet transmitted between communication layers. It comprises
+both payload (data) and Protocol Control Information (PCI).
+• PCI: It refers to headers and metadata for managing the data packet flow through the AUTOSAR
+stack layers and specifies the SDU’s next destination. Figure 7.2 provides an illustration of the
+PDU structure and its decomposition through the COM stack.
+Figure 7.2 – PDUs and PCIs
+To better understand the PDU, SDU, and PCI, let’s consider the following example for data communication
+from PduR through the CAN Transport Protocol (CanTp), to CanIf, and to CAN Driver, where a
+message assumes its content is ABCDEFGHIJ........., this is sent, it starts as a PDU at one
+layer, becomes the SDU for the next, and gets segmented and appended with PCI, such as sequence
+numbers within the CanTp scope.
+
+
+=== Page 158 ===
+COM stack overview 139
+Here is the flow:
+1. A user (COM) provides the PduR with an SDU (request to send a PDU).
+The PduR receives an SDU with content, such as ABCDEFGHIJ.......... Then, it packs
+the SDU along with PCI (routing info in this case), and the resulting PDU is passed to a lower
+layer, in our case, CanTp, and this PDU would be considered by the CanTp as an SDU.
+SDU: This is the raw data or message content that the PduR got from an upper layer (e.g.,
+COM says 1 k bytes of data). ABCDEFGHIJ.......... The PCI at the PduR level is empty,
+nothing is added to the SDU, even without explicit PCI, and routing the SDU to a lower-layer
+module (such as CanTp) acts as implicit PCI.
+PCI: Empty (not needed at this stage).
+Resulting PDU content: ABCDEFGHIJ..........
+2. CanTp treats the received PDU as its SDU, which is essentially the payload it needs to process.
+CanTp adds PCI to the SDU. This PCI might include a Frame type, sequence number, addressing
+information, and data size to manage the data’s segmentation and reassembly at destination
+reception; we will refer to it as Other in this case.
+SDU: ABCDEFGHIJ..........
+PCI added: Type Seq Other: This refers to the Frame type, sequence number, and other
+metadata that could be needed for a PCI.
+Note that the following data is segmented:
+ Segment 1: Type Seq Other ABCDEF
+ Segment 2: Type Seq Other FGHIJ….
+ Segment N: Type Seq Other …….
+3. CanTp provides the segment data each as an individual PDU.
+CanIf receives these segments from CanTp. It adds a CAN ID, the CAN message identifier, to
+each segment:
+I. SDU: Type Seq Other ABCDEF.
+II. PCI added: CANID.
+III. Segment 1 PDU: CANID Type Seq Other ABCDEF
+IV. PCI added: CANID
+V. Segment 2 PDU: CANID Type Seq Other FGHIJ….
+Then, the CAN Driver obtains CanIf PDUs as its own SDU and transmits it over the physical bus.
+
+
+=== Page 159 ===
+140 Exploring the Communication Stack
+In summary, the original message (ABCDEFGHIJ..........) undergoes segmentation as it’s
+very large and can’t fit within a single CAN frame, and various protocol layers add specific control
+information to ensure the message is transmitted correctly over the CAN network. Each layer adds
+its own PCI if needed before passing the data to the next layer or the CAN network for transmission.
+Figure 7.3 provides a clearer sequence diagram of how the previously mentioned process goes in
+each layer:
+Figure 7.3 – UML sequence showing data flow from PduR to CAN Driver, with each
+layer adding PCI and segmenting data before final CAN network transmission
+Gatewaying is the mechanism by which signals or PDUs can be routed or mapped from one
+communication channel to another. For example, a message from channel CAN A will be sent/redirected
+with the same content to another communication bus. Figure 7.4 shows a sequence diagram example
+where a frame is received in CAN and then gatewayed to Eth and FlexRay.
+
+
+=== Page 160 ===
+COM stack overview 141
+Figure 7.4 – Gateway of a PDU from the CAN network to ETH and FlexRay networks
+We are now prepared to take a deeper dive into the core modules of the COM stack in the case of the
+CAN network. I will not explore the details of other communication buses, but the same concepts
+can generally be applied when working with them. Let’s begin our exploration of the COM module.
+COM module
+The COM module in AUTOSAR serves as an intermediary layer between the Application Layer
+and the underlying communication hardware. Its primary function is to manage the sending and
+receiving of data (in the form of signals) between software components in the system and the
+communication infrastructure.
+The features offered by the COM module include the following:
+• Signal handling: The COM module manages the abstraction of application data into signals.
+Signals can represent everything from sensor readings to control command values.
+• Signal grouping: Multiple signals can be grouped together into what’s known as signal groups.
+This allows for the efficient bundling of related signals, ensuring they’re transmitted together
+and preserving data consistency.
+• PDU handling: The COM module takes signals (or signal groups) and packages them into
+PDUs for transmission. Similarly, it extracts signals from received PDUs.
+• Notification mechanisms: The COM module can notify the Application Layer about the
+successful transmission or reception of signals, or the occurrence of errors.
+Figure 7.5 shows how the AUTOSAR COM module packages signals from various SWCs into a PDU
+and sends them to the lower communication layers for transmission across the network.
+
+
+=== Page 161 ===
+142 Exploring the Communication Stack
+Figure 7.5 – COM module packing signals into a PDU
+Now, let’s jump into the details of sending and receiving operations within the COM module, focusing
+on how data is managed through the process of packaging into PDUs and how the COM module
+handles these operations.
+Sending and reception in COM
+The COM module manages the data flow between ECUs by packaging data into PDUs and handling
+the transmission and reception according to defined transmission modes (Direct, Periodic, Mixed,
+If Active, or None):
+• Sending: When the Application Layer has data to send, it passes this data to the COM module,
+which abstracts it as a signal. The COM module then maps this signal into a specific area within
+the PDU, which is sent to the lower layers for transmission on the physical bus.
+• Reception: For incoming data, the COM module extracts signals from the received PDU and
+provides the actual data to the Application Layer. During this process, it might use filtering
+mechanisms to decide which signals should be processed.
+Now that we understand how the COM module manages the sending and reception of data by packaging
+and unpacking PDUs, it’s time to explore the different transmission modes that dictate how and when
+this data is transmitted. Understanding these modes is helpful in optimizing communication efficiency
+and ensuring reliable data flow within automotive systems. Let’s dive into the various transmission
+modes provided by the AUTOSAR COM module.
+
+
+=== Page 162 ===
+COM stack overview 143
+Transmission modes in COM
+These modes dictate how and when data is transmitted, catering to different requirements of timing,
+event triggering, and data aggregation. Understanding these transmission modes is helpful for
+optimizing communication efficiency, ensuring data consistency, and managing network bandwidth
+in automotive systems. The AUTOSAR COM module provides distinct transmission modes for PDUs:
+• DIRECT (N-Times):
+Description: In this mode, the data (PDU) is transmitted immediately upon update if the
+triggering condition is met. For instance, if the DIRECT (N-Times) count is set to 3, the COM
+module will transmit three PDUs upon receiving signals from RTE.
+Importance: This is useful for critical data that must be sent without delay, such as emergency
+vehicle signals.
+Figure 7.6 shows when a PDU is marked as updated, transmission happens right away.
+Figure 7.6 – PDU transmission mode is Direct with N = 0
+Figure 7.7 shows the same setup when N is set to 3, thus, this frame is visible three times in
+the communication bus.
+Figure 7.7 – PDU transmission mode is Direct with N = 3
+• Periodic:
+Description: Data is sent at predefined time intervals, regardless of changes in the data or
+other triggering conditions.
+Importance: It ensures regular updates, which is vital for systems that rely on steady and
+predictable data inputs.
+
+
+=== Page 163 ===
+144 Exploring the Communication Stack
+Figure 7.8 shows that in Periodic mode, a PDU is always requested for transmission at time t
+with the most recent data, regardless of whether the PDU has been updated.
+Figure 7.8 – PDU transmission mode is Periodic Time = t
+• Mixed:
+Description: A combination of Direct and Periodic transmission. Data is transmitted immediately
+when it changes, but also periodically if there are no changes.
+Importance: It balances the need for immediate transmission upon change with the reliability
+of periodic updates.
+Figure 7.9 illustrates that in mixed mode, a PDU is always transmitted within its period of time
+and also when it’s triggered (updated).
+Figure 7.9 – PDU transmission mode is Mixed Time = t
+• None:
+Description: No automatic transmission; data must be requested. This may be by the
+communication bus through Trigger Transmit methods.
+Importance: Useful for reducing network traffic by eliminating unnecessary data transmissions.
+Each of these modes serves specific purposes and choosing the appropriate transmission mode is critical
+for ensuring the performance and reliability of automotive communication systems. It impacts how
+effectively a vehicle’s electronic systems communicate, which in turn affects overall vehicle operation,
+safety, and efficiency.
+
+
+=== Page 164 ===
+COM stack overview 145
+Transfer properties for signals and signal groups
+The transfer properties of signals define how and when a signal should be transmitted within the
+communication stack. Two commonly used transfer properties are PENDING and TRIGGERED.
+Let’s understand their roles:
+• PENDING: When a signal is set with the PENDING transfer property, it indicates that the
+signal is ready to be transmitted but awaits certain conditions or events before the actual
+transmission can occur. The signal, in essence, remains in a standby or “waiting” state until
+those conditions are met.
+This property is often useful in scenarios where the system might need to batch-process or
+aggregate several signals before sending them out. Alternatively, it can be used when the signal
+needs to be transmitted after certain events, such as a response from another module or after
+a timeout.
+• TRIGGERED: A signal with the TRIGGERED transfer property is immediately scheduled for
+transmission once it’s updated or when a specific triggering event occurs. There’s no holding
+back or waiting – as soon as the conditions defined by the TRIGGERED property are met, the
+signal is sent to the lower layers for transmission.
+This property ensures real-time or near-real-time communication and is especially valuable in
+systems where timely data transmission is needed, such as safety-critical applications.
+Let’s explore specific examples to illustrate how transfer properties of signals in AUTOSAR are associated
+with different transmission modes, demonstrating their practical application in automotive systems.
+Example 1 – Triggered transfer with Direct Transmission Mode
+Scenario: An airbag deployment signal in a vehicle:
+• Transfer property: TRIGGERED
+• Transmission mode: Direct
+• Description: The airbag deployment signal needs to be communicated instantly to ensure the
+safety systems react without delay in the event of a collision. The TRIGGERED transfer property
+is used because the signal must be sent the moment its value changes (from not deployed to
+deployed). Using the Direct Transmission Mode, this signal is transmitted immediately to
+ensure a rapid response.
+
+
+=== Page 165 ===
+146 Exploring the Communication Stack
+Example 2 – Pending transfer with Periodic Transmission Mode
+Scenario: Engine temperature monitoring:
+• Transfer property: PENDING
+• Transmission mode: Periodic
+• Description: The engine temperature is a vital parameter that needs consistent monitoring but
+does not typically require immediate action unless there are critical changes. The PENDING
+transfer property fits as the data is regularly updated and sent at fixed intervals (e.g., every 30
+seconds), ensuring ongoing monitoring without the need for immediate transmission upon
+every minor change.
+Having explored the intricacies of transmission modes and their impact on signal management, let’s
+now turn our attention to another vital feature of the COM module in AUTOSAR: signal filtering.
+This functionality significantly enhances data handling and boosts system performance by selectively
+processing communication data.
+Signal filtering in the AUTOSAR COM module
+The AUTOSAR COM module can apply specific filtering criteria to signals received, thereby enabling
+certain signals to be selectively processed. While the COM module employs filtering mechanisms for
+transmission mode conditions, it’s noteworthy that it doesn’t exclude signals during transmission.
+The various filtering algorithms within the COM module, labeled as ComFilterAlgorithms,
+include the following:
+• ALWAYS: The module doesn’t apply any filtering, allowing every message to proceed
+• NEVER: This filter consistently prevents messages from being processed
+• MASKED_NEW_EQUALS_X: Only messages with a specific masked value matching a designated
+value are allowed
+• MASKED_NEW_DIFFERS_X: Messages that don’t match a designated masked value are allowed
+• MASKED_NEW_DIFFERS_MASKED_OLD: Only messages displaying a change in the masked
+value when compared to the previous value are processed
+• NEW_IS_WITHIN: Messages are processed if their value lies within a specified range
+• NEW_IS_OUTSIDE: Only messages with values that fall outside a specified range are permitted
+• ONE_EVERY_N: This filter allows one message to pass for every set of N messages received
+
+
+=== Page 166 ===
+COM stack overview 147
+Through these filtering mechanisms, the COM module offers enhanced flexibility and selectivity in
+managing incoming signal data.
+Having understood the transmission modes and properties in COM, it’s time to explore another
+key aspect of the COM module that influences critical data processing and can impact the overall
+system’s performance.
+COM processing modes
+One of the key aspects of COM processing involves deciding whether to handle communication
+requests/notifications PDUs immediately or defer them for later processing in the next processing
+slot of the COM module. This choice significantly impacts the efficiency, responsiveness, and resource
+utilization of the vehicle’s electronic control systems.
+Immediate processing
+Immediate processing in the COM module refers to the immediate handling of data once it is
+received or ready to be sent. This method is typically employed when the data’s timeliness is critical
+to the system’s operation.
+Use case: A prime example of immediate processing is the transmission of safety-critical signals, such
+as airbag deployment notifications. When an airbag sensor detects a collision, the signal indicating
+deployment must be transmitted instantly to ensure that the airbag deploys without delay.
+Deferred processing
+Deferred processing involves storing data temporarily and processing it at the next available processing
+slot (the next main function invocation). This approach is used when immediate handling is not
+necessary and can be scheduled to optimize system resources.
+Use case: An example of deferred processing is the periodic transmission of non-critical telemetry
+data, such as fuel consumption or regular diagnostic information. In this case, the COM module
+can collect data over a period and process a queue of data at a later point, benefiting the usage and
+availability of CPU time.
+To complete our understanding of the COM module, it’s beneficial to explore the commonly used
+APIs. As a developer, knowing these APIs will not only enhance your ability to interact with the
+COM module effectively but also simplify the debugging process, giving you a deeper insight into
+the module’s operations.
+
+
+=== Page 167 ===
+148 Exploring the Communication Stack
+COM modules APIs
+In this section, we will explore various APIs provided by the COM module, focusing on how they are
+typically utilized by the RTE to receive and update signals within AUTOSAR systems:
+Note
+Please note that the APIs listed here represent only a selected subset of the CAN APIs.
+For comprehensive details and specifications, always refer to the official AUTOSAR
+standard documentation.
+• Com_RxIndication:
+Purpose: This API is called by the lower layers (such as CAN and LIN drivers) when a PDU
+has been received. It notifies the RTE that data is available.
+Parameters:
+ PduId: This is the identifier of the received PDU
+ PduInfoPtr: This points to the structure containing the received data and length information
+• Com_TxConfirmation:
+Purpose: Used to confirm that a PDU has been successfully transmitted. This API is invoked
+after the successful transmission of a PDU.
+Parameters:
+ PduId: This is the identifier of the PDU that was transmitted
+• Com_ReceiveSignal:
+Purpose: This allows the application to read the latest data received for a specific signal.
+Parameters:
+ SignalId: This is the identifier of the signal whose data is being requested
+ SignalDataPtr: This points to where the signal data should be stored
+• Com_SendSignal:
+Purpose: This allows the application to update the data of a signal within the COM module.
+When the Application Layer needs to transmit new data over the communication network,
+this function enables the data to be sent through the COM module.
+Parameters:
+ SignalId: This is the identifier of the signal whose data is being updated
+ SignalDataPtr: This points to where the signal data should be stored
+
+
+=== Page 168 ===
+COM stack overview 149
+Having explored the COM module, let’s now shift our focus to the PduR module, another key component
+in the COM stack, which plays the main role in mediating between different communication modules
+and the COM layer.
+PDU-Router (PduR) Module
+PduR stands as a central module within the AUTOSAR communication stack. It facilitates the
+routing of PDUs between layers and modules, acting as a mediator to ensure data reaches its intended
+destination. In essence, PduR allows for the decoupling of communication layers, meaning that upper
+layers, such as the COM module, don’t need to be explicitly aware of the specifics of the lower-layer
+network implementations, such as CAN, LIN, or FlexRay.
+Let’s explore the main concepts for PduR.
+Key features within the PduR module
+The PduR module in AUTOSAR offers several functionalities that support efficient data communication
+across various network protocols. The following are the key features that define the PduR
+module’s capabilities:
+• Routing: At its core, PduR is responsible for routing PDUs from a source to a destination
+module. This encompasses activities such as taking PDUs from the COM layer and directing
+them to the appropriate bus-specific Interface Layer (such as CanIf for the CAN network).
+Figure 7.10 demonstrates the routing functionality of the PduR module, showing how a PDU
+from the COM module is effectively routed to the CAN bus.
+Figure 7.10 – PduR routing flow
+
+
+=== Page 169 ===
+150 Exploring the Communication Stack
+• Static configuration: PduR relies on a static configuration, meaning that all routes (i.e., the
+paths data takes from one module to another) are determined at compile time. This ensures
+that there’s no dynamic decision-making overhead during runtime, which benefits performance
+and predictability.
+• PDU fan-out: It supports the distribution of a single incoming PDU to multiple destinations. This
+is particularly useful when the same PDU needs to be processed by multiple upper-layer modules.
+• Gatewaying: In scenarios with multiple communication networks (e.g., a vehicle with both CAN
+and FlexRay), PduR can act as a gateway, routing PDUs from one network protocol to another.
+Figure 7.11 illustrates the gateway functionality of the PduR module, depicting how a message
+originating from the LIN bus is routed through the PduR level to the CAN bus.
+Figure 7.11 – PduR gateway flow
+• Multicast capabilities: PduR can send a single PDU to multiple receiving modules. This
+feature is particularly useful in systems where the same data needs to be distributed across
+various components.
+Up to this point, the configuration of the communication stack varies based on the communication
+protocol employed. AUTOSAR supports several communication protocols relevant to automotive
+systems, such as CAN, LIN, FlexRay, and Ethernet.
+Given that each protocol requires distinct handling, the corresponding hardware Abstraction Layer
+modules also differ. For instance, in a CAN setup, you would typically find modules such as CanIf,
+CAN Network Management (CanNm), CAN, and CAN Transceiver Driver (CanTrcv). Similarly,
+for FlexRay, the relevant modules include Flexray Interface (FrIf), Flexray Network Management
+(FrNm), and Flexray Driver (Fr), while Ethernet-related functionalities are supported by modules such
+
+
+=== Page 170 ===
+COM stack overview 151
+as Service Discovery (SD), Scalable Service-Oriented MiddlewarE over IP (SomeIp), Transmission
+Control Protocol/Internet Protocol (TcpIp), and Socket Adapter (SoAd).
+For clarity, we will focus on CAN-related modules to better understand the functionality of the
+COM module.
+CAN modules
+The AUTOSAR CAN stack is designed as a multi-layered architecture that abstracts the hardware
+details and provides standardized interfaces between the layers. At a high level, it consists of CanIf,
+the CAN Driver, CanTrcv, CanNm, CanSM, and the CAN Transport Protocol (CanTP).
+Let’s explore each of these modules individually, examining their features and use cases.
+CanIf module
+The CanIf module in AUTOSAR abstracts the complexities of the CAN hardware from the upper
+layers by providing a standardized interface for communication, allowing application developers to
+interact with the network without needing to manage or understand the specific details of the CAN
+hardware, such as baud rate or scheduling logistics.
+Note
+The upper layer could be the PduR module, the CanTp module, or another complex device
+driver module that needs to transmit a PDU over the CAN network.
+The following are some of the CanIf features:
+• Role: It acts as an intermediary between the higher layers, such as the PduR and the lower
+layers (the CAN Driver).
+• Multiple drivers: CanIf is designed to handle multiple CAN controllers/drivers. When you have
+multiple CAN controllers in each ECU, CanIf consolidates and manages access to these controllers.
+• Message buffering: It handles the buffering of messages using hardware or software-based
+message boxes, ensuring efficient use of available resources.
+• Filtering: CanIf performs message filtering based on identifiers. It ensures that the upper layers
+receive only those messages that are relevant to them.
+The next section introduces some of the important CanIf APIs.
+
+
+=== Page 171 ===
+152 Exploring the Communication Stack
+CanIf APIs
+Please note that the APIs listed here represent only a selected subset of the CanIf APIs. For comprehensive
+details and specifications, always refer to the official AUTOSAR standard documentation.
+• CanIf_Transmit:
+Purpose: It requests the transmission of a CAN PDU.
+Parameters:
+ CanTxPduId: This is the identifier of the CAN PDU that should be transmitted
+ PduInfoPtr: This points to the PDU structure containing the data and length of the
+CAN PDU
+Description: This function is used to transmit data over the CAN network. It manages the
+mapping from the PDU ID to the corresponding CAN hardware object and handles the queuing
+and prioritization of messages.
+• CanIf_RxIndication:
+Purpose: It indicates the reception of a CAN PDU.
+Parameters:
+ Hrh: The hardware receive handle, identifying the CAN hardware receiving the message
+ CanId: This is the identifier of the received CAN PDU
+ CanDlc: The data length code of the received CAN PDU
+ CanSduPtr: This points to the received data
+Description: This API is called by the CAN Driver to notify CanIf about the reception of
+messages. CanIf then processes this information and passes it up to the respective upper layers.
+• CanIf_TxConfirmation:
+Purpose: It is a confirmation callback for the successful transmission of a CAN PDU.
+Parameters:
+ CanTxPduId: This is the identifier of the CAN PDU that has been successfully transmitted
+Description: This callback is used by the CAN Driver to inform CanIf that a PDU has been
+successfully sent, allowing CanIf to perform any post-transmission handling, such as notifying
+upper layers or clearing buffers.
+
+
+=== Page 172 ===
+COM stack overview 153
+In summary, CanIf in AUTOSAR standardizes and simplifies the handling of CAN network
+communications for automotive applications, making it easier to develop and integrate various
+vehicle functions.
+Lastly, in the CAN stack, we will explore the CAN Driver.
+CAN Driver module
+The CAN Driver is a critical module responsible for managing the lower-level operations of the CAN
+hardware. This module acts as the interface between the hardware-specific communication needs of
+the CAN controller and the higher-level software functions, allowing applications and other software
+modules to communicate over the CAN network without needing to manage the detailed hardware
+complexities and handle the actual message transmission and reception.
+One important aspect of the CAN Driver is its processing modes, which dictate how data is handled
+and transmitted over the network. Here’s an overview of the processing modes for the CAN Driver
+in AUTOSAR:
+• Interrupt mode: In this mode, the CAN controller generates an interrupt for events, such
+as message reception or transmission completion. This mode is preferred when real-time
+processing is required.
+• Polling mode: The CAN Driver continuously checks or polls the status of the CAN controller
+to identify any events. This mode can be simpler in terms of implementation and is typically
+used in less time-critical applications.
+Choosing between these modes depends on factors such as system load, real-time requirements,
+and application complexity. While interrupt mode offers a timely response, polling can be more
+deterministic in systems with predictable loads.
+Each CAN message has a unique identifier, which determines its priority on the bus. The CAN
+Driver can be configured to filter incoming messages based on their IDs, thus reducing unnecessary
+processing for irrelevant messages.
+Then, mailboxes come into play, which are buffers in the CAN controller, used for storing incoming
+and outgoing CAN messages. Depending on the hardware, there could be separate mailboxes for
+transmission and reception, or they could be combined and used for either purpose. They ensure that
+the CAN Driver can handle multiple messages concurrently, improving system efficiency.
+Similarly, as for other modules, I would like to present some of the key APIs within the CAN Driver.
+
+
+=== Page 173 ===
+154 Exploring the Communication Stack
+CAN Driver APIs
+Please note that the APIs listed here represent only a selected subset of the CAN APIs. For comprehensive
+details and specifications, always refer to the official AUTOSAR standard documentation; let’s explore
+the most common ones:
+• Can_Write:
+Purpose: This initiates the transmission of a CAN PDU.
+Parameters:
+ Hth: This is the hardware transmit handler, which denotes the message buffer in the
+CAN hardware
+ PduInfo: This points to the PDU structure containing the ID, length, and data pointer of
+the CAN message
+• Can_Receive:
+Purpose: This handles the reception of CAN messages. This API is often implicitly called by
+the CAN Interrupt Service Routine (ISR) and is not typically used directly by the application.
+Parameters:
+ Hrh: This is the hardware receive handler, representing the message buffer in the CAN
+hardware that has received a message
+ CanId: This is the identifier of the received CAN message
+ CanDlc: This is the data length code of the received message
+ CanSduPtr: This points to the received data
+Having thoroughly explored the components of the communication stack, let’s now recap with a
+practical example.
+Exploring an example of sending a CAN message
+To grasp the functionality of the COM stack within AUTOSAR, let’s examine a practical scenario:
+an application transmitting a message, say, a directive to modify the angle of a car’s side mirrors.
+Figure 7.12 provides an illustration of the data flow from a SWC to the CAN Driver.
+
+
+=== Page 174 ===
+COM stack overview 155
+Figure 7.12 – Signals flow in COM
+Let’s understand what is going on:
+1. Application Layer: This is the starting point of the process. The user interacts with the car’s
+infotainment system and chooses to adjust the angle of the side mirrors. The Application Layer
+contains the software components that implement specific functionalities of the car, in this
+case, the side mirror adjustments.
+2. RTE: RTE acts as an intermediary between the Application Layer and the COM module. It
+abstracts the communication details, enabling software components to communicate as if
+they were in a single address space. In this case, it takes the angle command and prepares it
+for transmission by passing it to the COM layer.
+
+
+=== Page 175 ===
+156 Exploring the Communication Stack
+3. COM: This received the signal (the desired angle value) from the RTE layer:
+I. Signal handling: The COM layer will take this signal and map it to a PDU. If multiple
+signals need to be sent together, they can be packed into a single PDU.
+II. Transmission mode: The COM layer will decide when to send this PDU. This can be
+immediate (SEND_IMMEDIATE), cyclically based on a timer, or upon a change in
+signal value.
+4. PduR: The data from the COM layer includes the packaged PDU.
+5. Routing: PduR takes the PDU from the COM layer and routes it to the appropriate bus interface
+based on its configuration. The decision is made during compilation time and is static.
+6. CanIf: This layer abstracts specifics of the bus protocol, translating general PDUs into bus-specific
+data frames.
+7. CAN Driver: The CAN Driver takes the CAN frame and sends it as electrical signals over
+the CAN bus to the motor control unit of the side mirror. The Bus Driver interfaces directly
+with the physical layer, modulating and sending the signal across the actual communication
+medium (wires, optical fibers, etc.). In our example, if we’re using CAN, the CAN Driver takes
+the CAN frame and sends it as electrical signals over the CAN bus to the motor control unit
+of the side mirror.
+Figure 7.13 illustrates the CAN communication stack sequence in AUTOSAR, providing the flow of
+transmission of the CAN message the application sends a signal via Rte_Send_Signal_a(),
+which is processed through RTE (Com_Send(Signal)), COM (PduR_Transmit()), and PduR
+(CanIf_Transmit()), and finally transmitted by CanIf (Can_Write()).
+Figure 7.13 – Sequence diagram transmitting a signal
+
+
+=== Page 176 ===
+Network management 157
+Now that we have explored the COM stack data transmission and reception path, let’s try to unravel
+the control and Nm path.
+Network management
+Network management in AUTOSAR includes functions aimed at controlling and coordinating
+communication between ECUs across different network protocols. It handles tasks such as network
+configuration, fault detection and handling, and ensuring the overall integrity and reliability of data
+exchange. By overseeing these aspects, Nm helps maintain optimal network performance and reduces
+power consumption by managing the active and sleep states of ECUs. This enhances overall system
+performance and responsiveness.
+In the next section, we shall explore the key modules to handle network management.
+Key modules in network management
+ComM acts as a higher-level manager that coordinates with other Nm modules, such as the Network
+Management (Nm) and various bus-specific network management modules (e.g., CanNm for CAN,
+LinNm for LIN), to ensure efficient and reliable communication system operations.
+ComM manages various states of the communication channels:
+• Full communication mode: In this state, the network allows active communication where
+ECUs can send and receive messages. ComM ensures that the network remains in this mode
+as long as there are active communication requests from the ECUs.
+• Silent communication mode: Used primarily in bus systems such as CAN, where the ECUs
+need to listen to the bus but do not send any messages.
+• No communication mode: In this state, the network is effectively shut down to minimize
+power consumption, used especially when the vehicle is parked. The network can be woken
+up by specific wake-up events.
+Communication channel
+Communication channels are defined within the AUTOSAR communication stack, which
+encompasses various communication protocols and services, such as CAN, LIN, FlexRay,
+Ethernet, and others, each suited for different types of data transmission needs within the vehicle.
+It also collaborates with Nm modules to manage network state transitions based on ECU communication
+needs. It processes Application Layer requests for communication mode changes, assessing these
+against predefined rules and managing them with timers for stability. Additionally, ComM handles
+wake-up signals to transition the network from low power to active states, ensuring alignment with
+the vehicle’s operational conditions.
+
+
+=== Page 177 ===
+158 Exploring the Communication Stack
+Next, we can briefly discuss the CanNm as a core pillar of Nm.
+The CanNm module is responsible for managing the state transitions and overall operation of the
+CAN network within the automotive system.
+CanNm manages various states of the CAN network, including the following:
+• Bus-Sleep: In this state, the CAN network is inactive, conserving power to minimize energy
+consumption when not in use.
+• Ready Sleep: This state indicates that the CAN network is ready to enter the Bus-Sleep state
+but is currently active.
+• Normal Operation: The CAN network is fully operational and actively transmitting and
+receiving messages between ECUs.
+• Bus-Off: This state occurs when a node detects an error on the CAN bus, leading to temporary
+disconnection from the network. CanNm handles the recovery process to restore Normal Operation.
+• Prepare Bus-Sleep: CanNm prepares the CAN network to transition to the Bus-Sleep state by
+completing necessary tasks before entering the low-power mode.
+Figure 7.14 illustrates the state transitions for the previously mentioned states.
+Figure 7.14 – CanNm state machine
+
+
+=== Page 178 ===
+Network management 159
+When an ECU wakes up, it typically enters a state where it waits for Nm messages from other ECUs
+to synchronize its operation with the rest of the network. This state is known as the Repeat Message
+State. During this state, the ECU listens for Nm messages and may set a timer to wait for a certain
+duration before proceeding.
+For example, let’s consider a scenario where an ECU wakes up and enters the Repeat Message State.
+It waits for Nm messages from other ECUs to ensure that it synchronizes its activity with the rest of
+the network. If it receives Nm messages within a specified timeframe, indicating that other ECUs are
+active and ready to communicate, it transitions to the Normal Operation state.
+However, if the ECU stops receiving Nm messages from other ECUs, it interprets this as a signal that
+no other ECUs want it to be active, possibly indicating a synchronized sleep scenario. In such cases,
+the ECU transitions through intermediate states, such as Bus-Ready Sleep, and eventually enters the
+Bus-Sleep state to minimize power consumption.
+Synchronized sleep ensures efficient power management and network operation. By synchronizing
+the sleep periods of all ECUs within the network, power consumption can be minimized collectively,
+leading to improved energy efficiency of the entire system. Additionally, synchronized sleep prevents
+unintended wake-up events, where an active ECU may inadvertently wake up other ECUs unnecessarily,
+disrupting the network’s operation and potentially wasting energy.
+Note
+So far, we have been describing CanNm and Nm within the context of a CAN network. It’s
+important to note that similar concepts also apply to other communication protocols, such as
+FlexRay and Ethernet. While there are minor differences in implementation details and specific
+features, the core principles of Nm remain the same across these protocols.
+In summary, the process from ECU wake-up to entering synchronized sleep involves listening for Nm
+messages, transitioning through intermediate states based on network activity, and ultimately entering
+sleep mode collectively with other ECUs to optimize power consumption and network operation.
+
+
+=== Page 179 ===
+160 Exploring the Communication Stack
+Summary
+In our exploration of the AUTOSAR COM chapter, we have dived deeply into the fundamental
+components and mechanisms to build reliable communication within the AUTOSAR framework. We
+began by unraveling the intricacies of the COM module, elucidating its paramount role in facilitating
+data exchange across the system. Our journey also introduced us to the significance of signals, these
+atomic elements of data communication, and how they play into the larger picture of data transfer.
+One cannot discuss COM without reference to the PduR module. We shed light on its multifaceted
+features, emphasizing its role as a mediator in routing and transforming data between software
+modules. Providing a practical perspective, the CAN stack example served as an illustration of these
+abstract concepts. Through this, readers gained insights into the constituent elements of the CAN
+stack and their interplay. Further enriching our discourse, we ventured into the nuanced features of
+both the PduR and COM modules. This entailed a deep dive into the communication mechanisms,
+highlighting how data is handled, routed, and transformed. Furthermore, the discussion on transfer
+property offered a granular view of how data transmission is modulated based on different conditions
+and requirements.
+In summary, this chapter serves as a comprehensive guide for those looking to grasp the core tenets of
+AUTOSAR communication. The knowledge imparted herein is invaluable for readers as they embark
+on their AUTOSAR projects, offering both theoretical wisdom and practical insights to navigate the
+complexities of the framework effectively.
+As we conclude this chapter, we will turn our attention to the next topic: the crypto stack in AUTOSAR.
+In the upcoming chapter, we will focus on exploring the crypto stack in detail and investigate how to
+secure communication with the communication stack through a use case.
+Questions
+1. What is the primary role of the COM module within the AUTOSAR framework?
+2. How do signals fit into the larger framework of AUTOSAR communication?
+3. What is the PduR module’s function in the AUTOSAR communication paradigm?
+4. In the context of the CAN stack example, can you highlight one key element and its significance?
+5. What does the transfer property feature in the COM module refer to?
+6. Why is the PduR module often referred to as a mediator in AUTOSAR communication?
+7. How does the COM module manage the nuances of transmission and reception within AUTOSAR?
+8. What are the different states for Nm?
+
+
+=== Page 180 ===
+Part 3:
+Beyond Fundamentals –
+Advanced AUTOSAR Concepts
+This part addresses advanced topics within the AUTOSAR framework, such as cybersecurity and
+memory management. It explains the AUTOSAR Crypto Stack, Secure Onboard Communication
+(SecOC), and the Non-Volatile Memory (NVM) stack. The section concludes with a comprehensive
+use case, summarizing key concepts and encouraging further study and practical application. You
+will be prepared to tackle complex challenges in automotive software development and enhance your
+expertise in AUTOSAR.
+This part has the following chapters:
+• Chapter 8, Securing the AUTOSAR System with Crypto and Security Stack
+• Chapter 9, Dealing with Memory and Mode Management
+• Chapter 10, Wrapping Up and Extending Knowledge with a Use Case
+
+
+=== Page 181 ===
+(blank)
+

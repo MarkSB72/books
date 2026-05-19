@@ -1,0 +1,532 @@
+=== Page 23 ===
+4 Exploring the Genesis and Objectives of AUTOSAR
+The evolution of the car can be traced back to the early 20th century when the first automobiles were
+developed. These vehicles were simple and utilitarian, designed primarily for transportation from
+point A to point B. However, as technology advanced, so did the car. In the 1950s and 1960s, we saw
+the emergence of advanced safety features such as seat belts, airbags, and anti-lock brakes. By the
+1980s, we began to see the introduction of onboard computers, which enabled more advanced engine
+management and diagnostics. In the 1990s, vehicles saw the integration of more sophisticated electronic
+systems, such as electronic stability control (ESC) and advanced driver assistance systems (ADAS).
+In the 21st century, the car has undergone a massive transformation. Today’s vehicles are equipped
+with advanced features that were once reserved for high-end luxury cars.
+The percentage of car production costs attributed to electronic control systems and automotive software
+has been consistently rising over the years. This upward trend is clearly depicted in the Statista data
+(https://www.statista.com/statistics/277931/automotive-electronics-
+cost-as-a-share-of-total-car-cost-worldwide/) shown in the following figure,
+which has been monitoring this development since 1970:
+Figure 1.1 – Electronics system as percent of total car cost
+This increasing complexity of automotive systems has presented a challenge for the industry in terms
+of software development.
+The evolution of the car into a smart, connected, and autonomous machine is driven by several factors,
+which include the following:
+• The growing demand for advanced safety features
+• The need for more efficient and environmentally friendly transportation
+• The desire for a more convenient and connected driving experience
+
+
+=== Page 24 ===
+Evolution of the automotive industry 5
+The adoption of advanced technologies such as sensors, software systems, and connectivity has
+enabled car manufacturers to deliver on these demands, creating a new era of smart, autonomous,
+and connected vehicles.
+With the integration of new technologies such as ADAS and connected car features, the amount of
+software that needs to be developed and integrated into vehicles has grown significantly.
+The comparison to the Apollo mission highlights the significant increase in complexity of modern
+cars. While the Apollo spacecraft had only a limited number of systems that needed to be managed,
+modern cars can contain up to 100 or more ECUs, sensors, and actuators, all of which need to
+communicate seamlessly within very tight time constraints with one another to ensure proper
+functioning. Additionally, modern cars are highly connected devices that require sophisticated
+software and networking capabilities, further adding to their complexity. This increased complexity
+allows modern cars to offer advanced features and functionality but also requires more sophisticated
+maintenance and repair processes.
+Having discussed the evolution and complexity of automotive software, let’s shift our focus to one of
+the essential components that enable modern cars to function effectively – the ECU.
+What is an ECU?
+Before we move any further, we need to understand what an automotive ECU is. This is a computer –
+comprising a printed circuit board (PCB) with a microcontroller and various electronic components – that
+controls various functions in a vehicle. These functions may include engine management, transmission
+control, climate control, power steering, and brakes. Here are some examples of automotive ECUs:
+• Engine control module (ECM): The ECM is responsible for managing the engine’s performance,
+including fuel injection, ignition timing, and emissions control.
+• Transmission control module (TCM): The TCM manages the operation of the transmission,
+including gear selection, shift timing, and torque converter lock-up.
+• Body control module (BCM): The BCM controls various functions related to the vehicle’s body
+and interior, such as lighting, climate control, door locks, and audio systems.
+• Anti-lock braking system (ABS) control module: The ABS control module manages the
+operation of the ABS, which helps to prevent skidding and maintain control of the vehicle
+during braking.
+• Battery management system (BMS): The BMS’s primary function is to monitor, control, and
+optimize the performance of the vehicle’s battery pack. It also ensures all battery cells within
+the pack are charged and discharged uniformly, preventing the overcharging of certain cells
+and maximizing the overall battery capacity.
+
+
+=== Page 25 ===
+6 Exploring the Genesis and Objectives of AUTOSAR
+Some examples of these components are shown in the following figure:
+Figure 1.2 – Examples of ECUs in a vehicle
+Overall, automotive ECUs play a critical role in the operation of modern vehicles, providing precise
+control over various systems and ensuring optimal performance, efficiency, and safety. As automotive
+ECUs rely heavily on complex software to perform their functions, we first need to understand the
+software development aspect to comprehend the nuances of ECU operation and design.
+Introducing automotive software development
+Automotive software development is a critical component of the continued innovation and success of
+the automotive industry. It involves creating and maintaining software systems used in various types
+of automobiles, cars, trucks, buses, and other automobiles. These software systems are responsible for
+multiple tasks, such as engine management, navigation, entertainment, and safety features. Therefore,
+engineers in this field must have expertise in embedded systems, real-time programming, control
+systems, and communication protocols to create reliable and safe software systems.
+It is a highly specialized field that requires close collaboration with other members of the automotive
+development team, such as electrical and mechanical engineers and quality assurance specialists, to
+ensure seamless integration of the software systems into the vehicle and meet the end users’ needs.
+Clean software architecture principles can help address the challenges of this complex field by creating
+a system that is easy to maintain, modify, and evolve while being resilient to change.
+
+
+=== Page 26 ===
+Evolution of the automotive industry 7
+Note
+Clean architecture in software design refers to a structured approach that prioritizes clarity,
+separation of concerns, and maintainability. It emphasizes the organization of code in a way
+that minimizes dependencies, allowing for easy modifications and testing. Clean architecture
+fosters systems that are adaptable, scalable, and easy to comprehend.
+It’s a challenging field but plays a critical role in the continuous success and innovation of the automotive
+industry. Before we discuss advancements in this field, let’s first understand traditional automotive
+software development.
+Understanding traditional software development
+Traditional automotive software development involves a wide variety of ECUs with different hardware
+and software, which can make it difficult to ensure that all components work together efficiently. Each
+supplier has its own software architecture definitions, development methodology, and interfaces
+for ECUs, resulting in fragmented and non-standardized software components (SWCs) across the
+automotive industry. This approach had several limitations, including the following:
+• Limited reusability: SWCs developed for one vehicle or system may not be reusable in another,
+leading to increased development costs and a longer time to market, if a similar functionality
+is required on another platform.
+• Integration time: The integration of different SWCs can be a time-consuming and expensive
+process, particularly if the components were not designed to work together from the beginning.
+• Time to market: The time to market for new vehicles and features can be long and costly,
+particularly when traditional automotive software development methods are used. This can
+lead to missed opportunities and lost revenue for manufacturers and suppliers.
+• Complex supply chain: The rising complexity of software implementations is closely linked
+to the increasing complexity of supply chains. In this context, software developers design their
+components based on the requirement definitions provided by original equipment manufacturers
+(OEMs) or Tier 1 suppliers, who are responsible for their integration at a later stage.
+• Rigidity: Automotive software is often monolithic and inflexible. Also, it is very hard to adapt
+to changing requirements and technologies.
+Traditional automotive software development was fragmented, non-standardized, and costly, making
+it challenging to develop high-quality software and meet the growing demands of the automotive
+industry. An example of this type of non-standardized architecture is shown in the following figure:
+
+
+=== Page 27 ===
+8 Exploring the Genesis and Objectives of AUTOSAR
+Figure 1.3 – Example of non-standardized software architecture
+Thus, AUTOSAR was introduced to address these limitations and promote more efficient, effective,
+and standardized automotive software development. In the following section, we discuss a case study
+to illustrate this point.
+Note on the evolution of automotive software standardization
+There were early efforts to standardize automotive software both within individual companies
+and through collaborations between various entities, such as OSEK/VDX and HIS. These
+initiatives aimed to address specific aspects of software architecture, such as operating systems
+and diagnostics. Despite these efforts, they were often narrow in focus and lacked the integration
+needed for modern vehicle systems. This led to the development of AUTOSAR, a comprehensive
+standard that addresses all layers of automotive software architecture, enabling better scalability,
+interoperability, and reusability across different manufacturers and vehicle platforms.
+
+
+=== Page 28 ===
+Introducing the AUTOSAR framework 9
+Case study – Replacing an MCU and exchanging microcontroller
+drivers
+Let’s consider an example of a company wanting to upgrade an ECU, which was typically designed and
+implemented using proprietary software and hardware architectures, with little or no standardization
+across different car manufacturers. The microcontroller deployed in an ECU was typically bespoke
+and tailored to the car manufacturer and the specific model, and any alteration to it would necessitate
+extensive modifications to both the hardware and software aspects.
+Suppose the company wants to replace the microcontroller of the ECU with a more advanced
+microcontroller. In that case, they would need to design a new hardware board that is compatible with
+the new microcontroller, which would likely involve changing the pin assignments and other circuitry.
+With a similar architecture to that shown in Figure 1.3, most of the software would need to be rewritten
+or modified to adapt to the new microcontroller’s peripheral interfaces, and architecture. This would
+require a significant investment in time, money, and resources, depending on the complexity of the ECU.
+In summary, prior to the advent of AUTOSAR, altering the microcontroller of an automotive ECU
+represented a formidable task, necessitating considerable technical knowledge and regulatory expertise.
+The lack of standardization across automotive manufacturers compounded the issue, making it difficult
+to devise a universal solution. Moreover, the intricate nature of the software and hardware involved
+rendered any attempts to upgrade or modify an ECU a substantial challenge, requiring significant
+effort and resources. With the advent of AUTOSAR, there was a paradigm shift as it allowed software
+to be abstracted from not just the microcontroller but the entirety of the ECU and vehicle architecture.
+This enables developers to write applications that communicate with other software, fully abstracted
+from aspects such as the ECU architecture, endianness, bus architecture, signal packing and protocol,
+and vehicle gateways.
+It’s worth noting that our focus has primarily been on the benefits of AUTOSAR in relation to
+microcontroller replacement in this context. However, the benefits of AUTOSAR are far more
+comprehensive. Beyond facilitating microcontroller substitution, AUTOSAR’s broad reach positively
+affects numerous other aspects of automotive software and hardware, making it a more efficient and
+flexible solution in the realm of automotive technology.
+Introducing the AUTOSAR framework
+AUTOSAR is an open and standardized software architecture for the automotive industry. It was
+developed by a consortium of automotive manufacturers, suppliers, and tool developers. The aim is
+to create an industry standard for automotive software architectures that is open and accessible to all.
+The standard is designed to meet the technical goals of the automotive software industry: modularity,
+scalability, transferability, and function reusability.
+
+
+=== Page 29 ===
+10 Exploring the Genesis and Objectives of AUTOSAR
+The main objective of AUTOSAR is to develop a standard architecture that can be used across different
+automotive domains, such as powertrain, chassis control, body, and safety. This standardization aims
+to enable SWCs from different suppliers to work together seamlessly, reduce development costs, and
+facilitate the reusability of SWCs. It also helps in managing the increasing complexity of electrical
+and electronic systems, as well as ensuring their quality and reliability.
+Here’s how the different components of the ecosystem work:
+• OEMs: They are responsible for setting ECU software requirements and choosing Tier 1 suppliers
+to deliver the hardware and SWCs. By adopting AUTOSAR, OEMs ensure compliance with
+safety and regulatory standards while promoting modular, reusable, and scalable software
+development for seamless integration and compatibility across various automotive systems
+and suppliers.
+• Tier 1 suppliers: A Tier 1 supplier is a company that directly supplies components or systems.
+It can be hardware or software to an OEM for use in vehicle production. These suppliers
+are considered at the top of the automotive supply chain and are responsible for providing
+high-quality and reliable components that meet the OEM’s specifications and requirements.
+Examples of Tier 1 suppliers in the automotive industry include companies that provide
+engines, transmissions, braking systems, steering systems, and electronics components such
+as infotainment systems and ECUs.
+• Standard software vendors: Standard software vendors provide AUTOSAR-compliant software
+modules, such as communication stacks and diagnostic services, that can be easily integrated
+and interchanged with other SWCs. The standard software is developed following the AUTOSAR
+standards and can be used by Tier 1 suppliers to build more complex software modules.
+• Semiconductor manufacturers: Semiconductor manufacturers in the automotive industry
+provide the electronic components. They ensure that future hardware and software needs of
+the automotive industry are met.
+The AUTOSAR standard is developed and maintained through a collaborative effort involving its
+partners, who ensure that it remains relevant and up to date by considering the necessary use cases to
+support the roadmaps of users. Partners are grouped based on their membership type, with varying
+levels of involvement in the standard’s development, implementation, and usage. This approach
+encourages diverse stakeholder participation and reflects the needs and perspectives of the entire
+automotive ecosystem. The collaborative nature of AUTOSAR has been instrumental in its success,
+enabling it to become the industry standard for automotive software architectures. The main categories
+are as follows:
+• Core partners: The core partners are BMW Group, Bosch, Continental, Daimler AG, Ford,
+General Motors, PSA Group, Toyota, Volkswagen Group, and Volvo Group. They were the
+initial members of the partnership and provided the funding and resources required to develop
+the AUTOSAR standard.
+
+
+=== Page 30 ===
+Introducing the AUTOSAR framework 11
+• Premium partners: A group of companies who are members of the AUTOSAR development
+partnership and have made significant contributions to the development and promotion of the
+AUTOSAR standard. Premium partners have a higher level of involvement and influence in
+the partnership than regular members and benefit from additional collaboration opportunities
+and early access to the latest AUTOSAR specifications and releases.
+• Development partners: Development partners play an important role in the partnership by sharing
+their knowledge, expertise, and resources to help shape the future of the automotive industry.
+• Associate partners: Associate partners have a lower level of involvement than core partners
+and premium partners, but still benefit from collaboration opportunities and access to the
+latest AUTOSAR specifications and release.
+In summary, AUTOSAR enables all the stakeholders in the ECU development process to work together
+effectively by providing a common language and standardized framework. This promotes interoperability,
+scalability, and reuse of SWCs across different car manufacturers and reduces development time and
+costs while improving software quality and reliability.
+Impact on traditional software development
+AUTOSAR addresses the limitations of traditional automotive software development by providing
+a standardized approach. By promoting modularity, standardization, and scalability, AUTOSAR has
+made it easier to develop high-quality software that meets the increasingly demanding needs of the
+automotive industry. The success of AUTOSAR is evident in its widespread adoption as the industry
+standard for automotive software architectures.
+Here are some ways in which AUTOSAR addresses the limitations of traditional software development:
+• Common platform: It provides a common platform and architecture for software development,
+enabling collaboration between different suppliers and manufacturers.
+• Modular design: It promotes modularity and standardization, making it easier to reuse SWCs
+across different projects and adapt to changing requirements and technologies.
+• Cost-effective integration: The standardized approach to software development that AUTOSAR
+takes has made it easier and more cost-effective to integrate different SWCs.
+• Safety and security: The framework for implementing safety and security concepts in automotive
+software helps to ensure the safety and security of vehicles on the road.
+• Interoperability: It defines a common methodology for communication and enables ECUs
+from different suppliers to interoperate seamlessly.
+• Consistency: The consistent approach to software development makes it easier to ensure the
+interoperability, maintainability, and scalability of SWCs.
+
+
+=== Page 31 ===
+12 Exploring the Genesis and Objectives of AUTOSAR
+• Flexibility: It promotes a modular and flexible approach to software development, making it
+easier to adapt to changing requirements and technologies.
+In the next section, we will examine the methods used by AUTOSAR to address the limitations of
+traditional automotive software development. We will investigate how AUTOSAR’s common platform,
+modular design, cost-effective integration, safety and security, interoperability, consistency, and
+flexibility have transformed the industry by providing a standardized and efficient framework for
+developing superior automotive software.
+How were these goals achieved?
+The separation of infrastructure from the application is a fundamental principle of software architecture
+that enables software developers to focus on their core competencies and expertise in developing
+application software (ASW) modules that provide the unique features and functions of their product.
+They do not need to worry about the underlying hardware or software platform or the implementation
+details of the BSW and runtime environment (RTE). Instead, they can focus on their core competencies
+in developing ASW modules while providing standardized interfaces and services for accessing the BSW.
+Note
+The BSW provides low-level software services, such as drivers and communication and diagnostic
+services, that are necessary for the proper functioning of the ECU. It includes standardized
+modules that are compliant with the AUTOSAR specifications and can be easily integrated
+and interchanged with other BSW modules from different vendors.
+The following figure shows the basic structure of this standardized interface:
+Figure 1.4 – AUTOSAR Standardization
+The separation of infrastructure from the application also enables the ECU to be more modular and
+scalable. Different ASW modules from different vendors can be easily integrated into the ECU, and
+new ASW modules can be added or removed without affecting the BSW or other ASW modules.
+
+
+=== Page 32 ===
+Understanding the AUTOSAR standards 13
+However, AUTOSAR does not provide specific solutions for individual problems or use cases. Instead,
+it provides a structured way to implement specific functionality in an ECU that can be adapted and
+customized to meet the needs of different car manufacturers and use cases.
+For example, if a car manufacturer wants to implement a specific braking system, they would use the
+AUTOSAR framework and specifications to develop the software modules that control the braking
+system. AUTOSAR would provide a standardized way to interact with the microcontroller and
+peripheral hardware to allow the implementation of the braking functionality. However, it would not
+provide specific guidance on how to manage the braking system or how to implement specific features
+or functions. The following case study provides a more detailed example.
+Case study – Developing an ECU in the AUTOSAR framework
+An automotive supplier is developing a new radar sensor system for autonomous driving applications
+using AUTOSAR. The challenge is in developing a highly accurate and reliable radar sensor system that
+can detect objects and provide warning signals to the vehicle’s control system as soon and accurately
+as possible.
+The supplier has decided to adopt AUTOSAR, which provides a standardized set of interfaces and
+services for the development and integration of SWCs. The AUTOSAR BSW layer provides a set of
+pre-built software modules that abstract the hardware-specific details and provide a unified interface
+for the ASW layer to access the hardware functions.
+By using AUTOSAR, the supplier is able to reduce the development time and cost required to
+integrate multiple SWCs, as well as reduce the risk of incompatibilities or errors. The standardized
+interfaces and services provided by AUTOSAR enable the software engineers to focus on developing
+the application-specific features of the radar sensor system, rather than spending time on developing
+and integrating basic software services.
+For example, the application engineers don’t have to worry about how to store data in non-volatile
+memory, how communication works, or whether to use a controller area network (CAN) or Ethernet
+as a medium of transmission.
+Instead, they only focused on implementing warning algorithms that would detect objects and provide
+warning signals to the vehicle’s control system.
+Now that we’ve understood the need for AUTOSAR, let’s look at its standards in more detail.
+Understanding the AUTOSAR standards
+The AUTOSAR standards consist of a set of specifications, standards, and guidelines that provide
+a framework for the development and integration of SWCs in automotive ECUs. The AUTOSAR
+standards consist of the following components:
+
+
+=== Page 33 ===
+14 Exploring the Genesis and Objectives of AUTOSAR
+Figure 1.5 – AUTOSAR standards
+The following list describes these components in detail:
+• AUTOSAR platform: AUTOSAR has two main flavors, namely, Classic Platform (CP) and
+Adaptive Platform (AP). It is a common misconception that adaptive AUTOSAR is replacing
+classic AUTOSAR. Both adaptive AUTOSAR and classic AUTOSAR are complementary software
+architectures that address different requirements and use cases in the automotive industry:
+ CP is intended for conventional embedded automotive systems that have a fixed set of
+functionalities and tightly integrated hardware and software (static). It features a layered
+architecture and standardized interfaces that facilitate the consistent and efficient development
+and integration of SWCs. It is also optimized for resource-constrained environments, making
+it ideal for ECUs with limited processing power and memory.
+It uses an OSEK/VDX-based real-time operating system (RTOS), which is highly deterministic
+and optimized for real-time performance, thus suitable for safety-critical and hard real-time
+applications such as powertrain and chassis control.
+Communication is based on static configurations using predefined protocols such as CAN,
+LIN, FlexRay, and Ethernet, and communication relationships are established at design time.
+
+
+=== Page 34 ===
+Understanding the AUTOSAR standards 15
+ AP is designed for more flexible and dynamic automotive systems, where the hardware and
+software are decoupled and can be upgraded independently. It provides a modular architecture
+and supports the use of open source and third-party components, enabling faster innovation
+and more frequent updates. In contrast to CP, it supports dynamic communication with
+a service-oriented architecture (SOA) using Ethernet, where services can be discovered
+and communicated with during runtime. It uses a POSIX-compliant operating system,
+typically based on Linux, which provides greater flexibility, suitable for handling complex
+and resource-intensive tasks.
+The two flavors of AUTOSAR reflect the different needs and requirements of the automotive
+industry, and they are designed to provide a common standard for the development and
+integration of SWCs in vehicles, regardless of the specific use case or application.
+• Foundation: Foundation (FO) in AUTOSAR is designed to ensure interoperability between
+different AUTOSAR platforms by providing a set of generic artifacts that are shared between
+both CP and AP. This helps to promote compatibility between different platforms, including
+those that are not based on AUTOSAR, and ensures that automotive systems and devices can
+work together seamlessly.
+It contains common requirements and technical specifications, for example, E2E Protocol
+Specification, V2X Specification, Secure Onboard Communication Protocol, and Specification
+of Intrusion Detection System Protocol, which are all shared between the AUTOSAR platforms
+(CP and AP).
+Figure 1.6 – FO within AUTOSAR standard
+
+
+=== Page 35 ===
+16 Exploring the Genesis and Objectives of AUTOSAR
+• Acceptance tests (ATs): AUTOSAR ATs are system tests at the bus level as well as the application
+level to validate the behavior of an AUTOSAR stack with regard to the ASW components as
+well as the communication bus:
+Figure 1.7 – Acceptance test AUTOSAR
+The documentation at https://www.AUTOSAR.org/fileadmin/standards/
+tests/1-2/AUTOSAR_ATS_CommunicationCAN.pdf describes AT specifications of
+communication on a CAN bus. It describes the test case steps along with the test architecture.
+In Figure 1.8, taken from the preceding example use case, this diagram illustrates a test setup
+where a test bench sends test sequences to an embedded SWC within the system under test
+(SUT) via the CAN bus.
+Figure 1.8 – Test architecture description
+
+
+=== Page 36 ===
+Software architecture and design 17
+• Application interfaces (AIs): AUTOSAR has standardized a large set of AIs in terms of syntax
+and semantics for the different vehicle domains: Body and Comfort; Powertrain; Chassis
+Control; Occupant and Pedestrian Safety; and HMI, Multimedia and Telematics. For instance,
+the Chassis Control domain focuses on stability and control, while Powertrain manages
+propulsion. The Body domain handles comfort and convenience features, autonomous systems
+enable self-driving capabilities, and in-vehicle infotainment (IVI) ensures entertainment and
+connectivity. AUTOSAR defines reference interfaces and SWCs across these domains that the
+systems can communicate effectively and are interoperable, regardless of the specific hardware
+or software used by different manufacturers. For example, the Powertrain and Chassis Control
+systems work together for car stability and performance, while the ADAS relies on inputs from
+various sensors and systems to make real-time driving decisions.
+An example of an application interface in AUTOSAR is the adaptive cruise control (ACC)
+interface. This interface standardizes how the ACC component communicates with other
+vehicle systems, such as sensors and actuators. It defines how data such as vehicle speed and
+distance from the car ahead is processed and exchanged, allowing ACC to maintain a safe
+distance from other vehicles automatically. By using this standardized interface, different
+ACC implementations can interact with various sensors and actuators across different vehicle
+models, guaranteeing consistency and interoperability. This is discussed in further detail
+here: https://www.autosar.org/fileadmin/standards/R22-11/CP/
+AUTOSAR_EXP_AIChassis.pdf
+AUTOSAR standardizes the interfaces and SWCs across these domains, ensuring that the systems
+can communicate effectively and are interoperable, regardless of the specific hardware or software
+used by different manufacturers. For example, the interaction between the Powertrain and Chassis
+Control systems is crucial for vehicle stability and performance, while the Autonomous domain relies
+on inputs from various sensors and systems to make real-time driving decisions.
+Software architecture and design
+The defined architecture is based on a modular, layered approach that emphasizes the separation of
+concerns, clear interfaces, and independence of components. AUTOSAR provides guidelines and
+best practices for software architecture and design, which enable software engineers to develop high-
+quality, standardized SWCs that can be easily integrated into different automotive systems and devices.
+Layers
+A layer in software architecture refers to a logical grouping of SWCs that share a common set of
+responsibilities and are designed to work together to perform a specific set of tasks.
+
+
+=== Page 37 ===
+18 Exploring the Genesis and Objectives of AUTOSAR
+It can be seen as a horizontal slice through the software architecture, with each layer providing a
+specific set of services to the layer above it, as shown in Figure 1.9. The layers are typically designed
+to be modular and loosely coupled so that changes made to one layer do not affect the functionality
+of the other layers.
+The AUTOSAR layered architecture provides the necessary mechanisms for achieving software and
+hardware independence by dividing the software into three main layers that run on a microcontroller,
+as shown in the following figure:
+Figure 1.9 – AUTOSAR layered architecture
+Let’s discuss these layers in further detail:
+• Application layer: This is where the SWCs that contain the algorithms and functionality of
+the system are located. This layer is responsible for implementing the high-level behavior of
+the system and uses the interface of the lower layers to access the hardware resources. Some
+examples of functions are monitoring the battery charge for a battery charger ECU and setting
+and viewing the temperature through the human-machine interface (HMI).
+• AUTOSAR RTE: The RTE serves as both a binding and isolating layer between the ASW and
+BSW layers. All communication and service usage between these two layers must occur within
+the RTE. We will dive into the specifics of this topic in greater detail in Chapter 4.
+
+
+=== Page 38 ===
+Software architecture and design 19
+• Basic software: The BSW layer is divided into three different layers, each providing specific
+functionality required for the proper functioning of an ECU. These layers are as follows:
+ Services layer: This layer offers a variety of services for applications to utilize. It comprises
+services such as System Services, Memory Services, Crypto Services, and Diagnostic and
+Communication Services.
+ ECU abstraction layer: This layer delivers ECU-related abstractions, including I/O
+Hardware Abstraction, Onboard Device Abstraction as an external watchdog, Memory
+Hardware Abstraction, and Crypto Hardware Abstraction, to enable hardware independence
+for applications.
+ Microcontroller abstraction layer (MCAL): This layer provides a driver implementation
+for the MCU in use, enabling communication between the BSW layers above and the
+microcontroller hardware peripherals.
+Further exploration of the layers will be conducted in Chapter 2.
+Stacks
+A stack refers to a collection of software layers or components that work together to provide a specific
+functionality or service. Each layer in the stack represents a distinct set of functions and services and
+is responsible for performing a specific set of tasks. The layers communicate with each other through
+well-defined interfaces, and the data is passed between the layers in a hierarchical manner, with each
+layer providing services to the layer above it. The architecture is shown in the following figure:
+Figure 1.10 – AUTOSAR stacks
+
+
+=== Page 39 ===
+20 Exploring the Genesis and Objectives of AUTOSAR
+Some of the main AUTOSAR stacks that we will dive into in our journey are the following:
+• Memory Stack
+• Communication (CAN, Ethernet, LIN, and FlexRay)
+• Diagnostic
+• IO Hardware Abstraction
+• Security
+Summary
+Throughout this chapter, we have traced the evolution of the automotive industry and identified the
+challenges that traditional software development faces. These challenges served as key driving forces
+behind the creation of AUTOSAR. We discussed that the AUTOSAR framework offers a standardized
+method for software development and integration within the automotive sector. This enables software
+developers to concentrate on their core competencies while developing application-specific features
+and taking advantage of standardized interfaces and services to access the basic software layer.
+Furthermore, the framework fosters interoperability, scalability, and the reuse of SWCs across various
+car manufacturers, ultimately reducing development time and costs while enhancing software quality
+and reliability.
+We learned that AUTOSAR is comprised of specifications and guidelines that establish a framework
+for the development and integration of SWCs in automotive ECUs. The framework employs a layered
+approach with modular and loosely coupled layers, achieving ASW and hardware independence.
+Additionally, AUTOSAR provides a set of stacks that collaborate to deliver ECU-specific functionalities
+and services. The insights gained in this chapter are significant because they allow for a better
+understanding of the real-world applications of AUTOSAR. By comprehending the relevance of these
+topics and the lessons learned, developers can effectively apply this knowledge in real-world contexts,
+further improving the development and integration of automotive software systems.
+In the next chapter, we will explore the various layers and stacks within AUTOSAR, providing a more
+comprehensive understanding of the framework and its classical components.
+
+
+=== Page 40 ===
+Questions 21
+Questions
+Please answer the following questions to evaluate your overall understanding of this chapter:
+1. What does AUTOSAR stand for?
+2. Who developed the AUTOSAR standard?
+3. What are the main goals of the AUTOSAR framework?
+4. How many layers does classical AUTOSAR have?
+5. List four of the AUTOSAR stacks.
+6. Is adaptive AUTOSAR replacing classical AUTOSAR, and if so, why?
+7. What are the key differences between classical and adaptive AUTOSAR?
+
+
+=== Page 41 ===
+(blank)
+
+
+=== Page 42 ===
+2
+Introducing the AUTOSAR
+Software Layers
+By now, you have learned about AUTOSAR, its challenges, and its development by a group of
+collaborators who joined forces to create it. But what is AUTOSAR exactly?
+Consider AUTOSAR as a collection of modular elements that create a base platform upon which
+automotive applications can be built. Similar to how building blocks can be used to construct various
+structures, AUTOSAR offers a range of standardized modules and software components (SWCs)
+that can be combined to create diverse automotive systems.
+What is an SWC?
+In AUTOSAR, an SWC is a modular, reusable, and self-contained piece of functionality that
+encapsulates a specific part of a software application and represents various types of functionalities,
+such as sensor data processing, actuator control, or complex algorithms. AUTOSAR offers a
+standardized way of defining these components besides offering standardized interfaces to the
+underlying service components.
+AUTOSAR can be likened to a universal language for automotive software development. In the same
+way that people from different countries can communicate using a shared language, SWCs created with
+AUTOSAR can interact with one another through standardized interfaces and protocols, irrespective
+of the underlying hardware or software platform.
+In this chapter, we will attempt to understand this in depth by covering the following main topics:
+• Understanding layered software architecture in AUTOSAR
+• Application layer
+• Runtime environment
+• Basic software layer
+

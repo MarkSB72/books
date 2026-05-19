@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTOSAR 基础与应用 — 第2章 AUTOSAR 软件层简介</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: #f5f5f0;
+    color: #2c2c2c;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.06);
+    min-height: 100vh;
+  }
+  h1 { font-size: 22px; text-align: center; margin: 30px 0 10px; color: #1a1a1a; }
+  h2 { font-size: 18px; margin: 28px 0 12px; color: #333; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 20px 0 8px; color: #444; }
+  p { margin: 8px 0; text-align: justify; }
+  ul, ol { margin: 8px 0 8px 24px; }
+  li { margin: 3px 0; }
+  .page-marker {
+    text-align: right;
+    color: #bbb;
+    font-size: 12px;
+    margin: 24px 0 0;
+    border-top: 1px dashed #e8e8e8;
+    padding-top: 4px;
+  }
+  .page-marker:first-child { border-top: none; margin-top: 0; }
+  .figure {
+    text-align: center;
+    margin: 16px 0;
+    padding: 12px;
+    background: #fafaf7;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
+  .figure img { max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 4px; }
+  .figure p { margin-top: 6px; font-weight: bold; color: #555; font-size: 14px; }
+  .note {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: #f0f7ff;
+    border-left: 4px solid #4a90d9;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+  }
+  .note::before { content: "📝 注意 "; font-weight: bold; color: #4a90d9; }
+  .case-study {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: #fffdf0;
+    border-left: 4px solid #e6a817;
+    border-radius: 0 4px 4px 0;
+  }
+  .case-study::before { content: "📋 案例研究 "; font-weight: bold; color: #b8860b; }
+  .questions {
+    margin: 16px 0;
+    padding: 16px 20px;
+    background: #f5f0ff;
+    border-radius: 6px;
+  }
+  .questions h3 { margin-top: 0; color: #6b3fa0; }
+  .summary {
+    margin: 16px 0;
+    padding: 16px 20px;
+    background: #f0fff0;
+    border-radius: 6px;
+  }
+  .summary h3 { margin-top: 0; color: #2d7d2d; }
+  .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+  pre { background: #2d2d2d; color: #e0e0e0; padding: 14px 18px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 10px 0; }
+  code { font-family: "Consolas", "Monaco", "Courier New", monospace; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>第2章 AUTOSAR 软件层简介</h1>
+<p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+
+<div class="page-marker">第 43 页</div>
+
+<h2>理解 AUTOSAR 中的分层软件架构</h2>
+
+<p>我们可以将 AUTOSAR 中的分层软件架构想象为一栋多层建筑，每一层都有不同的用途和各自的职责。在这个类比中，楼层代表 AUTOSAR 软件架构的不同层次，每层中的房间代表各层内的模块：</p>
+
+<ul>
+<li><strong>基础软件（BSW）层（地下室）：</strong>这一层代表建筑的地基，提供水电、暖通等基础服务。类似地，该层包含管理低级任务的模块，如通信、诊断服务、内存管理和操作系统（OS）功能。</li>
+<li><strong>运行时环境（接地层/大厅）：</strong>这一层充当连接底层与上层的通道，使它们之间能够顺畅通行。AUTOSAR 中的运行时环境（RTE）促进应用层中的 SWC 与 BSW 层之间的通信，为底层硬件提供抽象。</li>
+<li><strong>应用层（上层）：</strong>这一层包含居住空间，如卧室、厨房和客厅，满足居住者的特定需求。同样地，应用层容纳定义汽车系统功能和行为的具体应用 SWC。</li>
+</ul>
+
+<p>在这个多层建筑类比中，如图 2.1 所示，每一层都服务于独特的目的，并依赖其下层提供的服务：</p>
+
+<div class="figure">
+  <img src="images/p043_0.png" alt="图 2.1 – AUTOSAR 类比">
+  <p>图 2.1 – AUTOSAR 类比</p>
+</div>
+
+<p>建筑的居住者（最终用户）主要与上层（应用层）交互，该层专为满足他们的需求而设计。类似地，汽车系统的功能主要由应用层决定，该层利用下层来实现其目标。</p>
+
+<div class="page-marker">第 44 页</div>
+
+<p>这个类比有助于说明 AUTOSAR 软件架构中每一层的独特角色和依赖关系，突显了抽象和关注点分离在管理汽车系统复杂性方面的重要性。接下来，让我们讨论和研究图 2.2 所示的 AUTOSAR 各层。以下是总体结构：</p>
+
+<div class="figure">
+  <img src="images/p044_0.png" alt="图 2.2 – AUTOSAR 层">
+  <p>图 2.2 – AUTOSAR 层</p>
+</div>
+
+<p>在本章中我们将采用自上而下的方法，更详细地讨论每一层的功能，最后以一个电池管理系统（BMS（Battery Management System，电池管理系统））ECU 开发的案例研究作为总结。让我们先看应用层。</p>
+
+<h2>应用层</h2>
+
+<p>在 AUTOSAR 中，应用层代表软件架构的最高层，负责执行系统的高层功能。</p>
+
+<p>该层由设计用于执行汽车系统所需特定任务或操作的 SWC 组成。这些组件可以包含控制算法、信号处理、监控和诊断功能、用户界面以及其他应用特定的逻辑。SWC 之间以及 SWC 与下层之间通过明确定义的接口进行通信，促进了模块化、可重用性和可维护性。AUTOSAR 软件架构定义了应用层，其组件被设计为独立于底层硬件和 BSW 层。这种独立性使得 SWC 在不同的汽车系统之间具有更高的灵活性和可重用性。如下图所示：</p>
+
+<div class="page-marker">第 45 页</div>
+
+<div class="figure">
+  <img src="images/p045_0.png" alt="图 2.3 – AUTOSAR 应用层">
+  <p>图 2.3 – AUTOSAR 应用层</p>
+</div>
+
+<div class="note">算法和决策是高层功能，需要使用 BSW 层提供的服务，例如读取特定 GPIO 的 ADC 值、使用 SPI 通信控制 ECU 上的其他芯片，以及通过通信协议发送消息。当我们在本章稍后更详细地讨论 BSW 时，我们将更加熟悉 BSW 为应用提供的服务。</div>
+
+<p>例如，雷达传感器 ECU 负责处理和解译来自 RF 芯片的数据，这些芯片通常用于高级驾驶辅助系统（ADAS）和自动驾驶功能。盲点检测是一项利用雷达传感器检测车辆是否处于盲区并通过声音或视觉警报提醒驾驶员的功能。在这种情况下，应用层将由多个 SWC 组成，每个 SWC 负责功能的特定部分。例如，可能有一个组件读取雷达传感器的原始数据；另一个组件追踪和分类物体；另一个组件处理数据以检测潜在危险；还有另一个组件为驾驶员生成视觉或听觉警报。</p>
+
+<p>应用层需要关心底层通信协议吗？不需要。如果 ECU 通过通信总线发送检测到的物体或警告信号，SWC 将这些数据发送到 BSW 层，其服务模块将这些数据打包到已配置的通信总线（控制器局域网（CAN）、Ethernet 或 FlexRay）中。</p>
+
+<div class="note">虽然 AUTOSAR 没有规定特定的编程语言，但其大多数 SWC 是用 C 语言编写的。这是因为 C 是一种被广泛认可和成熟的编程语言，与底层系统软件（如设备驱动和通信协议）的开发高度兼容。</div>
+
+<p>在接下来的章节中，我们将深入探讨 RTE 层，它充当连接应用层和 BSW 服务的桥梁。</p>
+
+<div class="page-marker">第 46 页</div>
+
+<h2>运行时环境</h2>
+
+<p>RTE 在 AUTOSAR 架构中扮演着关键角色；它是促进应用层中的 SWC 与 BSW 层之间通信的中间件层。RTE 作为一个抽象层，使数据与信号的交换能够在 SWC 之间进行，而无需了解底层硬件或软件的细节。</p>
+
+<p>这种抽象使得 SWC 能够彼此独立且独立于目标硬件平台进行设计、开发和测试。此外，RTE 还提供一系列服务，如数据编组、数据转换和事件驱动通信，进一步增强了整个系统的效率和健壮性。</p>
+
+<p>在进一步讨论 RTE 之前，我们需要先熟悉虚拟功能总线（VFB（Virtual Functional Bus，虚拟功能总线））的概念，以便更好地理解 RTE。</p>
+
+<h3>理解 VFB 概念</h3>
+
+<p>VFB 是 AUTOSAR 中的一个抽象概念，代表应用层中 SWC 的通信基础设施。它定义了一组标准化的接口和协议，用于 SWC 之间的数据交换，使它们能够在无需了解底层硬件或软件细节的情况下进行通信。</p>
+
+<p>但这到底是什么意思呢？</p>
+
+<p>VFB 在配置步骤中是必需的，在此过程中会定义和设置 AUTOSAR 系统的架构。这包括定义 SWC、它们的接口以及这些组件之间的通信。</p>
+
+<p>这也是架构师决定系统所需功能的时刻，从而将这些功能划分为不同的 SWC：</p>
+
+<div class="figure">
+  <img src="images/p046_0.png" alt="图 2.4 – VFB 概念">
+  <p>图 2.4 – VFB 概念</p>
+</div>
+
+<div class="page-marker">第 47 页</div>
+
+<p>每个软件部分被分解为多个 SWC，每个 SWC 都有自己专门的功能。当一个 SWC 需要与另一个 SWC 交换数据时，通过信号甚至远程过程调用（RPC（Remote Procedure Call，远程过程调用））来完成。一旦软件架构完成，SWC 被分布到一个或多个物理 ECU 上。这些 ECU 负责实现相应的功能以及促进组件之间的通信：</p>
+
+<div class="figure">
+  <img src="images/p047_0.png" alt="图 2.5 – 将 SWC 分配到 ECU">
+  <p>图 2.5 – 将 SWC 分配到 ECU</p>
+</div>
+
+<p>因此，如果 SWC（如 SWC 1 和 SWC 2）位于同一个 ECU 内，通信将使用 ECU 内部通信机制，通信保持在 ECU 内部，由 RTE 实现。</p>
+
+<p>然而，如果 SWC 位于两个不同的 ECU 中，如 SWC 1 和 SWC 3，它们之间的通信将通过通信介质（如 CAN、FlexRay 或 Ethernet）实现。信号在 BSW 层中如何打包的过程将在第 5 章中更详细地讨论。</p>
+
+<p>目前，可以将 RTE 视为一座桥梁或粘合层，允许 SWC 之间共享数据，同时也支持与 BSW 层的交互。这在维护基于 AUTOSAR 的汽车系统中 SWC 的模块化、可重用性和互操作性方面起着至关重要的作用。</p>
+
+<h3>理解 RTE 的功能</h3>
+
+<p>你可能在想 RTE 层如何促进模块化。让我们通过以下示例来阐明这个想法。假设有两个 SWC 组件：SWC 1 是发送方，SWC 2 是信号的接收方，例如一个计数器值。此外，接收方模块将计数器值发送到通信总线（例如 CAN）。</p>
+
+<div class="note">以下示例仅用于演示 RTE 层如何充当 SWC 与 BSW 服务层之间的粘合层。</div>
+
+<div class="page-marker">第 48 页</div>
+
+<p>以下示例在 SWC 1 中定义了一个名为 <code>SenderCounterFunction</code> 的函数。该函数递增一个名为 <code>counter</code> 的静态变量，并使用名为 <code>Rte_Write_SenderInterface_SenderOutput</code> 的函数写入其更新后的值：</p>
+
+<pre><code>#include "Rte_Sender.h"
+void SenderCounterFunction(void) {
+    static UInt32 counter = 0U;
+    counter++; /*just an example */
+    Rte_Write_SenderInterface_SenderOutput(counter);
+}</code></pre>
+
+<p>SWC 2 定义了另一个名为 <code>ReceiverCounterFunction</code> 的函数。在函数内部，声明了一个类型为 <code>UInt32</code> 的局部变量 <code>receivedData</code>。然后该函数读取一个值并将其存储在 <code>receivedData</code> 变量中。</p>
+
+<p>代码随后检查 <code>receivedData</code> 是奇数还是偶数。如果是奇数，函数使用名为 <code>Rte_Write_ReceiverModule_CounterSig</code> 的函数发送该值：</p>
+
+<pre><code>#include "Rte_Receiver.h"
+void ReceiverCounterFunction(void) {
+    UInt32 receivedData;
+    Rte_Read_ReceiverInterface_ReceiverInput(&receivedData);
+    // Process received data, e.g., control an actuator based on the input
+    // In this example only odd counter value is sent
+    if (receivedData % 2) {
+        Rte_Write_ReciverModule_CounterSig(receivedData)
+    }
+}</code></pre>
+
+<p>以下代码演示了 RTE 层的一种可能实现，它充当 SWC 或应用程序之间的中介。RTE 层作为粘合剂，使信号能够在不同 SWC 之间传递。为实现这一点，代码定义了一个缓冲区作为数据的临时存储位置，并提供了可用于读取或写入缓冲区的 setter 和 getter 函数。总体而言，这段代码提供了一个示例，说明如何使用 RTE 层来促进 SWC 之间的通信：</p>
+
+<pre><code>UInt32 Rte_buffer_Data=0U;
+FUNC (Std_ReturnType, RTE_CODE) Rte_Write_SenderInterface_SenderOutput(UInt32 data)
+{
+    Std_ReturnType ret = RTE_E_OK;
+    Rte_buffer_Data = data;
+    return ret;
+}</code></pre>
+
+<div class="page-marker">第 49 页</div>
+
+<pre><code>FUNC(Std_ReturnType, RTE_CODE) Rte_Read_ReceiverInterface_ReceiverInput (UInt32 *data)
+{
+    Std_ReturnType ret = RTE_E_OK;
+    *data = Rte_buffer_Data;
+    return ret;
+}
+
+FUNC (Std_ReturnType, RTE_CODE) Rte_Write_ReciverModule_CounterSig(UInt32 data)
+{
+    Std_ReturnType ret = RTE_E_OK;
+    ret |= Com_SendSignal(ComConf_ComSignal_CounterSig_Tx,&(data));
+    return ret;
+}</code></pre>
+
+<p>如本例所示，两个 SWC 通过交换数据来相互通信。RTE 管理缓冲区和数据处理过程。两个 SWC 独立运行，SWC 1 将数据发送到 RTE，RTE 在内部存储数据。每当另一个 SWC 需要数据时，它从 RTE 请求数据。此外，当数据被发送到通信总线时，会使用 BSW 层的 COM 服务。请进一步查看图 2.6，其中以序列图的形式展示了这个过程。在第 7 章中，我们将探索从应用层到物理通信总线的完整路径。</p>
+
+<div class="figure">
+  <img src="images/p049_0.png" alt="图 2.6 – RTE 层作为 SWC 之间的中介">
+  <p>图 2.6 – RTE 层作为 SWC 之间的中介</p>
+</div>
+
+<p>至此，我们已经理解了应用层和 RTE 层的机制和运作方式。为了获得更深入的理解，让我们探索 BSW 层。</p>
+
+<div class="page-marker">第 50 页</div>
+
+<h2>基础软件层</h2>
+
+<p>在智能手机的最底层，有处理器、内存和传感器等硬件组件。这些组件由设备驱动和其他低级软件模块管理，使它们能够与更高级的 SWC（如你喜爱的微信或抖音应用）通信。在 AUTOSAR 中，BSW 层为上层应用提供这种低级功能，如内存管理、通信协议和诊断服务，如下图所示：</p>
+
+<div class="figure">
+  <img src="images/p050_0.png" alt="图 2.7 – BSW 层">
+  <p>图 2.7 – BSW 层</p>
+</div>
+
+<p>让我们放大观察 BSW 的架构及其不同的子层，BSW 由三个额外的子层组成：服务层、ECU 抽象层和微控制器层。</p>
+
+<h3>服务层</h3>
+
+<p>最顶层是服务层，为应用组件提供各种服务。它是应用组件与 BSW 功能之间的主要接口。它是应用唯一可以直接访问的层，使应用组件能够访问和利用一系列功能，而无需直接处理底层硬件或 SWC。让我们在 BSW 图中突出显示这些组件：</p>
+
+<div class="page-marker">第 51 页</div>
+
+<div class="figure">
+  <img src="images/p051_0.png" alt="图 2.8 – BSW 服务层">
+  <p>图 2.8 – BSW 服务层</p>
+</div>
+
+<p>BSW 为应用提供的服务示例如下：</p>
+<ul>
+<li><strong>通信服务：</strong>这些服务处理不同 ECU 之间以及 ECU 与外部设备之间的通信，使用标准化协议，如 CAN、LIN、FlexRay 和 Ethernet。通过提供通用的通信服务，BSW 层允许分布式汽车系统中各种组件的无缝集成。<br>如果你的应用需要发送 CAN 消息，它利用 COM API 来触发消息的发送。你将在第 7 章中了解更多相关信息。</li>
+<li><strong>内存服务：</strong>BSW 层提供标准化的内存服务，如 EEPROM Abstraction 和 Flash EEPROM Emulation，使应用层能够访问和管理非易失性存储器，而无需处理硬件特定的细节。<br>例如，开发中的 ECU 可能需要永久存储校准值、配置参数和其他重要设置等数据。</li>
+<li><strong>诊断服务：</strong>诊断服务，如诊断通信管理器（DCM（Diagnostic Communication Manager，诊断通信管理器））和诊断事件管理器（DEM），使应用层能够执行诊断并报告错误。这些服务提供了一种标准化的诊断方法，简化了开发和维护。更多内容见第 10 章，届时我们将简要涉及诊断模块。</li>
+</ul>
+
+<div class="page-marker">第 52 页</div>
+
+<ul>
+<li><strong>系统服务：</strong>这些服务管理基本的系统功能，如 ECU 状态管理器（ECUM）、OS 和模式管理。通过提供通用的系统服务，BSW 层使应用层能够专注于高层功能，而无需担心底层的系统管理任务。</li>
+</ul>
+
+<h3>ECU 抽象层</h3>
+
+<p>AUTOSAR 中的 ECU 抽象层充当通用连接器，使不同的 AUTOSAR 软件组件能够与不同的硬件设备交互和管理，而无需了解每个设备的具体细节。该层在 BSW 和硬件之间建立了标准化接口，确保跨不同 ECU 的兼容性和无缝操作，无论具体的微控制器制造商或型号、ECU 配置，或者某些硬件外设是集成在微控制器内还是作为独立芯片存在。通过抽象 ECU 之间的差异，ECU 抽象层使应用层能够独立于特定的硬件实现或 ECU 的具体布局进行开发：</p>
+
+<div class="figure">
+  <img src="images/p052_0.png" alt="图 2.9 – ECU 抽象层">
+  <p>图 2.9 – ECU 抽象层</p>
+</div>
+
+<div class="page-marker">第 53 页</div>
+
+<p>在复杂的汽车系统中，一个 ECU 可能包含多个 CAN 设备，既有内部的也有外部的。这些设备负责与车辆内的其他 ECU 和系统进行通信。ECU 抽象层在管理与这些各种 CAN 设备的交互方面发挥着重要作用，同时保持应用程序对底层 ECU 布局的独立性。在这种情况下，ECU 提供以下功能：</p>
+
+<ul>
+<li><strong>统一接口：</strong>ECU 抽象层为应用程序提供了一个统一的接口，用于与系统中的所有 CAN 设备交互，无论它们是内部还是外部的。这种抽象隐藏了不同 CAN 设备之间的复杂性和差异，使应用代码保持独立于具体的 ECU 布局。</li>
+<li><strong>适应性：</strong>ECU 抽象层管理多个 CAN 设备交互的能力使应用程序能够更好地适应 ECU 布局的变化。例如，如果添加了新的 CAN 设备或替换了现有设备，可以更新 ECU 抽象层以适应这些变化，而无需修改应用代码。这使得系统更具可扩展性，更易于维护。</li>
+</ul>
+
+<p>另一个例子是输入/输出硬件抽象（I/O Hardware Abstraction），位于 ECU 抽象层内 RTE 的下方。它充当 BSW 模块与应用软件之间的接口。它还提供一致的接口用于与各种硬件组件交互，如数字输入/输出（DIO）、模数转换器（ADC）和脉宽调制（PWM）外设，使应用层能够正常工作而无需关心硬件特定的细节，因为它抽象并隐藏了硬件特定的细节。</p>
+
+<h3>微控制器抽象层</h3>
+
+<p>在 AUTOSAR 中，微控制器抽象层（MCAL）是软件架构中的最低层，提供 BSW 层与底层微控制器硬件之间的标准化接口：</p>
+
+<div class="page-marker">第 54 页</div>
+
+<div class="figure">
+  <img src="images/p054_0.png" alt="图 2.10 – MCAL">
+  <p>图 2.10 – MCAL</p>
+</div>
+
+<p>MCAL 的主要目的是抽象硬件特定的细节。它提供了一套针对系统中使用的特定微控制器而定制的软件模块和设备驱动。这些模块和驱动提供对微控制器外设的访问。这些模块包括 DIO 端口、ADC、定时器、通信接口（CAN、LIN、FlexRay 和 Ethernet）驱动和内存管理（Flash Driver 或 FLS）、以及 Crypto Driver。</p>
+
+<p>想象一个汽车应用需要通过 PWM 信号控制电机的速度。如果没有 MCAL，应用开发人员需要编写特定于所用硬件（例如特定的微控制器和 PWM 模块）的代码。这可能使应用难以维护和移植到其他硬件平台。为了更清晰地说明这一点，在以下示例中，我们将演示如何在 AUTOSAR 中使用 ECU 抽象层控制 LED。目标是通过 DIO 使 LED 周期性亮灭。</p>
+
+<p>现在，让我们看看用于切换 LED 的代码：</p>
+
+<pre><code>void ToggleHeartBeatLED(){
+    static boolean ledState = FALSE;
+    // Toggle the LED state
+    ledState = !ledState;
+    // Write the new state to the LED pin
+    Dio_WriteChannel(LED_PIN, ledState);
+}</code></pre>
+
+<div class="page-marker">第 55 页</div>
+
+<p>检查上述代码，统一的 API <code>Dio_WriteChannel</code> 被用于访问 PIN，而无需担心特定的微控制器实现。这使得能够无缝集成来自不同供应商（如 Infineon、NXP、ST 或任何其他制造商）的微控制器。</p>
+
+<p>如果我们不能使用抽象层来完成这个任务，我们需要直接访问外设寄存器来实现它。然而，这种方法会将我们的应用或实现与特定的微控制器系列紧密耦合。这可能会阻碍模块化，使代码在不同微控制器平台之间的可用性降低。</p>
+
+<p>在讨论了 BSW 各层及其各自的功能（这些层由多个模块组成以实现 ECU 功能）之后，有必要探索向 AUTOSAR 系统引入新功能或集成遗留代码的可能性。AUTOSAR 致力于维护一个灵活的平台，同时支持遗留代码的集成。为了满足这一需求，复杂设备驱动（CDD（Complex Device Driver，复杂设备驱动））应运而生，填补了空白，使用户能够向 AUTOSAR 框架中最初不存在的任何 BSW 层添加新功能。让我们在下一节中讨论这些内容。</p>
+
+<h3>复杂驱动</h3>
+
+<p>在 AUTOSAR 中，CDD 是一种专门的软件模块，旨在管理和控制未被其他层覆盖的复杂硬件设备或子系统。CDD 的创建是为了解决需要超出规范范围的独特功能或硬件控制的特定汽车系统的需求。</p>
+
+<p>下图显示了复杂驱动横跨所有 BSW 子层：</p>
+
+<div class="figure">
+  <img src="images/p055_0.png" alt="图 2.11 – CDD">
+  <p>图 2.11 – CDD</p>
+</div>
+
+<div class="page-marker">第 56 页</div>
+
+<p>想象一个汽车应用利用定制的触控感应界面来控制各种车内功能，如信息娱乐系统、气候控制和照明。该触控感应界面由第三方供应商开发，不能直接与标准 AUTOSAR 模块兼容。因此，需要开发一个 CDD 来弥合这一差距。CDD 可以通过 SPI 与传感器通信（利用 AUTOSAR SPI 模块），然后通过 RTE 将触摸信息提供给应用，帮助应用 SWC 采取适当的操作。</p>
+
+<p>到目前为止，我们已经讨论了 AUTOSAR 的分层架构和 BSW 层的各个组件。为了完善全貌，让我们讨论各层之间的不同接口，明确哪些是标准的，哪些可以由用户定制。</p>
+
+<h2>接口</h2>
+
+<p>接口使各种 SWC 和层之间能够进行通信和交互。如下图所示，可以在应用与 RTE 之间、RTE 与 BSW 之间以及 BSW 模块之间观察到不同的 AUTOSAR 接口：</p>
+
+<div class="figure">
+  <img src="images/p056_0.png" alt="图 2.12 – AUTOSAR 分层软件架构的组件视图">
+  <p>图 2.12 – AUTOSAR 分层软件架构的组件视图</p>
+</div>
+
+<div class="page-marker">第 57 页</div>
+
+<p>如上图所示，AUTOSAR 提供了三种主要类型的接口：</p>
+
+<ul>
+<li><strong>标准化接口（Standardized interfaces）：</strong>标准化 AUTOSAR 接口是源自 SWC 端口的通用接口。由 RTE 提供，这些接口充当 SWC 之间或 SWC 与 ECU 固件（IoHwAb 或复杂驱动）之间的通信通道。通过这些接口，SWC 可以（例如）读取输入值和写入输出值。以下接口是标准化 AUTOSAR 接口结构的一部分，可供各种 SWC 通过 <code>Rte_read</code> 和 <code>Rte_call</code> 使用：
+<pre><code>Std_ReturnType Rte_Read_&lt;portname&gt;_&lt;interface&gt;(&lt;data&gt;)
+Std_ReturnType Rte_call_&lt;portname&gt;_&lt;operation&gt;(&lt;data&gt;)</code></pre>
+</li>
+<li><strong>标准化 AUTOSAR 接口（Standardized AUTOSAR interfaces）：</strong>这些接口的语法和语义由 AUTOSAR 标准预定义。这些接口被 SWC 用于访问服务层内 BSW 模块提供的 AUTOSAR 服务，如 ECUM 或 DEM。<br>例如，<code>Det_ReportError</code> 是所有 BSW 模块用于报告错误的接口：
+<pre><code>Det_ReportError(uint16 ModuleId, uint8 InstanceId, uint8 ApiId, uint8 ErrorId);</code></pre>
+</li>
+<li><strong>AUTOSAR 接口（AUTOSAR interfaces）：</strong>这些接口也由 AUTOSAR 联盟定义，但专门用于 ECU 内 BSW 模块之间的交互、RTE 与系统 OS 之间，或 RTE 与通信层之间：
+<pre><code>Com_SendSignal(uint16 SigId,uint8* value)
+StatusType ActivateTask(TaskType TaskID)</code></pre>
+</li>
+</ul>
+
+<p>现在你已经清晰地理解了 AUTOSAR 各层和接口，是时候将这些知识应用到一个现实案例中了，比如电动汽车中的 BMS ECU。这个案例将以原始设备制造商（OEM）可能指定的需求形式呈现。通过理解这些需求，我们将深入了解必要的功能，并能够将不同功能关联到相应的 AUTOSAR 层，从而帮助 AUTOSAR 新手更清晰地理解各层。</p>
+
+<div class="note">以下案例将用来说明一个现实生活中的用例，帮助我们更好地理解不同 AUTOSAR 层的各种功能。需要注意的是，该案例为传达信息而进行了简化处理，不应被视为设计参考。</div>
+
+<div class="page-marker">第 58 页</div>
+
+<div class="case-study">
+<h3>案例研究 – 开发 BMS ECU</h3>
+
+<p>BMS 负责监控和管理电动汽车中的电池组。其主要功能包括测量电池电压、电流和温度，估算荷电状态和健康状态，确保安全的充放电，并向其他 ECU 提供诊断信息。下图展示了这一工作流程：</p>
+
+<div class="figure">
+  <img src="images/p058_0.png" alt="图 2.13 – BMS 框图">
+  <p>图 2.13 – BMS 框图</p>
+</div>
+
+<p>上图展示了一个 BMS 的拟议系统设计。以下是本案例研究背景下的 ECU 需求：</p>
+<ol>
+<li><strong>荷电状态估算 [REQ_1]：</strong>ECU 使用基于电池电压、电流、温度和历史数据的算法估算剩余电池容量。</li>
+<li><strong>电芯均衡 [REQ_2]：</strong>ECU 监控并控制单个电芯的充放电过程，以确保最佳性能并延长电池寿命。</li>
+<li><strong>热管理 [REQ_3]：</strong>监控电池温度并控制冷却/加热系统，以将电池维持在最佳温度范围内。</li>
+<li><strong>故障检测与保护 [REQ_4]：</strong>检测并管理故障，如过压、欠压、过流或过温，并采取适当措施。</li>
+<li><strong>故障存储 [REQ_5]：</strong>故障存储在非易失性存储器（NVM）中。</li>
+<li><strong>诊断服务 [REQ_6]：</strong>提供诊断功能（例如统一诊断服务 UDS），以监控 BMS 的健康状态并支持故障排除和维护活动。</li>
+</ol>
+</div>
+
+<div class="page-marker">第 59 页</div>
+
+<ol start="7">
+<li><strong>通信服务 [REQ_7]：</strong>使用标准化接口和协议，促进 BMS 与其他车辆系统或外部设备（例如充电站）之间的交互。</li>
+<li><strong>通信 [REQ_8]：</strong>BMS 将在 CAN 上发送两条循环状态消息（Msg_A, Msg_B）。</li>
+<li><strong>内存管理 [REQ_9]：</strong>处理非易失性存储器访问，如在 eFlash 存储器中读取和存储校准数据和故障码。</li>
+<li><strong>OS [REQ_10]：</strong>管理 ECU 内的软件任务调度与执行、中断和资源分配。</li>
+<li><strong>I/O 硬件抽象 [REQ_11]：</strong>提供访问和控制电池相关硬件组件（如 ADC、DAC 或 GPIO）及外围设备（如温度传感器、接触器或冷却系统组件）的接口。</li>
+<li><strong>网络管理 [REQ_12]：</strong>管理 ECU 在车辆网络中的参与，包括启动和关闭程序、休眠/唤醒模式和错误处理。</li>
+</ol>
+
+<p>现在让我们讨论其中一些需求将如何实现，以及它们分别属于哪些层。</p>
+
+<h3>应用层</h3>
+
+<p>可以在应用层范围内实现的一些需求是 REQ_1 和 REQ_2——这两个需求要求软件执行电池电芯均衡和剩余电量估算，软件将通过实现特定算法（超出本书范围）来实现这一功能，这些算法使用电池电压和电流。</p>
+
+<h3>RTE</h3>
+
+<p>正如我们刚才讨论的，RTE 仅充当桥梁或粘合层；SWC 或 BSW 之间的所有通信都将通过 RTE 处理。</p>
+
+<p>例如，假设有一个名为 BattEst 的 SWC，负责实现估算电池容量的算法并传输电量百分比。在这种情况下，应用利用 BSW 的通信服务，RTE 作为 SWC 和 BSW 服务提供者之间的中介。</p>
+
+<h3>BSW – 服务层</h3>
+
+<p>软件所需的所有服务都通过服务层提供，例如诊断服务（REQ_6）——软件提供 BMS 健康状态，或内存服务（REQ_5）——软件需要一种机制来在非易失性存储器中存储数据。</p>
+
+<div class="page-marker">第 60 页</div>
+
+<h3>BSW – ECU 抽象层</h3>
+
+<p>应用程序使用的任何服务，无论是发送消息还是在非易失性存储器中存储块，都会影响 ECU 抽象层的配置，例如 REQ_5 在非易失性存储器中存储数据块。</p>
+
+<h3>BSW – MCAL</h3>
+
+<p>在这个阶段，所有底层驱动都被配置。例如，根据 REQ_8，需要通过 CAN 进行通信；因此，必须在 MCAL 中配置 CAN 驱动以允许传输到物理 CAN。</p>
+
+<p>在此时，展示一个消息发送和接收过程中各层之间交互或通信的抽象图可能会很有帮助。图 2.14 展示了从软件组件（SWCA）向 CAN 总线发送信号（Msg_A）以及由另一个软件组件（SWCB）通过不同的 AUTOSAR 层接收不同信号（Msg_B）所涉及的事件序列。</p>
+
+<div class="figure">
+  <img src="images/p060_0.png" alt="图 2.14 – AUTOSAR 各层中的通信流程">
+  <p>图 2.14 – AUTOSAR 各层中的通信流程</p>
+</div>
+
+<p>这个案例研究有助于阐明 AUTOSAR 架构，并展示其模块化、标准化方法在实际应用中的优势。通过理解各层和各种接口的角色，可以更容易地掌握 AUTOSAR 框架如何促进汽车领域中高效的软件开发和集成。这些知识在开发、集成或维护汽车软件时非常有价值。</p>
+
+<div class="page-marker">第 61 页</div>
+
+<div class="summary">
+<h3>本章小结</h3>
+<p>在本章中，我们探讨了 AUTOSAR 架构中各个层的重要性和相关性，强调了它们在汽车软件系统开发中的作用。本章获得的见解至关重要，因为它们为设计和实现符合 AUTOSAR 标准的模块化、可重用和兼容的 SWC 提供了指导。</p>
+<p>理解每一层——如应用层、RTE、服务层、ECU 抽象层和 MCAL——对于开发人员和工程师有效地创建符合 AUTOSAR 标准的汽车系统至关重要。这种理解使他们能够高效地利用每一层提供的服务，并确保 SWC 与底层硬件之间的顺畅交互。</p>
+<p>通过上述电池管理 ECU 的用例理解不同 AUTOSAR 层的功能，开发人员可以创建不仅模块化、可重用，而且兼容各种硬件平台的 SWC。这促进了汽车软件生态系统内的适应性和多样性。</p>
+<p>在下一章中，我们将讨论 AUTOSAR 的方法论，包括软件和配置如何建模与共享。</p>
+</div>
+
+<div class="questions">
+<h3>思考题</h3>
+<ol>
+<li>AUTOSAR 有哪些层？</li>
+<li>针对本章讨论的案例研究，尝试将需求与它们可能实现的层进行匹配。<br>提示：一个需求可能与多个层匹配。</li>
+<li>AUTOSAR 中拥有不同层的好处是什么？</li>
+</ol>
+</div>
+
+<div class="page-marker">第 62 页</div>
+
+<h2>第3章 AUTOSAR 方法论与数据交换格式</h2>
+
+<p>在了解了 AUTOSAR 及其各个层之后，我们现在准备好深入探讨支撑这一创新方法的方法论，以及它在汽车软件开发流程中的定位——从需求工程到验证与测试。这些知识将使你能够充分发挥 AUTOSAR 框架的潜力。你不仅能够更有效地将其应用到汽车软件项目中，还能领会它在当今汽车行业中的重要意义。</p>
+
+<p>在本章中，我们将通过涵盖以下主要主题来深入理解：</p>
+<ul>
+<li>AUTOSAR 方法论简介</li>
+<li>理解 AUTOSAR 方法论</li>
+<li>使用模板进行数据交换</li>
+<li>AUTOSAR 的一致性类别</li>
+</ul>
+
+<h3>AUTOSAR 方法论简介</h3>
+
+<p>在本节中，我们将讨论 AUTOSAR 方法论，概述开发 AUTOSAR 系统所需的步骤或活动。AUTOSAR 方法论区别于其他方法论的一个关键特征是软件组件实现与电子控制单元（ECU）配置的实质性独立。这种分离提供了更大的灵活性和适应性优势，使开发人员能够在不同的 ECU 配置和平台之间重用软件组件，最终减少开发时间和成本。</p>
+
+</div>
+</body>
+</html>

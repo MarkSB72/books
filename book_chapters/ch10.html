@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第10章 总结与知识拓展用例</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;background:#f5f5f0;color:#2c2c2c;line-height:1.8;font-size:15px}.container{max-width:780px;margin:0 auto;padding:40px 24px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.06);min-height:100vh}h1{font-size:22px;text-align:center;margin:30px 0 10px}h2{font-size:18px;margin:28px 0 12px;color:#333;border-bottom:2px solid #e0e0e0;padding-bottom:6px}h3{font-size:16px;margin:20px 0 8px;color:#444}p{margin:8px 0;text-align:justify}ul,ol{margin:8px 0 8px 24px}li{margin:3px 0}.page-marker{text-align:right;color:#bbb;font-size:12px;margin:24px 0 0;border-top:1px dashed #e8e8e8;padding-top:4px}.page-marker:first-child{border-top:none;margin-top:0}.figure{text-align:center;margin:16px 0;padding:12px;background:#fafaf7;border:1px solid #eee;border-radius:4px}.figure img{max-width:100%;height:auto;border:1px solid #e0e0e0;border-radius:4px}.figure p{margin-top:6px;font-weight:bold;color:#555;font-size:14px}.note{margin:12px 0;padding:12px 16px;background:#f0f7ff;border-left:4px solid #4a90d9;border-radius:0 4px 4px 0;font-size:14px}.note::before{content:"📝 注意 ";font-weight:bold;color:#4a90d9}.case-study{margin:12px 0;padding:12px 16px;background:#fffdf0;border-left:4px solid #e6a817;border-radius:0 4px 4px 0}.case-study::before{content:"📋 案例研究 ";font-weight:bold;color:#b8860b}.questions,.summary{margin:16px 0;padding:16px 20px;border-radius:6px}.summary{background:#f0fff0}.summary h3{margin-top:0;color:#2d7d2d}.questions{background:#f5f0ff}.questions h3{margin-top:0;color:#6b3fa0}.subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:24px}pre{background:#2d2d2d;color:#e0e0e0;padding:14px 18px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.5;margin:10px 0}code{font-family:Consolas,Monaco,Courier New,monospace}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}th{background:#f0f0f0}</style></head><body><div class="container">
+<h1>第10章 总结与知识拓展用例</h1><p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+<div class="page-marker">第 219 页</div>
+<h2>诊断概览</h2>
+<p>诊断（Diagnostics）对于确保车辆可靠性、安全性和性能至关重要。其主要目标包括检测故障、准确报告并提供维修机制。有效的诊断系统支持：早期故障检测（防止小问题升级为重大故障）、高效维护维修（精确故障信息减少停机时间）、法规遵从（排放和安全标准）以及客户满意度。</p>
+<div class="page-marker">第 220 页</div>
+<h3>DCM（Diagnostic Communication Manager，诊断通信管理器）</h3>
+<p>DCM 是 AUTOSAR 诊断栈的核心组件，确保车辆内部系统（发动机控制单元、变速箱控制和其他电子单元）能与外部诊断工具有效通信。关键功能：</p>
+<ul><li><strong>诊断会话管理：</strong>处理默认、编程和扩展会话，扩展会话提供对需要更高安全级别或更具侵入性功能的访问，如电机标定和调优参数</li><li><strong>安全与访问控制：</strong>通过 seed/key 算法管理安全访问级别，保护敏感诊断操作</li><li><strong>诊断请求处理：</strong>解释外部工具的诊断请求并转发给相应内部模块</li><li><strong>服务处理：</strong>支持 UDS（Unified Diagnostic Services，统一诊断服务，ISO 14229）和 J1939 等标准定义的诊断服务</li></ul>
+<div class="note">UDS 是 ISO 14229 标准定义的协议，用于通过通信网络（通常是 CAN）诊断和配置车辆设备。它标准化了诊断工具与 ECU 之间的通信，支持跨不同品牌和车型的一致诊断。</div>
+<div class="page-marker">第 221 页</div>
+<div class="figure"><img src="images/p221_0.png" alt="图10.1"><p>图 10.1 – DCM 在 AUTOSAR 架构中的序列图</p></div>
+<p>上图展示了诊断会话过程：测试工具通过 CAN 发送诊断请求，依次经过 CAN、CanTp（CAN Transport Protocol，CAN 传输协议）和 PduR 到达 DCM。DCM 通过 RTE 与 SWC 交互执行内存读取操作，响应沿相同路径返回。</p>
+<div class="page-marker">第 222 页</div>
+<h3>DEM（Diagnostic Event Manager，诊断事件管理器）</h3>
+<p>DEM 负责诊断事件的管理和故障信息存储。核心职责：</p>
+<ul><li><strong>故障检测：</strong>SWC（作为监控器）监控各种信号和参数并报告事件给 DEM，DEM 执行防抖（Debouncing）等处理步骤</li><li><strong>事件状态管理：</strong>跟踪每个事件的状态——活跃、已确认、待定</li><li><strong>DTC 管理：</strong>记录诊断故障码（DTC，Diagnostic Trouble Code），如 P0301 表示 1 缸失火</li><li><strong>事件存储：</strong>维护事件存储供服务和维护期间访问</li></ul>
+<div class="figure"><img src="images/p222_0.png" alt="图10.2"><p>图 10.2 – AUTOSAR 架构中 DCM 与 DEM 的交互</p></div>
+<div class="page-marker">第 223 页</div>
+<h3>DET（Default Error Tracer，默认错误追踪器）</h3>
+<p>DET 是在汽车软件开发阶段使用的诊断方法。关键职责：错误检测（监控开发错误）、错误记录、调试支持以及内部错误检测（如错误函数调用、参数不匹配或断言失败）。DET 关注软件开发生命周期而非车辆运行诊断。例如，<code>CalculateEngineTorque()</code> 函数因代码 bug 被错误地用负发动机转速值调用，DET 会检测并记录此开发错误。</p>
+<div class="figure"><img src="images/p223_0.png" alt="图10.3"><p>图 10.3 – DET 功能序列图</p></div>
+<div class="page-marker">第 224 页</div>
+<h3>FiM（Function Inhibition Manager，功能抑制管理器）</h3>
+<p>FiM 模块与 DEM 交互，管理诊断事件状态并基于故障条件控制功能启用/禁用。例如，转向系统检测到故障时抑制自动泊车功能，确保车辆安全运行。</p>
+<div class="figure"><img src="images/p224_0.png" alt="图10.4"><p>图 10.4 – FiM 功能序列图</p></div>
+<p>诊断部分已涵盖 DCM、DEM、DET 和 FiM——每个模块都提供丰富的功能和配置，这里仅做了入门概述。接下来转向时间同步。</p>
+<div class="page-marker">第 225 页</div>
+<h2>时间同步概览</h2>
+<p>AUTOSAR 中的时间同步（Time Synchronization）旨在通过专用时间同步协议和机制确保车辆内不同 ECU 之间的精确一致计时。时间关键型应用通常分布在通过 CAN、Ethernet 和 FlexRay 等车载网络连接的多个 ECU 上，每个 ECU 都有自己的源时钟。通过网关连接的不同协议节点间同步是混合网络架构的主要挑战——AUTOSAR 通过时间网关（Time Gateway）概念来解决。</p>
+<div class="figure"><img src="images/p225_0.png" alt="图10.5"><p>图 10.5 – 时间同步架构</p></div>
+<p>核心概念：<strong>Time Master（时间主节点）</strong>负责生成和分发参考时间；<strong>Time Slave（时间从节点）</strong>接收时间更新并调整自身时钟与参考时间对齐。</p>
+<div class="page-marker">第 226 页</div>
+<p><strong>精确时间同步为何重要：</strong>事件关联（跨 ECU 精确时间戳）、实时系统（ADAS 和自动驾驶需要精确时序）、传感器融合、通信协议要求（如 Ethernet）、日志记录和回放。</p>
+<h3>StbM（Synchronized Time-Base Manager，同步时基管理器）</h3>
+<p>StbM 是管理时间同步的基础组件。核心功能：维护每个 ECU 上的本地时基、运行实体同步（配置运行实体在基于 StbM 提供的同步时基的特定时间执行）、支持多个时间域、计算本地时基与同步时间之间的偏移。四个关键时间同步模块：EthTSyn（Ethernet 时间同步）、CanTSyn（CAN 时间同步）、FrTSyn（FlexRay 时间同步）以及 StbM 本身。</p>
+<div class="page-marker">第 227 页</div>
+<div class="case-study"><h3>用例——使用 StbM 同步雷达 ECU</h3>
+<p>场景：车辆有多个雷达 ECU，为避免雷达信号间干扰，每个雷达 ECU 需要以精确的 40µs 时间偏移触发其 RF 信号。StbM 确保所有雷达共享统一的时基，使每个雷达 ECU 能够在精确的时间点发射信号。</p></div>
+<div class="figure"><img src="images/p227_0.png" alt="图10.6"><p>图 10.6 – 雷达 ECU 时间同步架构</p></div>
+<div class="page-marker">第 228 页</div>
+<h3>CanTSyn（CAN 时间同步）</h3>
+<div class="figure"><img src="images/p228_0.png" alt="图10.7"><p>图 10.7 – CanTSyn 同步机制</p></div>
+<p>CanTSyn 采用 PTP（Precision Time Protocol，精确时间协议）同步流程：Time Master 广播 SYNC 消息（含当前时间 T0t）→ Time Slave 记录精确接收时间 T2r → Time Master 发送 FUP（Follow-Up）消息（含实际传输与指示时间的差值 T1t−T0t）→ Slave 结合 SYNC 和 FUP 信息精确调整本地时钟。</p>
+<div class="page-marker">第 229 页</div>
+<h2>如何阅读 AUTOSAR 标准</h2>
+<p>无论选择哪种配置工具，实现需求的关键在于理解定义 AUTOSAR 标准的规范文档。这些规范充当通用蓝图，概述每个模块的行为方式以及可用的配置参数。</p>
+<h3>核心文档类型</h3>
+<ul><li><strong>SWS（Software Specification，软件规范）：</strong>定义软件模块的功能、需求、API 接口和详细行为描述</li><li><strong>TPS（Template Protocol Specification，模板协议规范）：</strong>定义特定模板的格式、结构和内容</li><li><strong>RS（Requirement Specification，需求规范）：</strong>概述高层需求，包括需求 ID、描述、优先级和依赖关系</li><li><strong>EXP（Explanatory Document，解释性文档）：</strong>提供特定概念、设计决策或过程的详细见解和理由</li></ul>
+<h3>阅读方法</h3>
+<ol><li><strong>从基础开始：</strong>先读概述文档和术语表</li><li><strong>聚焦相关章节：</strong>根据角色定位关键领域，寻找用例和示例</li><li><strong>系统化阅读：</strong>自上而下，从高层描述逐步到详细规范，持续参考架构图</li></ol>
+<div class="page-marker">第 232 页</div>
+<h2>下一步做什么？</h2>
+<p>跟上行业趋势、参与 AUTOSAR 社区、动手实践。AUTOSAR 官方通常每年发布两次新版本，持续学习是保持技能更新的关键。</p>
+<div class="page-marker">第 233 页</div>
+<div class="case-study"><h3>案例研究——开发自动驾驶泊车辅助系统（AP）</h3>
+<p>用户故事：Yahya 在拥挤的城市环境中难以完成平行泊车。开发 AP 系统：检测空车位、自动控制转向和车速、通过 HMI 提供实时反馈。</p></div>
+<div class="page-marker">第 234 页</div>
+<div class="figure"><img src="images/p234_0.png" alt="图10.8"><p>图 10.8 – AP 系统框图</p></div>
+<p><strong>功能需求：</strong>物体检测、转向控制、速度控制、用户界面<br>
+<strong>通信需求：</strong>CAN 收集超声波传感器数据、发送转向和速度命令、仪表盘显示状态<br>
+<strong>诊断需求：</strong>故障检测与报告、DTC 存储<br>
+<strong>安全需求：</strong>控制命令的数据完整性和认证（SecOC）<br>
+<strong>内存管理：</strong>持久存储 DTC 和系统日志<br>
+<strong>模式管理：</strong>管理不同运行模式（活跃、待机、故障）</p>
+<div class="page-marker">第 235 页</div>
+<table>
+<tr><th>需求 ID</th><th>描述</th></tr>
+<tr><td>AP_SW_001</td><td>处理超声波传感器数据，实时检测障碍物</td></tr>
+<tr><td>AP_SW_002</td><td>基于障碍物检测触发转向调整或停车</td></tr>
+<tr><td>AP_SW_003</td><td>计算并发送转向角命令控制车辆转向</td></tr>
+<tr><td>AP_COM_001</td><td>通过 CAN 协议处理传感器、执行器和控制单元间的通信</td></tr>
+<tr><td>AP_CRY_001</td><td>通过 SecOC 确保控制命令的数据完整性和真实性</td></tr>
+<tr><td>AP_NVM_001</td><td>管理 NVM 存储 DTC 和系统日志</td></tr>
+<tr><td>AP_GEN_001</td><td>ECU 软件符合 AUTOSAR 标准</td></tr>
+</table>
+<div class="page-marker">第 236 页</div>
+<div class="figure"><img src="images/p236_0.png" alt="图10.9"><p>图 10.9 – AP ECU 建议软件架构</p></div>
+<p><strong>应用层 SWC：</strong>ObjDetect（物体检测，覆盖 AP_SW_001）处理超声波传感器数据。其他 SWC 如 ControlAlgo、SteeringCtrl、ThrottleCtrl 和 UIDisplay 同样通过 RTE 与底层 BSW 通信。</p>
+<p><strong>BSW 模块选择：</strong></p>
+<ul><li><strong>通信栈（COM、PduR、CanTp、CanIf）：</strong>管理 CAN 数据交换；如需 Ethernet，添加 Eth、EthIf、TcpIp、SoAd、SD</li><li><strong>Crypto 栈（SecOC、CSM、CryIf、Crypto Driver）：</strong>保护传输数据，覆盖 AP_CRY_001</li><li><strong>诊断栈（DCM、DEM）：</strong>管理故障检测和 DTC 报告</li><li><strong>内存栈（NvM、FEE、MemIf）：</strong>NVM 数据管理，覆盖 AP_NVM_001</li><li><strong>模式管理（ECUM、BSWM、ComM）：</strong>管理 ECU 运行模式</li></ul>
+<div class="page-marker">第 237 页</div>
+<div class="summary"><h3>全书总结</h3>
+<p>本书从 AUTOSAR 的起源出发，逐步深入分层架构、SWC 设计、事件与接口、OS、通信栈、安全栈、内存管理和诊断。通过本章的自动驾驶泊车辅助系统案例，我们看到了所有模块如何协同工作——应用层 SWC 实现核心算法，RTE 桥接通信，BSW 提供通信/安全/诊断/内存服务。</p>
+<p>AUTOSAR 的成功在于标准化——让来自不同供应商的 ECU 和 SWC 能够无缝协作。继续深入阅读 AUTOSAR 标准文档，将这些知识应用于实际项目，是巩固和拓展技能的最佳途径。</p></div>
+<div class="questions"><h3>思考题</h3><ol>
+<li>DCM 和 DEM 在诊断栈中各扮演什么角色？</li>
+<li>为什么时间同步在分布式汽车系统中至关重要？</li>
+<li>StbM 的主要功能是什么？</li>
+<li>SWS、TPS、RS 和 EXP 四种文档类型分别用于什么目的？</li>
+<li>总结本书学到的五个核心 AUTOSAR 概念。</li></ol></div>
+</div></body></html>

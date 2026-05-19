@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>第7章 探索通信栈</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;background:#f5f5f0;color:#2c2c2c;line-height:1.8;font-size:15px}.container{max-width:780px;margin:0 auto;padding:40px 24px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.06);min-height:100vh}h1{font-size:22px;text-align:center;margin:30px 0 10px}h2{font-size:18px;margin:28px 0 12px;color:#333;border-bottom:2px solid #e0e0e0;padding-bottom:6px}h3{font-size:16px;margin:20px 0 8px;color:#444}p{margin:8px 0;text-align:justify}ul,ol{margin:8px 0 8px 24px}li{margin:3px 0}.page-marker{text-align:right;color:#bbb;font-size:12px;margin:24px 0 0;border-top:1px dashed #e8e8e8;padding-top:4px}.page-marker:first-child{border-top:none;margin-top:0}.figure{text-align:center;margin:16px 0;padding:12px;background:#fafaf7;border:1px solid #eee;border-radius:4px}.figure img{max-width:100%;height:auto;border:1px solid #e0e0e0;border-radius:4px}.figure p{margin-top:6px;font-weight:bold;color:#555;font-size:14px}.note{margin:12px 0;padding:12px 16px;background:#f0f7ff;border-left:4px solid #4a90d9;border-radius:0 4px 4px 0;font-size:14px}.note::before{content:"📝 注意 ";font-weight:bold;color:#4a90d9}.questions,.summary{margin:16px 0;padding:16px 20px;border-radius:6px}.summary{background:#f0fff0}.summary h3{margin-top:0;color:#2d7d2d}.questions{background:#f5f0ff}.questions h3{margin-top:0;color:#6b3fa0}.subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:24px}pre{background:#2d2d2d;color:#e0e0e0;padding:14px 18px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.5;margin:10px 0}code{font-family:Consolas,Monaco,Courier New,monospace}</style></head><body><div class="container">
+<h1>第7章 探索通信栈</h1><p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+<div class="page-marker">第 153 页</div>
+<h2>什么是 COM 栈？</h2>
+<p>假设你是一位开发监测发动机温度 ECU 的工程师。在传统嵌入式实现中，你需要自己处理整个通信过程——配置硬件接口（CAN、FlexRay、LIN），格式化消息数据，管理数据传输的时序和同步，以及实现错误检测和恢复机制。这需要大量底层编码，且高度依赖系统中使用的特定硬件和通信协议。</p>
+<p>在 AUTOSAR 中，ECU 间通信通过标准化接口和分层通信栈实现了抽象。在 AUTOSAR 兼容的系统中，同样的场景将按如下方式处理：</p>
+<ul><li><strong>应用层（Application Layer）：</strong>在 ECU 上运行的应用生成表示发动机高温的信号（Signal）</li><li><strong>RTE 层：</strong>信号被传递到 RTE，RTE 将应用的通信需求从底层硬件和协议中抽象出来</li><li><strong>通信栈（Communication Stack）：</strong>通信栈接管打包并传输信号的责任，还负责根据预定义的通信路由将消息路由到适当的目标 ECU——消息是通过 CAN、FlexRay 还是其他汽车通信总线发送？</li></ul>
+<p>通信硬件接口——如 CAN 控制器或 Ethernet PHY——处理消息在通信总线上的物理传输。</p>
+<div class="note">AUTOSAR 中的信号（Signal）是在车辆电子系统的不同组件或软件模块之间传输的信息或数据。信号可以表示各种类型的数据，如传感器读数、执行器命令或状态信息。</div>
+<div class="page-marker">第 154 页</div>
+<h2>COM 栈概述</h2>
+<div class="figure"><img src="images/p154_0.png" alt="图7.1"><p>图 7.1 – COM 分层架构</p></div>
+<p>AUTOSAR 通信栈分为三个主要部分：</p>
+<ul><li><strong>数据路径（A）：</strong>处理信号、PDU（PDU（Protocol Data Unit，协议数据单元），协议数据单元）及其传输</li><li><strong>控制路径（B）：</strong>处理通信通道的状态</li><li><strong>网络管理（C，Network Management（网络管理））</strong></li></ul>
+<p>这些部分分布在服务层（Service Layer）、ECU 抽象层（ECU Abstraction Layer）和硬件层之间。</p>
+<div class="page-marker">第 155 页</div>
+<h3>服务层通信模块</h3>
+<ul><li><strong>COM：</strong>进一步抽象通信细节，提供 PDU 处理服务，核心职责是处理基于信号的通信，抽象底层通信协议和硬件接口</li><li><strong>PduR（PDU Router（PDU路由器））：</strong>在层间路由 PDU——例如从 COM 层到适当的总线特定接口（CAN、FlexRay、LIN 等），或提供两个通信接口之间的网关功能（如 CAN 到 Ethernet）</li><li><strong>BUS-TP（传输协议）：</strong>管理 ECU 间可靠数据传输，处理分段、流控、错误检测和寻址（如 CAN-TP）</li><li><strong>BUS-SM（总线状态管理器）：</strong>基于来自 ComM（通信管理器）的请求管理每个网络的通信模式转换</li><li><strong>ComM（通信管理器）：</strong>根据 ECU 状态协调通信路径的激活/停用，支持 Full（全部通信可用）、Partial（部分通道）和 No Communication 模式</li></ul>
+<div class="page-marker">第 156 页</div>
+<h3>ECU 抽象层模块</h3>
+<ul><li><strong>CanIf（CAN 接口）：</strong>抽象底层 CAN 控制器和收发器，成为上层 PduR 和底层 CAN 驱动之间的桥梁</li><li><strong>LinIf（LIN 接口）：</strong>类似 CanIf，管理 LIN 帧的内外传输</li><li><strong>EthIf（Ethernet 接口）：</strong>抽象以太网控制器，提供 ETH 收发器与上层模块间的标准接口</li><li><strong>FrIf（FlexRay 接口）：</strong>管理 FlexRay 通信，抽象底层驱动细节</li></ul>
+<div class="page-marker">第 157 页</div>
+<h3>PDU 与 PCI（协议控制信息）</h3>
+<div class="figure"><img src="images/p157_0.png" alt="图7.2"><p>图 7.2 – PDU 与 PCI</p></div>
+<p>PDU 是通信栈各层之间传输的数据包，每层可以添加自己的 PCI。形成嵌套结构——上层 SDU（Service Data Unit，服务数据单元）加上本层的 PCI 构成该层的 PDU。</p>
+<div class="page-marker">第 159 页</div>
+<h3>从 PduR 到 CAN Driver 的数据流</h3>
+<div class="figure"><img src="images/p159_0.png" alt="图7.3"><p>图 7.3 – PduR 到 CAN Driver 的 UML 序列图</p></div>
+<p>上述序列图展示了数据从 PduR 经 CanIf 到 CAN Driver 再经 CanTrcv（CAN 收发器）到物理总线的完整流程。每个模块在传输链中都有其特定的责任。</p>
+<div class="page-marker">第 160 页</div>
+<h3>COM 模块详细解析</h3>
+<p>COM 模块是通信服务层的核心，为上层 SWC 提供统一的信号级通信接口。COM 将来自不同 SWC 的多个信号打包进 PDU，管理信号的发送模式和传输时机。关键 API 包括：</p>
+<pre><code>Std_ReturnType Com_ReceiveSignal(uint16 SignalId, void* SignalDataPtr);
+// 从COM模块读取信号数据
+
+Std_ReturnType Com_SendSignal(uint16 SignalId, const void* SignalDataPtr);
+// 通过COM模块更新并发送信号数据</code></pre>
+<div class="page-marker">第 161 页</div>
+<div class="figure"><img src="images/p161_0.png" alt="图7.5"><p>图 7.5 – COM 模块将信号打包成 PDU</p></div>
+<p>上图展示了 COM 模块如何将来自不同 SWC 的信号（Signal A, B, C）聚合打包进一个 PDU 进行传输，接收端再解包还原各个信号。</p>
+<div class="page-marker">第 162 页</div>
+<h3>PDU 传输模式</h3>
+<p><strong>直接传输（Direct）：</strong>PDU 一经更新立即请求传输。可配置重复次数 N——N=0 仅发送一次，N=3 则在总线上重复 3 次以提高可靠性：</p>
+<div class="figure"><img src="images/p162_0.png" alt="图7.6"><p>图 7.6 – 直接传输模式 N=0</p></div>
+<div class="figure"><img src="images/p162_1.png" alt="图7.7"><p>图 7.7 – 直接传输模式 N=3</p></div>
+<p><strong>周期传输（Periodic）：</strong>PDU 按固定时间间隔 t 请求传输，无论数据是否更新。</p>
+<p><strong>混合传输（Mixed）：</strong>在周期内如 PDU 更新则立即发送，无更新则在周期结束时发送一次。</p>
+<div class="page-marker">第 163 页</div>
+<h3>PduR 路由与网关</h3>
+<div class="figure"><img src="images/p163_0.png" alt="图7.4"><p>图 7.4 – PDU 从 CAN 到 ETH 和 FlexRay 的网关路由</p></div>
+<p>PduR 模块不仅负责将 PDU 从上层（COM）路由到正确的总线接口（如 CanIf），还提供网关功能——允许 PDU 在不同总线协议间转发。例如，来自 CAN 总线的消息可以通过 PduR 网关转发到 Ethernet 或 FlexRay 网络。</p>
+<div class="page-marker">第 168 页</div>
+<div class="figure"><img src="images/p168_0.png" alt="图7.10"><p>图 7.10 – PduR 路由流程</p></div>
+<p>PduR 路由流程展示了从 COM 发送的 I-PDU 经过 PduR 转发到 CanIf，再通过 CAN 驱动发送到物理总线的完整路径。</p>
+<div class="figure"><img src="images/p169_0.png" alt="图7.11"><p>图 7.11 – PduR 网关流程</p></div>
+<p>网关流程展示了一条消息从 CAN 网络通过 PduR 网关转发到 Ethernet 网络的路径，涉及 CanIf → PduR → EthIf 的跨总线传输。</p>
+<div class="page-marker">第 173 页</div>
+<h3>从 SWC 到 CAN Driver 的完整数据流</h3>
+<div class="figure"><img src="images/p175_0.png" alt="图7.12"><p>图 7.12 – 信号在 COM 中的流向</p></div>
+<p>完整发送流程：SWC → RTE（Rte_Send）→ COM（Com_SendSignal）→ PduR（PduR_Transmit）→ CanIf（CanIf_Transmit）→ CAN Driver（Can_Write）→ CAN 控制器 → 物理总线。接收流程反向进行。</p>
+<div class="page-marker">第 177 页</div>
+<div class="figure"><img src="images/p177_0.png" alt="图7.13"><p>图 7.13 – 信号传输序列图</p></div>
+<p>序列图展示了从应用层 SWC 发送信号到 CAN 总线物理传输的时序过程，包括各层模块的调用顺序和数据流向。</p>
+<div class="page-marker">第 178 页</div>
+<h2>网络管理（Network Management，NM）</h2>
+<div class="figure"><img src="images/p178_0.png" alt="图7.14"><p>图 7.14 – CanNm 状态机</p></div>
+<p>CanNm（CAN 网络管理）管理 ECU 在 CAN 网络中的状态转换：</p>
+<ul><li><strong>Bus Sleep Mode（总线休眠模式）：</strong>总线休眠，无通信活动</li><li><strong>Prepare Bus Sleep Mode（准备总线休眠）：</strong>准备进入休眠状态</li><li><strong>Network Mode（网络模式）：</strong>活跃通信状态。包含三个子状态：<ul><li>Repeat Message State（重复消息状态）：重复发送 NM 消息</li><li>Normal Operation State（正常操作状态）：正常通信</li><li>Ready Sleep State（准备休眠状态）：准备休眠</li></ul></li></ul>
+<div class="page-marker">第 179 页</div>
+<h3>NM 协调式唤醒</h3>
+<p>ECU 通过 CanNm 模块发送和监听 NM 消息来实现协调式唤醒和休眠。NM 消息包含源节点 ID，节点通过逻辑环令牌机制（Logical Ring Token（逻辑环令牌））协调唤醒。当所有节点同意进入休眠时，网络转换为 Bus Sleep Mode 以节省功耗。</p>
+<div class="page-marker">第 180 页</div>
+<div class="summary"><h3>本章小结</h3>
+<p>本章深入 AUTOSAR 通信栈，理解了它在 ECU 间管理数据和信号传输的关键作用。我们探索了 COM 栈的分层架构——包括 COM、PduR、CanIf、CAN Driver 和 CanTp——理解了数据通过通信层传输的机制。我们讨论了 PDU 的三种传输模式（Direct/Periodic/Mixed）以及 PduR 的路由和网关功能。最后我们了解了网络管理及其状态机，使 ECU 能够在休眠和唤醒状态间转换，实现高效的功耗管理。</p></div>
+<div class="questions"><h3>思考题</h3><ol><li>AUTOSAR 通信栈的主要组成部分是什么？</li><li>COM 和 PduR 模块各自的角色是什么？</li><li>PDU 的三种传输模式及其应用场景？</li><li>CanNm 状态机的状态及其转换条件是什么？</li></ol></div>
+<div class="page-marker">第 181 页</div>
+<h2>第8章 使用 Crypto 与安全栈保护 AUTOSAR 系统</h2>
+<p>在本章中，我们将踏上汽车网络安全之旅，概述 AUTOSAR 框架内的安全景观，然后探索 Crypto 栈设计的核心组件——检查安全敏感数据和保障车辆组件之间安全通信的原则与配置。本章将涵盖汽车安全简介、汽车安全基础、AUTOSAR 架构中的安全栈，以及 Crypto 栈用例和示例。</p>
+</div></body></html>

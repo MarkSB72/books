@@ -1,0 +1,557 @@
+=== Page 219 ===
+200 Wrapping Up and Extending Knowledge with a Use Case
+In this chapter, we will discuss the following:
+• Overview of diagnostics
+• Overview of time synchronization
+• How to read the standards
+• What’s next?
+• Case study – development of an autonomous parking assist system
+Overview of diagnostics
+In this book, we’ve embarked on a journey through the foundational aspects of AUTOSAR, beginning with
+its history and motivations, followed by an in-depth look at the runtime environment (RTE), software
+component (SWC), and core modules within the basic software (BSW) layer, such as communication,
+security, and memory management. These elements form the backbone of AUTOSAR and are key to
+understanding how this architecture standardizes and enhances automotive software development.
+However, it’s important to recognize that there are other essential components within the AUTOSAR
+framework that we have not covered in detail. Notably, diagnostics are critical to automotive systems
+and vital for maintaining vehicle safety and performance. While we haven’t deeply examined diagnostics
+and other advanced modules, it’s important to note their significance.
+Diagnostics in automotive systems are key to ensuring the reliability, safety, and performance of vehicles.
+The primary goals of diagnostics are to detect faults, report them accurately, and provide mechanisms
+for repairing and maintaining the vehicle ECUs. Effective diagnostic systems help with the following:
+• Early fault detection: Identifying issues early on prevents minor problems from escalating
+into major failures, thereby improving vehicle safety and reliability.
+• Maintenance and repair: Diagnostics facilitates efficient maintenance and repair processes by
+providing precise fault information and reducing downtime and associated costs.
+• Compliance with regulations: Many regions have strict regulations regarding vehicle emissions
+and safety. Diagnostics help ensure compliance with these standards.
+• Customer satisfaction: By ensuring vehicles operate smoothly and safely, diagnostics enhance
+customer satisfaction and trust in the brand.
+As we have grasped the importance of diagnostics in a vehicle, let’s discuss the modules that compose
+the diagnostics stack, starting with the Diagnostic Communication Manager (DCM) module.
+
+
+=== Page 220 ===
+Overview of diagnostics 201
+Diagnostic Communication Manager (DCM) in detail
+DCM is a central component in the AUTOSAR diagnostics stack. Its primary role is to ensure that the
+vehicle’s internal systems—such as the engine control unit, transmission control, and other essential
+electronic units—can communicate effectively with external diagnostic tools. This allows technicians
+to accurately diagnose issues, perform maintenance, and update software, ensuring the vehicle runs
+smoothly and safely. Key features of DCM include the following:
+• Diagnostic session management: DCM handles different diagnostic sessions, such as default,
+programming, and extended sessions, each offering varying access levels to diagnostic services.
+It ensures that the vehicle is in the correct session for the requested diagnostic operation,
+controlling transitions between these sessions as needed.
+Extended session
+The primary purpose of the extended session is to provide access to features that typically
+require higher security or are more intrusive to the vehicle’s normal operation. Examples of
+functions that might be accessible only in an extended session are the motor calibration and
+tuning adjusting parameters in the ECU, such as those for engine tuning or motor control.
+• Security and access control: To protect against unauthorized access, DCM manages security
+access levels and ensures that sensitive diagnostic operations are performed only after the
+appropriate security mechanisms, such as seed/key algorithms, are satisfied.
+• Processing diagnostic requests: DCM interprets diagnostic requests from external tools and
+forwards them to the appropriate internal modules.
+• Service handling: This supports a wide range of diagnostic services as defined by standards
+such as Unified Diagnostic Services (UDS) and J1939.
+Note on UDS
+UDS is a standard protocol (ISO 14229) used in automotive and other industries for diagnosing
+and configuring vehicles or devices over a communication network, typically a controller area
+network (CAN). UDS defines a set of diagnostic services that enable functions such as reading
+diagnostic trouble codes (DTCs), monitoring the status of vehicle components, performing
+software updates, and configuring parameters. The protocol standardizes communication
+between a diagnostic tool and the vehicle’s ECUs, facilitating consistent and reliable diagnostics
+across different vehicle makes and models.
+
+
+=== Page 221 ===
+202 Wrapping Up and Extending Knowledge with a Use Case
+Figure 10.1 shows the process of a diagnostic session where a tester tool sends a diagnostic request via
+the CAN. The request is routed through various layers, including the CAN, CAN Transport Protocol
+(CanTp), and Protocol Data Unit Router (PDUR), before reaching DCM. DCM then interacts with
+the SWC via the RTE to request a memory read operation. The response follows a similar path back
+to the tester tool, ensuring the secure and reliable communication of diagnostic data between the
+vehicle’s internal systems and the external diagnostic tool.
+Figure 10.1 – Sequence diagram illustrating DCM in an AUTOSAR architecture
+After understanding DCM’s role in managing and translating communication, let’s now explore
+Diagnostic Event Manager (DEM), which completes the picture by gathering, debouncing, and
+managing diagnostic events within the vehicle’s ECUs.
+Diagnostic Event Manager
+DEM is part of the diagnostics stack. It handles the management of diagnostic events and the storage
+of fault information. In an AUTOSAR system, while DCM oversees the communication of diagnostic
+data, DEM is responsible for internally collecting, processing, and managing these events. It acts like
+the system’s internal detective, continuously monitoring through another SWC, which acts as a monitor
+for events, recording and analyzing the vehicle’s operational state to identify faults and anomalies.
+Its main responsibilities include the following:
+• Fault detection: An SWC monitors various signals and parameters to detect faults in the
+vehicle systems and reports these events to DEM, which then performs debouncing and other
+processing steps to qualify the faults.
+
+
+=== Page 222 ===
+Overview of diagnostics 203
+• Event status management: DEM keeps track of the status of each event, including whether
+an event is currently active, has been confirmed, or is pending. This helps with understanding
+the severity and status of the detected faults.
+• DTC management: It records DTCs whenever a fault is detected, which is essential for
+diagnosing issues.
+A note on DTCs
+A DTC is a standardized code read by a vehicle’s onboard diagnostics (OBD) system to
+indicate specific faults or issues within the vehicle’s electronic systems. Each DTC consists of
+a combination of letters and numbers that correspond to problems, such as engine misfires,
+sensor failures, or communication errors. For instance, the code P0301 indicates a misfire
+in cylinder 1. In practice, a software monitor within the ECU continuously checks for such
+errors and, upon detecting a fault, records it as a DTC. These DTCs are then stored in the ECU’s
+memory and can be retrieved later by diagnostic tools for analysis, allowing for precise fault
+identification and efficient debugging and repair processes.
+• Event memory: DEM maintains an event memory to keep track of all diagnostic events, which
+can be accessed during service and maintenance.
+Figure 10.2 illustrates the AUTOSAR architecture, focusing on the interaction between key components
+across different layers. DEM, centrally located in the BSW layer, is responsible for collecting, processing,
+and storing diagnostic events. For example, a software monitor in the ECU might detect a fault and
+log it as a DTC in DEM. Later, DCM can retrieve this DTC, allowing external diagnostic tools to read
+and analyze the stored fault information.
+Figure 10.2 – Interaction between DCM and DEM within the AUTOSAR architecture
+
+
+=== Page 223 ===
+204 Wrapping Up and Extending Knowledge with a Use Case
+Having explored DEM and DCM, which focus on production-level diagnostics, it’s important to
+also consider internal diagnostics within the system. This is where the Default Error Tracer (DET)
+comes into play. The DET operates at another level of diagnostics. It provides critical functionality
+for detecting and tracing errors during both development and runtime.
+Default Error Tracer (DET)
+The DET is a diagnostic method used during the development phase of automotive software. It helps
+developers identify and trace errors in the system, guaranteeing the robustness and reliability of the
+final product. Key responsibilities include the following:
+• Error detection: Monitors the system for development errors
+• Error logging: Records detailed information about detected errors
+• Debugging support: Provides valuable insights for developers to debug and fix issues effectively
+• Internal error detection: Continuously monitors the software’s internal operations, detecting
+issues such as incorrect function calls, parameter mismatches, or failed assertions
+The DET’s focus is on the software development life cycle rather than on the vehicle’s operational
+diagnostics. It serves as a critical tool for developers by ensuring that the software behaves as expected
+before it is deployed in a car. As the AUTOSAR standard puts it: “The Default Error Tracer provides
+immediate detection and tracing of errors, facilitating robust software development and reducing the
+risk of undetected faults during runtime.”
+Imagine you’re developing a software module for an ECU in a vehicle. During the development phase,
+one of the functions, let’s say CalculateEngineTorque(), is supposed to be called with a valid
+range of parameters, such as engine speed and throttle position. However, due to a bug in the code,
+this function is sometimes called with a negative engine speed value, which is invalid. Figure 10.3
+shows such a use case as a sequence diagram.
+Figure 10.3 – Sequence diagram demonstrating the DET functionality
+
+
+=== Page 224 ===
+Overview of diagnostics 205
+Failure Management
+The Failure Management (FiM) module interacts with DEM to manage the status of diagnostic
+events and control functions based on the fault conditions. FiM is designed to enable or disable certain
+functions based on the occurrence of specific faults, helping to maintain safety and vehicle performance.
+The use case in Figure 10.4 illustrates this process, showing how FiM evaluates conditions and controls
+function permissions dynamically in response to detected faults. Based on the fault information
+retrieved, FiM grants or denies permission to these functions.
+Figure 10.4 – Sequence diagram demonstrating the DET functionality
+With the overview of diagnostics—covering DCM, DEM, DET, and FiM—complete, it’s important to
+recognize that we’ve only scratched the surface. Each module offers extensive features and configurations
+to achieve robust diagnostics in automotive systems. Now, let’s transition to another vital aspect: time
+synchronization. In systems with multiple ECUs, precise time alignment is essential for coordinated
+operation and communication. Next, we’ll explore how time synchronization can be effectively
+implemented in an automotive context.
+
+
+=== Page 225 ===
+206 Wrapping Up and Extending Knowledge with a Use Case
+Overview of time synchronization
+Time synchronization in AUTOSAR is a set of components designed to ensure accurate and consistent
+timekeeping across different ECUs within a vehicle. This is achieved through dedicated time
+synchronization protocols and mechanisms, providing a common time base for various applications
+and systems to enable precise coordination and timing-dependent operations. In automotive systems,
+time-critical applications are often distributed across multiple ECUs connected via different in-vehicle
+networks such as CAN, Ethernet, and FlexRay, each operating with its own source clock. Synchronizing
+these ECUs is essential to achieve time-sensitive functionalities. The challenge in a mixed network
+architecture is synchronizing nodes across different protocols connected via a gateway. AUTOSAR
+addresses this challenge with the concept of a Time Gateway, which ensures synchronization across
+diverse networks, enabling seamless time-sensitive operations, and this is where the AUTOSAR
+modules help to achieve this goal
+What are the Time Master and Time Slave?
+The Time Master is a central node responsible for generating and distributing the reference time
+across the network, ensuring all nodes operate with synchronized timing. The Time Slave is a
+node that receives time updates from the Time Master and adjusts its own clock to align with
+the reference time, allowing coordinated and time-consistent operations across the network.
+Figure 10.5 depicts the AUTOSAR time synchronization framework, highlighting the four key modules
+responsible for synchronizing time across different communication buses: EthTSyn for Ethernet, CAN
+Time Synchronization (CanTSyn) for CAN, and FrTSyn for FlexRay. Central to this framework is
+Synchronized Time-Base Manager (StbM), which coordinates these modules to ensure a consistent
+and synchronized time base across the entire system.
+Figure 10.5 – Time synchronization architecture
+
+
+=== Page 226 ===
+Overview of time synchronization 207
+Imagine an orchestra where each musician represents an ECU. In an orchestra, the conductor ensures
+that all musicians play in sync, following the same tempo and rhythm. If the conductor failed to
+synchronize the musicians, the resulting performance would be chaotic, with instruments playing
+out of tune and time with each other.
+Similarly, in a vehicle, the sync module acts like the conductor, ensuring that all ECUs are synchronized
+to a common time base. Just as a conductor provides cues to keep the musicians in sync, sync modules
+provide accurate timestamps and time alignment across the network nodes.
+Accurate time synchronization is essential for several reasons:
+• Event correlation: Precise timestamping allows for the accurate correlation of events across
+different ECUs, aiding in fault diagnosis and system analysis
+• Real-time systems: Many vehicle systems, such as Advanced Driver Assistance Systems
+(ADASs) and autonomous driving, rely on real-time processing and require precise timing
+for correct operation
+• Sensor fusion: Combining data from multiple sensors often involves timestamping and
+synchronization to ensure accurate results
+• Communication protocols: Some communication protocols, such as Ethernet, require time
+synchronization for efficient and reliable data transfer
+• Logging and recording: Precise timestamps are vital when logging and recording data for
+accurate analysis and replay
+Synchronized Time-Base Manager (StbM) module
+The StbM module is a fundamental component within the AUTOSAR architecture responsible for
+managing time synchronization within a vehicle. It provides the following core functionalities:
+• Time-based management: Maintains a local time base on each ECU, ensuring accurate timekeeping.
+• Synchronization of runnable entities: Runnables can be configured to execute at specific
+times based on the synchronized time base provided by StbM. By doing so, the execution of
+these runnables can be precisely coordinated across various ECUs.
+• Time domain management: Supports multiple time domains within a vehicle, allowing for
+different time references based on specific system requirements.
+• Time offset calculation: Determines the offset between the local time base and the
+synchronized time.
+• Time adjustment: Adjusts the local clock based on calculated offsets to maintain synchronization.
+• Time information provision: Provides time information to other SWCs as required.
+
+
+=== Page 227 ===
+208 Wrapping Up and Extending Knowledge with a Use Case
+One of the use cases I always like to describe is how to achieve synchronization between ECUs using
+StbM and why it is sometimes needed in special cases.
+Use case – synchronizing radar ECUs with StbM
+Consider a scenario where a vehicle has multiple radar ECUs, each responsible for emitting radio
+frequency (RF) signals to detect objects in the vehicle’s surroundings. To avoid interference between
+the radar signals, it is required that each radar ECU triggers its RF signal with a precise time offset of
+40 microseconds (µs) from the others.
+Figure 10.6 illustrates a straightforward interaction where two radar ECUs synchronize with the
+Time Master provider ECU, schedule their tasks with the necessary time offsets, and execute these
+tasks independently.
+Figure 10.6 – Time synchronization architecture
+You have been introduced to StbM and understand its role as the central timekeeper that interacts with
+the OS to reschedule tasks or adjust the OS schedule table. Let’s now explore CanTSyn. This module
+is specifically responsible for CAN bus time synchronization and obtaining the necessary time data.
+Similar modules, such as EthTSyn and FrTSyn, perform comparable functions, with variations tailored
+to the specific communication bus they support.
+
+
+=== Page 228 ===
+Overview of time synchronization 209
+CAN Time Synchronization (CanTSyn)
+The CanTSyn module is responsible for handling the distribution and synchronization of time information
+over CAN buses. However, simply transmitting the time information from the Time Master to the
+Time Slaves through a broadcast CAN message can lead to inaccuracies due to CAN-specific factors
+such as message arbitration and delays within the BSW.
+To address these challenges, the CanTSyn module uses PTP synchronization, employing a process to
+ensure precise timing across the network. Figure 10.7 shows how this process is achieved.
+Figure 10.7 – CanTSyn mechanism
+The preceding figure highlights a four-step process, which is described as follows:
+1. SYNC message: The Time Master ECU broadcasts a SYNC message with the current ECU time
+(T0t). It records the exact transmission time (T1t) the message was transmitted by the driver.
+2. Reception by Time Slaves: Time Slaves receive the SYNC message and a timestamp of the
+exact reception time (T2r).
+3. Follow-Up (FUP) message: The Time Master then sends an FUP message containing the time
+difference between the actual transmission and the time indicated in the SYNC message (T1t–T0t).
+4. Time adjustment: Slaves combine the information from the SYNC and FUP messages to
+accurately adjust their local clocks, aligning precisely with the Time Master, and provide this
+as an indication to StbM to keep the time.
+
+
+=== Page 229 ===
+210 Wrapping Up and Extending Knowledge with a Use Case
+In the previous sections and chapters, we covered the various modules within the AUTOSAR stack,
+providing an overview of their roles and interactions. One challenge I’ve encountered in the industry
+is that while many questions and issues are addressed in the AUTOSAR standards, some professionals
+might overlook or miss the importance of thoroughly reading and understanding these core documents.
+Mastering the standard and avoiding common pitfalls is impossible without fully grasping the art of
+reading documentation and knowing where to search for information or hints that you might be missing.
+With this in mind, let’s move on to the next section, where we’ll explore the core AUTOSAR documents,
+providing guidance on how to access, interpret, and apply these essential resources in our work.
+How to read the standards
+Regardless of which configurator you choose, you’ll quickly realize that implementing requirements
+goes beyond just using tools—it’s about deeply understanding the specifications that define the
+AUTOSAR standard. These specifications serve as a common blueprint, outlining how each module
+should behave and the configuration parameters that allow you to extend and customize a module’s
+functionality. The tools are like instruments used by builders to modify and adapt these blueprints,
+enabling you to tailor the modules to your specific needs.
+For example, in the case of the COM module, the specifications define the configuration parameters
+that could influence the transmission of a PDU. This is helpful for developers and architects to configure
+the COM module and manage communication signals efficiently and properly. The configurator tools
+allow you to adjust parameters such as signal timeouts or data packaging options, but these tools are
+only as effective as your understanding of the underlying requirements.
+Additionally, these configurations can be shared in ARXML files, much like blueprints that different
+builders can use to ensure their work aligns perfectly with the overall design. This allows other
+modules to read these settings and automatically adapt their internal configurations, providing
+seamless integration. This is a key reason why different vendors can collaborate so effectively—they
+all work from the same blueprint, with a shared understanding of the specifications and a consistent
+approach to module configurability.
+Building on what was mentioned earlier, the following section will guide you through some of the
+common AUTOSAR documents and their contents, helping you understand the specifications and
+navigate them effectively.
+
+
+=== Page 230 ===
+How to read the standards 211
+Key AUTOSAR documents
+This book’s main goal has been to give you a solid introduction to the fundamental concepts and
+most common stacks in AUTOSAR. To gain a comprehensive understanding and explore areas not
+covered here, I encourage you to refer to the detailed AUTOSAR specifications available at https://
+autosar.org. These documents will help you get a clearer understanding of advanced topics and
+additional modules that haven’t been discussed in this book:
+• Software Specification (SWS):
+Purpose: Defines the software module’s functionality
+Contents:
+ Overview: General introduction and functional overview of the module.
+ Requirements: Functional specification
+ Interfaces: Detailed descriptions of APIs, including input and output parameters.
+ Behavior: Detailed description of the module’s behavior, state machines, sequence diagrams,
+and flow diagrams.
+ Configuration parameters: List, as well as explanations, of configuration options available.
+ Example: An example that you can refer to is Communication Manager (ComM), stored
+at https://www.autosar.org/fileadmin/standards/R23-11/CP/
+AUTOSAR_CP_SWS_COMManager.pdf. The document shows an SWS for ComM in
+AUTOSAR. Its purpose is to define the functionality, requirements, and interfaces of the
+ComM module, which manages the communication modes for the communication buses
+within an ECU. This document provides detailed guidelines on how ComM interacts with
+other modules, handles communication mode transitions, and ensures efficient data exchange
+within the vehicle’s network.
+Note
+For each AUTOSAR module we’ve discussed, you can refer to its corresponding SWS document.
+These documents offer a comprehensive understanding of the module, including detailed
+descriptions of interfaces, state machines, sequence diagrams, and its interactions with other
+modules. They are essential for gaining a deeper insight into how each module operates within
+the AUTOSAR framework.
+
+
+=== Page 231 ===
+212 Wrapping Up and Extending Knowledge with a Use Case
+• Template Protocol Specification (TPS):
+Purpose: Define the format, structure, and content for specific templates used within
+the architecture
+Contents:
+ Introduction: General information about the document’s purpose.
+ Guidelines: Detailed implementation guidelines.
+ Example: The document https://www.autosar.org/fileadmin/standards/
+R23-11/CP/AUTOSAR_CP_TPS_SoftwareComponentTemplate.pdf is a Technical
+Protocol Specification (TPS) for the SWC template in AUTOSAR. Its purpose is to define the
+structure and content of SWCs within the AUTOSAR architecture, providing a standardized
+template that ensures consistency across different implementations. This document outlines
+how SWCs should be described, including their interfaces, attributes, and relationships, to
+support seamless integration and interoperability within AUTOSAR-compliant systems.
+• Requirement Specification (RS):
+Purpose: Outline the high-level requirements that the standard or a specific component or a
+stack must fulfill:
+ Requirement IDs: Unique identifiers for each requirement
+ Description: Detailed explanation of each requirement
+ Priority: Importance level of each requirement
+ Dependencies: Any dependencies or constraints related to the requirement
+• Explanation (EXP):
+Purpose: Provides detailed insights and justifications for specific concepts, design decisions, or
+processes within the AUTOSAR framework. These documents are intended to help developers
+and engineers understand the reasoning behind certain standards, offering context that aids
+in the correct implementation and integration of AUTOSAR components.
+Example: https://www.autosar.org/fileadmin/standards/R23-11/CP/
+AUTOSAR_CP_EXP_FirmwareOverTheAir.pdf provides an in-depth overview of the
+Firmware Over-the-Air (FOTA) update process within the AUTOSAR framework. It explains
+the concepts, architecture, and processes involved in remotely updating firmware in vehicles,
+including security measures, communication protocols, and system requirements.
+
+
+=== Page 232 ===
+What’s next? 213
+Navigating AUTOSAR documentation can be a daunting task due to its comprehensive and detailed
+nature. To make this process more manageable, it is important to adopt a structured approach. This
+section provides a guide on how to effectively read and understand AUTOSAR documents, ensuring
+that you grasp the essential concepts and detailed specifications needed for your work. By starting
+with the basics, focusing on relevant sections, and reading methodically, you can efficiently navigate
+through the extensive AUTOSAR documentation and apply its principles to your projects:
+• Start with the basics:
+ Overview documents: Begin with the introductory and overview documents that provide
+a high-level understanding of AUTOSAR and its architecture, goals, and core principles.
+These documents set the stage for more detailed specifications.
+ Glossary: Familiarize yourself with the terminology used in AUTOSAR specifications.
+Understanding the specific terms and abbreviations is important for comprehending
+detailed documents.
+• Focus on relevant sections:
+ Identify key areas: Depending on your role and the specific aspects of AUTOSAR you are
+dealing with, focus on the relevant sections.
+ Use cases: Look for use cases and examples that illustrate how the specifications are applied
+in real-world scenarios. This can provide context and make the specifications more relatable.
+• Read methodically:
+ Top-down approach: Start with high-level descriptions and gradually move to
+detailed specifications. This helps in building a comprehensive understanding without
+getting overwhelmed.
+ Reference models: Keep referring to architecture diagrams and reference models provided
+in the documents. Visual representations can aid in understanding complex interactions
+and data flows.
+As we conclude our comprehensive exploration of AUTOSAR, it’s important to recognize that this is
+just the beginning of your journey through the vast and dynamic field of automotive systems.
+What’s next?
+The world of AUTOSAR offers endless opportunities for learning, innovation, and professional growth.
+Here are some ways to continue your journey:
+• Stay updated with industry trends: The automotive industry is rapidly evolving, with new
+advancements in autonomous driving, electric vehicles, and connectivity. Staying informed
+about these trends will provide valuable context and help you understand the direction in
+
+
+=== Page 233 ===
+214 Wrapping Up and Extending Knowledge with a Use Case
+which AUTOSAR is heading. Follow industry news, attend conferences, and participate in
+webinars to keep your knowledge current. Monitor new releases regularly by checking the
+official AUTOSAR website for new releases, which are typically published twice a year.
+• Engage with the AUTOSAR community: Join online forums, discussion groups, and professional
+networks focused on AUTOSAR. Engaging with the community allows you to share experiences,
+ask questions, and learn from the insights of others. Consider joining organizations and attending
+AUTOSAR consortium meetings to connect with experts and practitioners in the field.
+• Get hands-on practice: Apply your knowledge by working on real-world projects, either through
+your current role or personal projects. Hands-on experience is invaluable for deepening your
+understanding and honing your skills. Experiment with different aspects of AUTOSAR, from
+developing BSW modules to implementing security mechanisms.
+As we conclude, it’s important to remember that while we haven’t covered every module within
+AUTOSAR, our selective approach was designed to give you a solid foundation in the most critical
+aspects. This introduction should equip you with the knowledge needed to confidently embark on
+your journey of managing and working with AUTOSAR projects.
+Let’s recap what we’ve covered in this book with a case study on building an autonomous parking assist
+system. This case study will be somewhat abstract, but it will provide a clear flow—from understanding
+the system to defining the requirements, and even touching on the design process and identifying the
+key modules you might need in your ECU.
+Case study – Development of an autonomous parking
+assist system
+You have just been introduced to key aspects of AUTOSAR, including the RTE, SWCs, communication,
+diagnostics, security, memory management, and mode management. To solidify your understanding,
+let’s embark on a case study that involves developing an Autonomous Parking (AP) system. This
+system will get a vehicle to autonomously park by integrating various sensors and control algorithms:
+User story: Imagine a driver named Yahya who struggles with parallel parking in crowded urban
+areas. To assist Yahya, we want to develop an AP system for his vehicle. This system will detect an
+empty parking slot and automatically steer and control the speed of the car to park it safely, accurately,
+and efficiently, while providing real-time feedback to Yahya through the vehicle’s Human Machine
+Interface (HMI).
+System requirements: To build this system, we need to establish clear and comprehensive requirements
+that cover various aspects, including functionality, communication, diagnostics, security, memory
+management, and mode management.
+
+
+=== Page 234 ===
+Case study – Development of an autonomous parking assist system 215
+Figure 10.8 shows an abstract view of how this system is designed.
+Figure 10. 8 – System diagram for the AP system
+The following are the functional requirements:
+• Object detection: The system should detect obstacles using ultrasonic sensors
+• Steering control: The system should control the vehicle’s steering to navigate into the parking spot
+• Speed control: The system should adjust the vehicle’s speed during the parking maneuver
+• User interface: The system should provide feedback to the driver through the vehicle’s
+display system
+The following are the communication requirements:
+• Sensor data: The system should collect data from ultrasonic sensors via CAN
+• Control commands: The system should send steering and speed commands over CAN
+• User feedback: The system should display status information and instructions on the dashboard
+The following are the diagnostics requirements:
+• Fault detection: The system should identify and report faults in sensors and actuators
+• DTCs: The system should store and report DTCs for maintenance purposes
+The following are the security requirements:
+• Data integrity: The system should ensure the integrity of control commands
+• Authentication: The system should authenticate communication between ECUs
+The following memory management requirements:
+• Efficient storage: The system should optimize memory usage for sensor data and control algorithms
+• Persistent storage: The system should store DTCs and system logs
+The following are the mode management requirements:
+• Operating modes: The system should manage different operating modes, including active,
+standby, and fault
+
+
+=== Page 235 ===
+216 Wrapping Up and Extending Knowledge with a Use Case
+What we have discussed are all general system requirements. We can refer to the following software
+requirements as a starting point from which we can start defining our software and the AUTOSAR
+layers needed:
+Requirements ID Requirements
+[AP_SW_001] The software should process data from ultrasonic sensors to detect obstacles
+in real time.
+[AP_SW_002] The software should trigger appropriate responses based on obstacle detection,
+such as adjusting steering or stopping the vehicle.
+[AP_SW_003] The software should calculate and send steering angle commands to control
+the vehicle’s steering during parking maneuvers.
+[AP_SW_004] The software should ensure smooth and accurate steering adjustments based
+on sensor data.
+[AP_SW_005] The software should manage the vehicle’s speed by adjusting throttle and
+brake commands during the parking process.
+[AP_SW_006] The software should ensure smooth deceleration and acceleration
+during maneuvers.
+[AP_SW_007] The software should provide real-time feedback to the driver via the vehicle’s
+display system, including parking status, instructions, and warnings.
+[AP_SW_008] The software should update the display based on the system’s state, such as
+when an obstacle is detected or when parking is complete.
+[AP_COM_001] The software should implement the CAN protocol to handle communication
+between sensors, actuators, and control units.
+[AP_COM_002] The software should manage the transmission and reception of sensor data
+and control commands over CAN.
+[AP_CRY_001] The software should ensure data integrity and authenticity for control
+commands transmitted over the network.
+[AP_NVM_001] The software should manage non-volatile memory for storing DTCs and
+system logs.
+[AP_NVM_001] The software should manage non-volatile memory for storing DTCs and
+system logs.
+[AP_GEN_001] The ECU software should be compliant with the AUTOSAR standard and
+adhere to its guidelines for architecture, communication protocols, diagnostics,
+memory management, mode management, security, and SWC integration.
+Table 10.1 – Proposed list of software requirements
+
+
+=== Page 236 ===
+Case study – Development of an autonomous parking assist system 217
+The software architecture might look something like what is shown in Figure 10.9. To explain the
+rationale behind the selection of modules shown in the architecture diagram and how they satisfy
+the software requirements, I’ll map each module to the corresponding requirements and provide a
+brief rationale for their inclusion in the design. This will help you understand the logical connection
+between the software requirements and the architectural design.
+Figure 10. 9 – Proposed software architecture for the AP ECU
+Let’s briefly outline the design choices that have influenced this architecture.
+Application layer (SWCs)
+We can use the Object Detection (ObjDetect) SWC as an example of one of the software modules
+composing the application layer. Other SWCs cover the rest of the requirements and implement the
+needed interfaces to the BSW:
+• Which requirement does it cover?: [AP_SW_001].
+• Rationale: ObjDetect processes data from ultrasonic sensors to detect obstacles in real time.
+It is positioned above the RTE because it interacts directly with sensor data and influences
+control decisions without needing to manage hardware details, which are abstracted by the RTE.
+
+
+=== Page 237 ===
+218 Wrapping Up and Extending Knowledge with a Use Case
+Note
+Other modules, such as Control Algorithm (ControlAlgo), Steering Control (SteeringCtrl),
+Throttle Control (ThrottleCtrl), and User Interface Display (UIDisplay), follow the same
+pattern. They handle specific vehicle control tasks or user interactions, leveraging the RTE for
+communication with the underlying BSW layers.
+Now, let’s explore some of the choices for the BSW stack.
+AUTOSAR BSW modules
+We are using the communication and crypto stacks as examples. Other stacks follow a similar process.
+Communication stack (COM, PduR, CanTp, and CanIf)
+The following requirements are covered by the communication stack:
+• Which requirements does it cover?: [AP_COM_001] and [AP_COM_002].
+• Rationale: The communication stack is needed for managing the exchange of data between
+various SWCs and the CAN, which is required for the operation of the autonomous parking
+system. Observe that we have selected CAN modules as we have assumed communication
+would take place through a CAN bus. If it were Ethernet, you might add Eth, EthIf, TcpIp,
+SoAd, and SD.
+Crypto stack (SecOC, CSM, CryIf, and Crypto)
+The following requirements are covered by the crypto stack:
+• Which requirement does it cover?: [AP_CRY_001].
+• Rationale: The crypto stack is needed to secure data transmitted across the communication channel.
+Generic note
+Similarly, the diagnostics stack (including modules such as DEM, DCM, and DET), the non-
+volatile memory (NVM) stack (including modules such as NvmM, MemIf, and Fee), and
+the mode management stack (including modules such as BswM, EcuM, ComM, WdgM, and
+CanSM) were selected to satisfy both the AUTOSAR requirements and the specific needs of this
+ECU. These stacks ensure effective fault detection, memory management, and mode transitions,
+which are essential for the reliability and functionality of the autonomous parking system.
+
