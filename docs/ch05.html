@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第5章 设计与实现事件和接口 — AUTOSAR 基础与应用</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="book-title">AUTOSAR 基础与应用</a>
+  </div>
+  <nav class="nav-list">
+    <ul>
+        <li><a href="ch01.html" class="nav-chapter">第1章 探索 AUTOSAR 的起源与目标</a></li>
+        <li><a href="ch02.html" class="nav-chapter">第2章 AUTOSAR 软件层简介</a></li>
+        <li><a href="ch03.html" class="nav-chapter">第3章 AUTOSAR 方法论与数据交换格式</a></li>
+        <li><a href="ch04.html" class="nav-chapter">第4章 使用软件组件与 RTE</a></li>
+        <li><a href="ch05.html" class="nav-chapter active">第5章 设计与实现事件和接口</a></li>
+        <li><a href="ch06.html" class="nav-chapter">第6章 AUTOSAR 操作系统入门</a></li>
+        <li><a href="ch07.html" class="nav-chapter">第7章 探索通信栈</a></li>
+        <li><a href="ch08.html" class="nav-chapter">第8章 使用 Crypto 与安全栈保护 AUTOSAR 系统</a></li>
+        <li><a href="ch09.html" class="nav-chapter">第9章 内存与模式管理</a></li>
+        <li><a href="ch10.html" class="nav-chapter">第10章 总结与知识拓展用例</a></li>
+    </ul>
+  </nav>
+</div>
+
+<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="切换导航">☰</button>
+
+<div class="main-content">
+  <div class="chapter-page">
+<div class="container">
+<h1>第5章 设计与实现事件和接口</h1><p class="subtitle">AUTOSAR Fundamentals and Applications — Hossam Soffar 著 | AI 辅助翻译</p>
+<div class="page-marker">第 103 页</div>
+<h2>信息流说明</h2>
+<p>让我们考虑一个简单的嵌入式示例。设想 ECU 中有一个非常简单的温度监控组件（Temperature Monitoring Component（温度监控组件））。该系统从传感器读取温度，处理数据，然后通过向信息娱乐 ECU 发送 CAN 消息将温度显示在车辆仪表盘上。</p>
+<p>为了将连续变化的模拟信号转换为软件可以理解的格式，嵌入式设备会使用模数转换器（ADC，Analog-to-Digital Converter）。ADC 周期性地将信号转换为数字值，并将其提供给用户，例如另一个软件模块。</p>
+<p>图 5.1 从抽象视图简要展示了这样一个系统的外观：</p>
+<div class="figure"><img src="images/p103_0.png" alt="图5.1"><p>图 5.1 – 温度传感器示例</p></div>
+<p>抽象化后的 ECU 软件可能利用 ADC 外设来获取信号值（温度）。这个过程很可能由 ADC 读取软件模块处理。ADC 值需要进行滤波处理，滤波后的值将转发给温度转换软件模块（Temperature Conversion SW Module（温度转换软件模块））。这个特定的软件模块负责将滤波后的 ADC 值转换为物理温度值，最终呈现在显示模块上。</p>
+<div class="page-marker">第 104 页</div>
+<p>让我们熟悉各个软件模块及其角色：</p>
+<ul><li><strong>ADC 读取模块（ADC Reading Module（ADC读取模块））：</strong>读取 ADC 值，进行转换，并将其提供给温度转换 SWC。以下代码片段展示了在 AUTOSAR 环境之外如何实现这样的系统。它包含一个 <code>analog_to_digital</code> 函数，通过读取特定的 ADC 通道将模拟信号转换为数字信号。<code>adc_task_10ms</code> 任务从温度传感器获取模拟值，将其转换为数字值，并通过 <code>TCM_ProcessTemperature</code> 发送给温度处理模块：</li></ul>
+<pre><code>#define ADC_RESOLUTION 1024 // Assuming a 10-bit ADC
+#define TEMP_SEN_CHANNEL 2
+int analog_to_digital(int channel) {
+    // Convert analog value to digital
+    int digital_value = (int)(rREG_ADC[channel].rawval * ADC_RESOLUTION);
+    return digital_value;
+}
+void adc_task_10ms() {
+    int digital_value=analog_to_digital(TEMP_SEN_CHANNEL);
+    TCM_ProcessTemperature(digital_value);
+}</code></pre>
+<ul><li><strong>温度转换模块（Temp Conversion Module（温度转换模块））：</strong>接收数字值，应用校准和转换，为显示做准备。当温度发生变化时，它向显示模块发送请求，在车辆仪表盘上显示更新后的值。代码定义了一个函数用于处理从 ADC 读取模块获得的温度值，在需要时应用校准，并将更新后的温度值发送给显示模块。此过程避免了温度未变化时的冗余更新：</li></ul>
+<pre><code>#define CALIBRATION_FACTOR 1.0
+#define TEMPERATURE_CONVERSION_FACTOR 0.01
+float current_temperature=0;
+std_return TCM_ProcessTemperature (int digital_value) {
+    float calibrated_value = digital_value * CALIBRATION_FACTOR;
+    float temperature = calibrated_value * TEMPERATURE_CONVERSION_FACTOR;
+    current_temperature = temperature;
+    return(E_OK);
+}</code></pre>
+<div class="page-marker">第 105 页</div>
+<pre><code>void processing_task_10ms() {
+    static float previous_temperature = -1;
+    Static T_TState current_state= RUNNING_STATE;
+    If .... some code
+    If ((current_temperature != previous_temperature) && someothercondition()) {
+        DIS_UpdateTemp(temperature , &current_state);
+        previous_temperature = temperature;
+    }
+}</code></pre>
+<ul><li><strong>显示软件模块（Display SW Module（显示软件模块））：</strong>在车辆仪表盘上显示温度值。以下代码展示了显示温度读数的功能。<code>display_task_50ms</code> 任务每 50 ms 运行一次，获取当前温度值，并在满足某些条件时将其作为 CAN 消息发送给显示单元：</li></ul>
+<pre><code>float updated_temperature=0;
+void DIS_UpdateTemp(float temperature, unsigned char* state) {
+    updated_temperature= temperature;
+    /*some code to use state*/
+}
+void display_temperature(float temperature) {
+    uint8_t *temp_ptr = (uint8_t*)&temperature;
+    Uint8 data[8] =0;
+    data[0] = temp_ptr[0]
+    ......
+    if (getsomestate() == TRUE) {
+        SendSignalOverCAN(0x7A1,&data);
+    }
+}
+void display_task_50ms() {
+    If(somecondition == TRUE) {
+        display_temperature(temperature);
+    }
+}</code></pre>
+<ul><li><strong>CANDrv：</strong>底层 CAN 驱动实现，用于向物理显示模块发送消息。</li>
+<li><strong>ADCDrv：</strong>底层 ADC 驱动实现，用于配置和读取 ADC 通道。</li></ul>
+<div class="page-marker">第 106 页</div>
+<p>图 5.2 展示了不同软件模块在汽车系统中如何交互以读取、处理和显示温度数据：</p>
+<div class="figure"><img src="images/p106_0.png" alt="图5.2"><p>图 5.2 – 温度传感器模块交互序列图</p></div>
+<p>信息流可以根据其性质进行分类。像模数转换器的输出这样的值流可能使用发送方-接收方（SR，Sender-Receiver（发送方-接收方））接口。对于行为请求及其响应，则使用客户端-服务器接口。这些是主要类型，我们将在以下章节中讨论它们。其他信息流方法，如模式切换和参数接口，不在本次讨论范围内。</p>
+<div class="note">请花时间仔细审阅上述示例。虽然它只是一个简单的说明，但对于我们接下来的 AUTOSAR 接口探索非常重要。这个示例将作为一个实用的参考点，帮助理解我们将要讨论的概念。确保现在清晰的理解将使后续章节更加易于理解和有意义。同一示例将再次用于按照 AUTOSAR 接口和方法论重新设计。</div>
+<h2>发送方-接收方通信</h2>
+<p>SR 接口管理 AUTOSAR 中 SWC 之间的数据交换。这些接口支持各种通信模式，包括 1-to-N 模型（一个发送方向多个接收方传输数据）和 N-to-N 模型（多个发送方向多个接收方传输数据）。有两种类型：</p>
+<ul><li><strong>发送方（Sender，P Port）：</strong>发出信息；接口通过提供端口引用</li>
+<li><strong>接收方（Receiver，R Port）：</strong>等待接收信息；接口通过需求端口引用</li></ul>
+<div class="page-marker">第 107 页</div>
+<p>例如，图 5.3 展示了一个 1-to-N 配置，负责计算车辆速度的 SWC（发送方）可以将此数据发送给多个其他 SWC（接收方）。这种数据交换可以是周期性的，也可以是事件驱动的：</p>
+<div class="figure"><img src="images/p107_0.png" alt="图5.3"><p>图 5.3 – SR 1-to-N 示例</p></div>
+<p>在 SR 接口的上下文中，数据元素（Data Element（数据元素））是信息交换的基本单元。你可以将数据元素想象为在 SWC 之间传输车辆速度、横摆率、加速度等信息的虚拟线路。虽然单个数据元素传输很常见，但 SR 接口足够灵活，可以容纳多个数据元素，允许更丰富、更全面的数据交换。</p>
+<div class="note"><strong>关于数据元素：</strong>为简单起见，你可以将 SR 接口中的数据元素视为一个全局变量，通过定义的接口可被多个 SWC 访问。一组数据元素可视为在组件间共享的结构化数据集。</div>
+<p>例如，考虑一个测量速度的车载系统。一旦捕获到速度数据，它可以被发送给多个组件：一个组件可能用它来在仪表盘上显示当前速度；另一个可能用它来调整车辆的自适应巡航控制（Adaptive Cruise Control（自适应巡航控制））；第三个可能记录数据用于诊断目的。SR 接口的这种多播特性确保所有这些组件同时接收速度数据，并能在近乎实时的情况下对其做出响应。</p>
+<div class="page-marker">第 108 页</div>
+<h3>AUTOSAR XML（ARXML）建模</h3>
+<div class="note">以下 ARXML 代码是作为示例提供的，旨在帮助你熟悉 ARXML 语法。它可能不完全准确，并且可能根据特定的 AUTOSAR Schema 而略有不同。</div>
+<p>此 ARXML 片段定义了一个特定的 SR 接口，名为 <code>If_SR_SenderReceiverTest</code>，用于处理 <code>VehicleSpeed</code> 数据元素的发送或接收，类型为 <code>uint32</code>：</p>
+<pre><code>&lt;SENDER-RECEIVER-INTERFACE UUID="2DABF647-F234-404A-9669-58A29FABF1BC"&gt;
+  &lt;SHORT-NAME&gt;If_SR_SenderReceiverTest&lt;/SHORT-NAME&gt;
+  &lt;IS-SERVICE&gt;false&lt;/IS-SERVICE&gt;
+  &lt;DATA-ELEMENTS&gt;
+    &lt;VARIABLE-DATA-PROTOTYPE UUID="D1368B17-1925-4F77-B4A8-520A992CED1D"&gt;
+      &lt;SHORT-NAME&gt;VehicleSpeed&lt;/SHORT-NAME&gt;
+      &lt;SW-DATA-DEF-PROPS&gt;
+        &lt;SW-DATA-DEF-PROPS-VARIANTS&gt;
+          &lt;SW-DATA-DEF-PROPS-CONDITIONAL&gt;
+            &lt;SW-CALIBRATION-ACCESS&gt;NOT-ACCESSIBLE&lt;/SW-CALIBRATION-ACCESS&gt;
+          &lt;/SW-DATA-DEF-PROPS-CONDITIONAL&gt;
+        &lt;/SW-DATA-DEF-PROPS-VARIANTS&gt;
+      &lt;/SW-DATA-DEF-PROPS&gt;
+      &lt;TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE"&gt;/AUTOSAR_Platform/ImplementationDataTypes/uint32&lt;/TYPE-TREF&gt;
+    &lt;/VARIABLE-DATA-PROTOTYPE&gt;
+  &lt;/DATA-ELEMENTS&gt;
+&lt;/SENDER-RECEIVER-INTERFACE&gt;</code></pre>
+<p>作为开发人员，通常不会直接编写 ARXML 代码，但了解其基本格式对调试实现很有帮助。以下是解释：</p>
+<ul><li><strong>&lt;SENDER-RECEIVER-INTERFACE&gt;：</strong>该标签标记 SR 接口定义的开始</li><li><strong>UUID：</strong>唯一标识符，帮助将此接口与项目中的其他接口区分开</li><li><strong>SHORT-NAME：</strong>接口的可读名称</li><li><strong>IS-SERVICE：</strong>指示接口是否提供服务（服务导向通信通常为 true）或仅促进数据交换（SR 为 false）</li><li><strong>&lt;DATA-ELEMENTS&gt;：</strong>定义可通过接口传输的数据</li><li><strong>&lt;VARIABLE-DATA-PROTOTYPE&gt;：</strong>定义接口内的特定变量，有自己的 UUID 和名称</li><li><strong>SW-CALIBRATION-ACCESS：</strong>设为 NOT-ACCESSIBLE，表示数据不能通过标定工具修改（适用于只读传感器数据）</li><li><strong>TYPE-TREF：</strong>指定变量的数据类型，此处引用 uint32 类型</li></ul>
+<div class="page-marker">第 109 页</div>
+<h3>提供端口作为发送方</h3>
+<p>此 ARXML 片段定义了一个名为 <code>Example_SenderPort</code> 的端口原型，使用非队列发送方通信规范通过 SR 接口传输 <code>VehicleSpeed</code> 数据元素：</p>
+<pre><code>&lt;P-PORT-PROTOTYPE&gt;
+  &lt;SHORT-NAME&gt;Example_SenderPort&lt;/SHORT-NAME&gt;
+  &lt;PROVIDED-COM-SPECS&gt;
+    &lt;NONQUEUED-SENDER-COM-SPEC&gt;
+      &lt;DATA-ELEMENT-REF DEST="VARIABLE-DATA-PROTOTYPE"&gt;/PortInterfaces/If_SR_SenderReceiverTest/VehicleSpeed&lt;/DATA-ELEMENT-REF&gt;
+    &lt;/NONQUEUED-SENDER-COM-SPEC&gt;
+  &lt;/PROVIDED-COM-SPECS&gt;
+  &lt;PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE"&gt;/PortInterfaces/If_SR_SenderReceiverTest/&lt;/PROVIDED-INTERFACE-TREF&gt;
+&lt;/P-PORT-PROTOTYPE&gt;</code></pre>
+<div class="page-marker">第 110 页</div>
+<p>需求端口的 ARXML 语法示例与提供端口非常相似。不过，它将使用 <code>&lt;R-PORT-PROTOTYPE&gt;</code> 替代 <code>&lt;P-PORT-PROTOTYPE&gt;</code>，通信规范也将替换为 <code>&lt;NONQUEUED-RECEIVER-COM-SPEC&gt;</code>。在探索 ARXML Schema 时，你还会遇到队列通信规范如 <code>&lt;QUEUED-RECEIVER-COM-SPEC&gt;</code>，可以处理缓冲通信。</p>
+<div class="note">XML Schema 定义了 XML 文档的结构、内容和约束。在 AUTOSAR 中，ARXML Schema 遵循 XML Schema 的一般原则，但包括了建模汽车软件组件和接口的特定规则和结构。</div>
+<h2>通信类型</h2>
+<p>SR 接口可以以两种不同的方式使用：隐式（Implicit）和显式（Explicit）通信机制。</p>
+<h3>隐式 SR 通信</h3>
+<ul><li><strong>IMPLICIT_SEND（隐式发送）：</strong>当运行实体使用 IMPLICIT_SEND 发布数据元素时，一旦运行实体结束，RTE 确保数据元素的最新值对接收方可用</li>
+<li><strong>IMPLICIT_RECEIVE（隐式接收）：</strong>运行实体直接访问在其执行开始时已存在的数据元素值。传输的值存储在缓冲区中，因此在运行实体的生命周期内保持不变。图 5.4 的序列图说明了隐式 SR 接口的行为，其中 SWC B 发布数据，SWC A 接收数据：</li></ul>
+<div class="note">运行实体 B 的优先级高于运行实体 A。因此运行实体 B 可以中断运行实体 A 并修改/读取数据。我们将在第 6 章探索 AUTOSAR 操作系统时介绍优先级和任务的概念。</div>
+<div class="figure"><img src="images/p111_0.png" alt="图5.4"><p>图 5.4 – 隐式写入序列图</p></div>
+<div class="page-marker">第 111 页</div>
+<p>RTE API 的生成语法：</p>
+<pre><code>Rte_IRead : DataElementType Rte_IRead_&lt;RunnableName&gt;_&lt;PortName&gt;_&lt;DataItemName&gt;()
+Rte_IWrite : Rte_IWrite_&lt;RunnableName&gt;_&lt;PortName&gt;_&lt;DataItem&gt;(DataElemementType Data)</code></pre>
+<p>其中 <code>DataElementType</code> 是数据类型，<code>Rte_IRead</code> 表示 RTE 读取函数，<code>&lt;RunnableName&gt;</code> 是执行读操作的运行实体名称，<code>&lt;PortName&gt;</code> 是读取数据的端口名称，<code>&lt;DataItemName&gt;</code> 是访问的特定数据项。例如，<code>float Rte_IRead_ReadSensorData_SensorPort_Temperature()</code>。</p>
+<p><strong>隐式读取用例：</strong>考虑一个在整个执行过程中需要一致温度数据的控制算法。当算法（运行实体）启动时，它读取初始温度值，该值被缓冲，控制算法在整个运行期间使用此稳定数据。</p>
+<div class="page-marker">第 112 页</div>
+<h3>显式 SR 通信</h3>
+<ul><li><strong>EXPLICIT SEND（显式发送）：</strong>数据更新后立即对所用用户发布，确保最新可用数据始终就绪</li><li><strong>EXPLICIT RECEIVE（显式接收）：</strong>显式调用转发到 RTE 以获取最新可用数据。传输值不被缓冲；运行实体读取数据元素时立即获取最新值</li></ul>
+<p>显式的发送方/接收方通信可以是有队列或无队列的，但两种方法都导致最新数据被立即发布和读取。可以将显式通信视为 RTE 中的一个全局缓冲区，发送方和接收方在执行读写操作时都可以访问它。</p>
+<p>在显式通信的上下文中，图 5.5 展示两个 SWC 之间的关系。SWC B 利用 RTE 将数据元素写入共享缓冲区。同时，SWC A 具有一个持续从该缓冲区读取的运行实体。序列图生动地说明数据由 SWC B 写入的内容正是 SWC A 运行实体所读取的内容：</p>
+<div class="figure"><img src="images/p112_0.png" alt="图5.5"><p>图 5.5 – 显式无队列读写示例</p></div>
+<div class="page-marker">第 113 页</div>
+<p>图 5.6 展示了涉及队列的类似示例。RTE 中的数据缓冲区大小为 3。注意从缓冲区读取和写入之间的关系，观察队列的行为：</p>
+<div class="figure"><img src="images/p113_0.png" alt="图5.6"><p>图 5.6 – 显式队列发送和接收示例</p></div>
+<p>显式 RTE API 语法：</p>
+<pre><code>Rte_Read : DataElementType Rte_Read_&lt;Runnable&gt;_&lt;Port&gt;_&lt;DataItem&gt;()
+Rte_Write : Rte_Write_&lt;Runnable&gt;_&lt;Port&gt;_&lt;DataItem&gt;(DataElemementType Data)</code></pre>
+<div class="note">显式无队列变体使用 <code>Rte_Write</code> 和 <code>Rte_Read</code>。队列变体分别使用 <code>Rte_Send</code> 和 <code>Rte_Receive</code>。</div>
+<p><strong>显式读取用例：</strong>考虑一个监控电池电压的系统。监控系统需要按特定间隔检查电池电压以确保其在安全范围内。当监控系统（运行实体）发起电压检查时，它通过 RTE API 调用显式请求最新电池电压，从而在需要时获得最新数据。</p>
+<div class="page-marker">第 114 页</div>
+<h2>客户端-服务器通信</h2>
+<p>通常缩写为 C/S 接口（Client-Server（客户端-服务器） Interface（客户端-服务器接口）），它促进 AUTOSAR 中 SWC 之间面向服务的通信。这些接口支持请求-响应通信模式，客户端向服务器发送服务请求，服务器处理请求并返回响应。例如，在客户端-服务器配置中，负责控制车辆灯光的 SWC（客户端）可以请求灯光状态或发送命令将其打开或关闭。服务器组件处理这些请求并提供必要的响应。这种交互可以是同步的（客户端等待服务器响应）或异步的（客户端继续处理并在稍后处理响应）。</p>
+<ul><li><strong>客户端（Client，R Port）：</strong>发起服务请求的组件，作为交互中的消费者</li><li><strong>服务器（Server，P Port）：</strong>响应客户端请求提供所需服务的组件，作为交互中的提供者</li></ul>
+<p>操作（Operation）是服务器提供的特定功能或服务。操作可以有参数（Argument），按方向分类：</p>
+<ul><li><strong>Set（in）：</strong>输入参数，为服务器提供必要数据</li><li><strong>Get（out）：</strong>输出参数，服务器处理后返回</li><li><strong>双向（in-out）：</strong>既能接收输入也能提供输出</li></ul>
+<div class="page-marker">第 115 页</div>
+<div class="figure"><img src="images/p115_0.png" alt="图5.7"><p>图 5.7 – 客户端-服务器接口</p></div>
+<h3>ARXML 建模</h3>
+<p>以下 ARXML 片段定义了一个特定的客户端-服务器接口，名为 <code>If_CS_ClientServerTest</code>，包含一个名为 <code>RunService</code> 的操作，接受 <code>Arg1</code>（uint8 类型输入参数）和 <code>Arg2</code>（uint8 类型输出参数）：</p>
+<pre><code>&lt;CLIENT-SERVER-INTERFACE&gt;
+  &lt;SHORT-NAME&gt;If_CS_ClientServerTest&lt;/SHORT-NAME&gt;
+  &lt;IS-SERVICE&gt;false&lt;/IS-SERVICE&gt;
+  &lt;OPERATIONS&gt;
+    &lt;CLIENT-SERVER-OPERATION&gt;
+      &lt;SHORT-NAME&gt;RunService&lt;/SHORT-NAME&gt;
+      &lt;ARGUMENTS&gt;
+        &lt;ARGUMENT-DATA-PROTOTYPE&gt;
+          &lt;SHORT-NAME&gt;Arg1&lt;/SHORT-NAME&gt;
+          &lt;TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE"&gt;/AUTOSAR_Platform/ImplementationDataTypes/uint8&lt;/TYPE-TREF&gt;
+          &lt;DIRECTION&gt;IN&lt;/DIRECTION&gt;
+        &lt;/ARGUMENT-DATA-PROTOTYPE&gt;
+        &lt;ARGUMENT-DATA-PROTOTYPE&gt;
+          &lt;SHORT-NAME&gt;Arg2&lt;/SHORT-NAME&gt;
+          &lt;TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE"&gt;/AUTOSAR_Platform/ImplementationDataTypes/uint8&lt;/TYPE-TREF&gt;
+          &lt;DIRECTION&gt;OUT&lt;/DIRECTION&gt;
+        &lt;/ARGUMENT-DATA-PROTOTYPE&gt;
+      &lt;/ARGUMENTS&gt;
+    &lt;/CLIENT-SERVER-OPERATION&gt;
+  &lt;/OPERATIONS&gt;
+&lt;/CLIENT-SERVER-INTERFACE&gt;</code></pre>
+<div class="page-marker">第 116 页</div>
+<p>服务提供者（服务器）的 ARXML 示例——定义了一个名为 <code>P_If_CS_ClientServerTest</code> 的提供端口原型，包含服务器通信规范及操作引用和队列长度：</p>
+<pre><code>&lt;P-PORT-PROTOTYPE&gt;
+  &lt;SHORT-NAME&gt;P_If_CS_ClientServerTest&lt;/SHORT-NAME&gt;
+  &lt;PROVIDED-COM-SPECS&gt;
+    &lt;SERVER-COM-SPEC&gt;
+      &lt;OPERATION-REF DEST="CLIENT-SERVER-OPERATION"&gt;/SWCA/PortInterfaces/If_CS_ClientServerTest/RunService&lt;/OPERATION-REF&gt;
+      &lt;QUEUE-LENGTH&gt;1&lt;/QUEUE-LENGTH&gt;
+    &lt;/SERVER-COM-SPEC&gt;
+  &lt;/PROVIDED-COM-SPECS&gt;
+  &lt;PROVIDED-INTERFACE-TREF DEST="CLIENT-SERVER-INTERFACE"&gt;/SWCA/PortInterfaces/If_CS_ClientServerTest&lt;/PROVIDED-INTERFACE-TREF&gt;
+&lt;/P-PORT-PROTOTYPE&gt;</code></pre>
+<h3>通信类型</h3>
+<p><strong>同步客户端-服务器通信：</strong>客户端发送请求后等待服务器响应再继续。客户端在此期间被阻塞，无法执行其他任务。每个请求后立即获得响应，然后才能继续下一操作。适用于客户端需要立即获得结果的场景。</p>
+<div class="figure"><img src="images/p117_0.png" alt="图5.8"><p>图 5.8 – 同步客户端-服务器调用</p></div>
+<div class="page-marker">第 117 页</div>
+<p><strong>异步客户端-服务器通信：</strong>客户端发送请求后不等待立即响应，继续自身操作。服务器独立处理请求并在就绪后发回响应。非阻塞特性允许客户端执行其他任务，通过回调、事件或中断机制处理响应。适用于客户端不需要立即结果或服务器处理时间不可预测的场景。</p>
+<div class="figure"><img src="images/p118_0.png" alt="图5.9"><p>图 5.9 – 异步客户端-服务器调用</p></div>
+<div class="page-marker">第 118 页</div>
+<h2>重新思考温度传感器设计</h2>
+<p>现在让我们重温本章开始时在"信息流说明"中讨论的示例。用接口和端口重新设计温度监控系统：</p>
+<div class="figure"><img src="images/p119_0.png" alt="图5.10"><p>图 5.10 – 温度监控软件组合</p></div>
+<div class="page-marker">第 119 页</div>
+<table>
+<tr><th>SWC</th><th>端口/接口</th><th>类型</th><th>描述</th></tr>
+<tr><td>SWC1 - ADC Reader</td><td>PP_Temp</td><td>提供端口</td><td>向其他 SWC 提供数字温度值</td></tr>
+<tr><td>SWC1</td><td>接口</td><td>发送方（Sender）</td><td>向连接的需求端口发送数字温度值</td></tr>
+<tr><td>SWC2 - Temperature Conversion</td><td>RP_Temp</td><td>需求端口</td><td>从连接的提供端口接收数字温度值</td></tr>
+<tr><td>SWC2</td><td>接口</td><td>接收方（Receiver SR）</td><td>从连接的提供端口接收数字温度值</td></tr>
+<tr><td>SWC2</td><td>RP_Display</td><td>需求端口</td><td>使用服务来显示温度</td></tr>
+<tr><td>SWC2</td><td>接口</td><td>客户端-服务器（Client-Server）</td><td>接受显示模块客户端端口的显示请求</td></tr>
+<tr><td>SWC3 - Display SWC</td><td>PP_Display</td><td>服务器端口</td><td>提供服务以接受显示请求并显示温度数据</td></tr>
+<tr><td>SWC3</td><td>接口</td><td>客户端-服务器（Client-Server）</td><td>接收来自 SWC2 的显示请求并显示温度数据</td></tr>
+</table>
+<p style="text-align:center;font-size:13px;color:#888;">表 5.1 – 使用 AUTOSAR 接口和端口的温度监控示例</p>
+<div class="page-marker">第 120 页</div>
+<p>基于建议设计的通信流程：</p>
+<ol><li>SWC1 读取温度值并通过 SR 接口发送给 SWC2</li>
+<li>SWC2 处理温度值后通过客户端-服务器接口请求 SWC3 显示</li>
+<li>SWC3 接收请求并使用 SR 接口通过 COM 模块发送 CAN 消息在仪表盘上显示温度</li></ol>
+<p><strong>如何选择：</strong>选择 Provide 还是 Require 端口——取决于 SWC 是提供（Provide）还是消费/请求（Require）数据或服务。选择 SR 还是客户端-服务器接口——SR 适合持续数据更新而不需要响应的情况；客户端-服务器适合需要执行动作并期待结果/确认的情况。</p>
+<div class="note">此示例选择性地聚焦于 ADC 读取模块、温度转换模块和显示模块，特别说明如何使用接口提供 ADC 和温度值以及显示值。ADC 读取模块如何从驱动读取数据的详细设计超出了本次讨论的范围。目的是让你了解何时使用 SR 接口（如持续数据传输）和客户端-服务器接口（用于直接服务请求和响应）。</div>
+<div class="page-marker">第 121 页</div>
+<h2>理解 AUTOSAR 中的事件</h2>
+<p>事件（Event）可以看作系统中可识别的发生或状态变化，可能需要相应的动作或反应。AUTOSAR 中的事件是触发系统内特定动作或反应的特定发生或条件。它们充当信号，通知 SWC 某个特定条件已满足，并促使其执行特定的功能。</p>
+<p>事件不仅促进 SWC 之间的同步和通信，而且显著影响系统的整体性能和功能。本节将探讨端口、接口和事件之间的相互依赖关系，突出它们对 AUTOSAR 生态系统的综合影响。事件可以由各种源生成，如外部输入、定时器甚至其他 SWC，通常由专用的事件处理器或中断服务例程处理。</p>
+<div class="figure"><img src="images/p122_0.png" alt="图5.11"><p>图 5.11 – RTE 事件生成与处理</p></div>
+<p>图 5.11 展示了 RTE 事件从各种源（OS 闹钟、信号变化或其他触发器）生成的序列，以及 RTE 如何处理和触发事件，最终 SWC 执行相应运行实体的过程。</p>
+<div class="page-marker">第 122 页</div>
+<h3>端口、接口和事件如何交互？</h3>
+<p>端口和接口定义了信息流的通道。然而，仅仅有这些通道还不够——我们需要一种机制基于接收到的信息或系统状态变化来触发动作。这就是事件发挥作用的地方。事件是与端口和接口关联的触发器，用于管理数据流或服务调用。</p>
+<p>例如，当传感器检测到特定条件（如车门打开）时，可以生成一个事件。事件随后触发一系列动作，如打开车内灯。因此，事件是动作的触发器，在 AUTOSAR 中通常是运行实体。</p>
+<p>考虑 ECU 中的一个抽象场景：温度传感器的 SWC（SWC 1）检测到温度急剧上升。传感器 SWC 通过其发送方端口使用 SR 接口周期性地发送温度数据。负责监控此数据的 SWC 2 中的主函数执行由定时事件触发的周期性检查。在一次周期性检查中，它检测到温度上升，立即使用客户端-服务器接口请求 SWC 3 进行紧急响应。此请求触发 SWC 3 中的事件，随即激活冷却系统。这个简化的示例说明了端口、接口和事件如何在 ECU 中协同工作以管理 SWC 之间的关键交互。</p>
+<div class="page-marker">第 123 页</div>
+<h3>RTE 事件类型</h3>
+<table>
+<tr><th>缩写</th><th>事件</th><th>描述</th></tr>
+<tr><td>T</td><td>TimingEvent（定时事件）</td><td>基于定时器周期的事件</td></tr>
+<tr><td>BG</td><td>BackgroundEvent（后台事件）</td><td>低优先级、无固定周期的后台活动</td></tr>
+<tr><td>DR</td><td>DataReceivedEvent（数据接收事件）</td><td>接收并处理 SR 接口上接收到的信号</td></tr>
+<tr><td>DRE</td><td>DataReceiveErrorEvent（数据接收错误事件）</td><td>收集接收错误状态（仅 SR 通信）</td></tr>
+<tr><td>DSC</td><td>DataSendCompletedEvent（数据发送完成事件）</td><td>接收并处理发送确认通知（仅显式 SR）</td></tr>
+<tr><td>DWC</td><td>DataWriteCompletedEvent（数据写入完成事件）</td><td>接收并处理传输确认（仅隐式 SR）</td></tr>
+<tr><td>OI</td><td>OperationInvokedEvent（操作调用事件）</td><td>客户端调用时触发服务器端运行实体</td></tr>
+<tr><td>ASCR</td><td>AsynchronousServerCallReturnsEvent</td><td>收集异步 C/S 操作的结果和状态</td></tr>
+<tr><td>MS</td><td>SwcModeSwitchEvent（模式切换事件）</td><td>接收到模式变更时触发</td></tr>
+<tr><td>ETO</td><td>ExternalTriggerOccurredEvent</td><td>外部事件发生时触发</td></tr>
+<tr><td>I</td><td>InitEvent（初始化事件）</td><td>RTE 启动或分区重启时的初始化</td></tr>
+</table>
+<p style="text-align:center;font-size:13px;color:#888;">表 5.2 – RTE 事件</p>
+<div class="page-marker">第 124 页</div>
+<p>我们将重点讨论三种最广泛使用的事件：</p>
+<h3>TimingEvent（定时事件）</h3>
+<p>定时事件是系统一致性和可预测性的标杆，像节拍器一样确保特定功能按固定间隔执行。例如，发动机 ECU 需要每 10 毫秒监控一次发动机温度——创建一个 TimingEvent 以精确按这些间隔触发温度监控功能，确保发动机在安全温度范围内运行：</p>
+<div class="figure"><img src="images/p125_0.png" alt="图5.12"><p>图 5.12 – AUTOSAR 中的 TimingEvent</p></div>
+<h3>OperationInvokedEvent（操作调用事件）</h3>
+<p>确保客户端请求的操作由服务器提供者响应或启动。与按固定时间表运行的事件不同，这些事件关乎即时性——当特定操作被调用时立即启动。图 5.13 展示了 Sensor SWC 通过 RTE 请求温度计算，RTE 调度并触发 Controller SWC 中的 <code>R_CalculateTemp</code> 运行实体，然后将计算结果返回的过程：</p>
+<div class="figure"><img src="images/p125_1.png" alt="图5.13"><p>图 5.13 – OperationInvokedEvent 序列图</p></div>
+<div class="page-marker">第 125 页</div>
+<h3>DataReceivedEvent（数据接收事件）</h3>
+<p>持续监控特定数据或信号，一旦检测到就立即启动动作，确保系统保持警惕并准备响应关键信息。设想碰撞传感器向安全气囊 ECU 发送信号表示需要立即展开——DataReceivedEvent 在接收到信号时立即触发，指示安全气囊无延迟展开：</p>
+<div class="figure"><img src="images/p126_0.png" alt="图5.14"><p>图 5.14 – DataReceivedEvent 序列图</p></div>
+<div class="page-marker">第 126 页</div>
+<h3>温度监控示例的事件分配</h3>
+<table>
+<tr><th>SWC</th><th>事件类型</th><th>事件名称</th><th>描述</th></tr>
+<tr><td>SWC1 - ADC Reader</td><td>TimingEvent</td><td>TI_ReadADCValue</td><td>每 10ms 触发 ADC 读取</td></tr>
+<tr><td>SWC2 - Temperature Conversion</td><td>DataReceiveEvent</td><td>DRE_ReceiveDigitalValue</td><td>SWC1 发送温度值时触发</td></tr>
+<tr><td>SWC2</td><td>TimingEvent</td><td>TI_ProcessTask10ms</td><td>每 10ms 触发温度计算</td></tr>
+<tr><td>SWC3 - Display Module</td><td>OperationInvokedEvent</td><td>OIE_ProcessTemperature</td><td>SWC2 请求更新时触发</td></tr>
+<tr><td>SWC3</td><td>TimingEvent</td><td>TI_DisplayTask50ms</td><td>每 50ms 触发 CAN 消息发送</td></tr>
+</table>
+<p style="text-align:center;font-size:13px;color:#888;">表 5.3 – 温度监控系统中的事件类型与功能</p>
+<div class="note">这只是一个示例，具体使用的事件、端口和操作可能因设计选择而异。</div>
+<div class="page-marker">第 127 页</div>
+<div class="summary"><h3>本章小结</h3>
+<p>本章揭示了 AUTOSAR 框架中事件和接口的复杂性。我们从信息流的说明开始，以温度监控系统为例展示了 SR 和客户端-服务器接口的实际应用。我们深入探讨了 ARXML 建模、隐式与显式通信机制、以及同步与异步客户端-服务器通信范式。最后，我们聚焦于三种关键事件——TimingEvent（定时驱动）、OperationInvokedEvent（操作调用驱动）和 DataReceivedEvent（数据接收驱动）——它们与端口和接口集成，像引擎一样协调 AUTOSAR 架构的平滑运行。</p>
+<p>现在你应该能够为汽车 SWC 架构和建立健壮的通信通道。基于本章建立的基础，下一章将深入 AUTOSAR 操作系统的内部机制，探讨它如何管理任务、优先执行并与硬件交互以确保实时性能。</p></div>
+<div class="questions"><h3>思考题</h3><ol>
+<li>事件和接口在 AUTOSAR 框架中的主要作用是什么？</li>
+<li>SR 和客户端-服务器接口在通信模型上有何不同？</li>
+<li>同步和异步通信类型在 AUTOSAR 中的意义是什么？</li>
+<li>AUTOSAR 提供了哪些不同的事件？</li></ol></div>
+<div class="page-marker">第 130 页</div>
+<h2>第6章 AUTOSAR 操作系统入门</h2>
+<p>基于对 AUTOSAR 及其多层架构的理解，我们现在准备更详细地检视 AUTOSAR 操作系统（OS，Operating System）在这一创新框架中的关键作用，以及它如何贡献于汽车软件开发的整体过程——从初始系统设计到性能调优和故障管理。</p>
+<p>通过探索 AUTOSAR OS 的角色并理解其在汽车软件开发中的意义，读者将具备坚实的基础来设计、开发和优化 AUTOSAR 框架内的软件系统。本章将重点通过以下主题揭示 AUTOSAR OS 的复杂性和功能：</p>
+<ul><li>AUTOSAR OS 简要概述</li><li>探索 AUTOSAR OS 架构</li></ul>
+  </div>
+</div>
+
+<script src="scripts.js"></script>
+</body>
+</html>
