@@ -106,9 +106,6 @@ AUTOSAR Blockset 已通过认证可用于 ISO 26262 标准。可选地，使用 
 
 Simulink 软件支持 AUTOSAR（汽车开放系统架构），这是一种开放且标准化的汽车软件架构，由三个软件层次组成：应用层（Application）、运行时环境（Run-Time Environment, RTE）和基础软件（Basic Software）。
 
-![图 1.3 AUTOSAR 分层软件架构](images/ch01/p043-000.png)
-*图 1.3 – AUTOSAR 分层软件架构（应用层、RTE、基础软件）*
-
 ```
                     Application（应用层）
 
@@ -613,6 +610,9 @@ AUTOSAR Adaptive 模型还生成一个可执行文件，可部署到基于 POSIX
 ---
 
 ## 1.7 AUTOSAR 软件组件与组合
+
+![油门位置控制组合](images/ch01/p043-000.png)
+*图 1.7 – 油门位置控制组合*
 
 AUTOSAR 软件组件是 AUTOSAR 软件的可复用构建块。AUTOSAR 软件组件封装一个或多个算法，并通过定义良好的端口与其环境通信。例如，一个油门（throttle）应用可能包含代表油门传感器和加速踏板传感器、油门位置监测器、控制器和执行器的 AUTOSAR 软件组件。
 
