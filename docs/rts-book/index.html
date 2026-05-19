@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实时系统设计原则 — 中文版</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body.index-page {
+    background: linear-gradient(160deg, #e8ede5 0%, #d4dcd0 40%, #e0e5dd 100%);
+  }
+  .book-cover {
+    background: linear-gradient(135deg, #1a2e1a 0%, #162816 50%, #1d3a1d 100%);
+  }
+  .cover-badge {
+    color: #6dad6d;
+    border-color: rgba(109,173,109,0.4);
+  }
+  .cover-divider {
+    background: #6dad6d;
+  }
+  .cover-stat-num {
+    color: #6dad6d;
+  }
+  .toc-item a:hover {
+    color: #2d5a2d;
+  }
+  .toc-item a:hover .toc-arrow {
+    color: #2d5a2d;
+  }
+  .toc-item a:hover .toc-chapter {
+    color: #2d5a2d;
+  }
+  .cover-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+  .cover-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .cover-stat {
+    text-align: center;
+  }
+  .cover-stat-num {
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .cover-stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+  }
+  .toc-item a .toc-arrow {
+    color: #ccc;
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .toc-item a:hover .toc-arrow {
+    transform: translateX(4px);
+  }
+  .back-link {
+    text-align: center;
+    padding: 8px 40px 30px;
+  }
+  .back-link a {
+    color: #999;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  .back-link a:hover {
+    color: #555;
+  }
+</style>
+</head>
+<body class="index-page">
+
+<div class="index-container">
+
+  <div class="book-cover">
+    <div class="cover-badge">REAL-TIME SYSTEMS</div>
+    <div class="cover-title">实时系统设计原则</div>
+    <div class="cover-subtitle">Real-Time Systems Design Principles — 中文版</div>
+    <div class="cover-divider"></div>
+
+    <div class="cover-authors">
+      <p>Hermann Kopetz · Wilfried Steiner</p>
+    </div>
+    <div class="cover-translator">
+      <p>第三版 · 2022 · AI 辅助翻译 · 2026年5月</p>
+    </div>
+
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-num">14</div>
+        <div class="cover-stat-label">章 节</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">186</div>
+        <div class="cover-stat-label">插 图</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">500+</div>
+        <div class="cover-stat-label">页</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-heading">📖 目 录</div>
+    <div class="toc-list">
+      <div class="toc-item"><a href="ch01.html">
+        <span class="toc-chapter">第 1 章</span>
+        <span class="toc-title">实时系统环境</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch02.html">
+        <span class="toc-chapter">第 2 章</span>
+        <span class="toc-title">简洁性</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch03.html">
+        <span class="toc-chapter">第 3 章</span>
+        <span class="toc-title">全局时间</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch04.html">
+        <span class="toc-chapter">第 4 章</span>
+        <span class="toc-title">实时（RT）模型</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch05.html">
+        <span class="toc-chapter">第 5 章</span>
+        <span class="toc-title">时间关系</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch06.html">
+        <span class="toc-chapter">第 6 章</span>
+        <span class="toc-title">可靠性</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch07.html">
+        <span class="toc-chapter">第 7 章</span>
+        <span class="toc-title">实时通信</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch08.html">
+        <span class="toc-chapter">第 8 章</span>
+        <span class="toc-title">功耗与能效意识</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch09.html">
+        <span class="toc-chapter">第 9 章</span>
+        <span class="toc-title">实时操作系统</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch10.html">
+        <span class="toc-chapter">第 10 章</span>
+        <span class="toc-title">实时调度</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch11.html">
+        <span class="toc-chapter">第 11 章</span>
+        <span class="toc-title">系统设计</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch12.html">
+        <span class="toc-chapter">第 12 章</span>
+        <span class="toc-title">验证</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch13.html">
+        <span class="toc-chapter">第 13 章</span>
+        <span class="toc-title">物联网</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch14.html">
+        <span class="toc-chapter">第 14 章</span>
+        <span class="toc-title">云计算与雾计算</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="../index.html">← 返回技术文档总览</a>
+  </div>
+
+  <div class="index-footer">Generated by OpenClaw</div>
+
+</div>
+
+</body>
+</html>
