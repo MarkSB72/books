@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第7章 指令 (Dir 1.1–4.14) — MISRA C:2012 中文版</title>
+<link rel="stylesheet" href="../autosar-book/styles.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="book-title">MISRA C:2012<br>中文版</a>
+  </div>
+  <nav class="nav-list">
+    <ul>
+        <li><a href="ch01.html" class="nav-chapter">封面与前言</a></li>
+        <li><a href="ch02.html" class="nav-chapter">第1-4章 背景与预备</a></li>
+        <li><a href="ch03.html" class="nav-chapter">第5章 采用MISRA C</a></li>
+        <li><a href="ch04.html" class="nav-chapter">第6章 指南引言</a></li>
+        <li><a href="ch05.html" class="nav-chapter active">第7章 指令</a></li>
+        <li><a href="ch06.html" class="nav-chapter">第8章 规则 ①</a></li>
+        <li><a href="ch07.html" class="nav-chapter">第8章 规则 ②</a></li>
+        <li><a href="ch08.html" class="nav-chapter">参考与附录</a></li>
+    </ul>
+  </nav>
+</div>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="切换导航">☰</button>
+
+<div class="main-content">
+  <div class="chapter-page">
+    <div class="container">
+
+<h3>7.1  实现</h3>
+<h4>Dir 1.1  程序输出所依赖的任何实现定义行为应被记录和理解</h4>
+<p>C90 [Annex G.3], C99 [Annex J.3]</p>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本文档的附录G列出了（针对C90和C99）那些：</p>
+<p>• 被认为有可能导致意外程序操作的实现定义行为，以及</p>
+<p>• 即使程序符合所有其他MISRA C指南也可能存在的实现定义行为。</p>
+<p>程序输出依赖的所有这些实现定义行为必须：</p>
+<p>• 被记录，并且</p>
+<p>• 被开发人员理解。</p>
+<p>注意：符合标准的实现需要记录其对所有实现定义行为的处理。如果缺少任何文档，应咨询实现开发人员。</p>
+<p>理由（Rationale）</p>
+<p>重要的是知道程序的输出是有意的，而不是偶然产生的。</p>
+<p>以下描述了一些安全相关嵌入式软件可能依赖的较常见的实现定义行为。</p>
+<p>核心行为</p>
+<p>大多数程序可能需要的基本实现定义行为包括：</p>
+<p>• 如何识别翻译过程中产生的诊断消息；</p>
+<p>• 函数main的类型，通常在独立实现中声明为void main (void)；</p>
+<p>• 标识符中有效字符的数量——配置分析工具以检查Rule 5.2时需要；</p>
+<p>• 源字符集和执行字符集；</p>
+<p>• 整数类型的大小；</p>
+<p>• #include名称如何映射到文件名并在宿主文件系统中定位。</p>
+<p>扩展</p>
+<p>扩展通常用于嵌入式系统，以提供对外设的访问，并将对象放置到具有特殊属性（如Flash EEPROM或快速访问RAM）的内存区域中。符合标准的实现允许提供扩展，前提是它们不改变任何严格符合程序的含义。</p>
+<p>某些C90实现可能提供实现C99特性子集的扩展。</p>
+<p>实现可以提供扩展的一些方法有：</p>
+<p>• #pragma预处理指令或_Pragma运算符（仅C99）；</p>
+<p>• 新关键字。</p>
+<p>标准库</p>
+<p>标准库实现中可能重要的一些方面包括：</p>
+<p>• 使用某些标准库函数时分配给errno的值；</p>
+<p>• clock和time函数的实现；</p>
+<p>• 文件系统的特性。</p>
+<p>应用程序二进制接口（ABI）</p>
+<p>有时需要将C代码与汇编语言接口，例如在那些执行速度至关重要的地方提高执行速度。也可能需要将不同编译器（可能针对不同语言）生成的代码接口。</p>
+<p>编译器的应用程序二进制接口（ABI）提供执行此任务所需的信息，包括一些实现定义的行为。它通常规定：</p>
+<p>• 函数参数如何在寄存器和栈中传递；</p>
+<p>• 函数值如何返回；</p>
+<p>• 哪些寄存器必须由函数保持；</p>
+<p>• 具有自动存储期的对象如何分配到栈帧；</p>
+<p>• 每种数据类型的对齐要求；</p>
+<p>• 结构如何布局以及位域如何分配到存储单元。</p>
+<p>某些处理器具有所有实现都使用的标准ABI。在没有标准ABI的地方，实现将提供自己的ABI。</p>
+<p>整数除法</p>
+<p>在C90中，有符号整数除法或取余运算（其中任一操作数为负值）可以向下舍入或向零舍入。在C99中，舍入保证向零舍入。</p>
+<p>浮点实现</p>
+<p>浮点类型的实现可能对程序行为产生重大影响，例如：</p>
+<p>• 值的范围及其存储精度；</p>
+<p>• 浮点运算后的舍入方向；</p>
+<p>• 转换为较窄浮点类型或整数类型时的舍入方向；</p>
+<p>• 在下溢、上溢和NaN存在时的行为；</p>
+<p>• 库函数在域错误和范围错误事件中的行为。</p>
+<p>另见</p>
+<h4>Rule 5.1, Rule 5.2</h4>
+<p>---</p>
+<h3>7.2  编译和构建</h3>
+<h4>Dir 2.1  所有源文件应无编译错误地编译</h4>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>符合标准的编译器允许在存在编译错误的情况下生成目标模块。然而，执行生成的程序可能产生意外行为。</p>
+<p>关于控制和分析编译器消息的进一步指导，见第5.3.1节。</p>
+<p>另见</p>
+<h4>Rule 1.1</h4>
+<p>---</p>
+<h3>7.3  需求可追溯性</h3>
+<h4>Dir 3.1  所有代码应可追溯到文档化的需求</h4>
+<p>[DO-178C Section 6.4.4.3.d]</p>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>满足项目需求所不需要的功能会产生不必要的路径。软件开发人员可能不了解这些额外功能可能带来的更广泛影响。例如，开发人员可能添加代码，每当程序到达某个特定点时切换处理器输出引脚的状态。这在开发过程中对于测量时序或触发仿真器或逻辑分析仪可能非常有用。然而，即使该引脚在软件需求规格说明中未被提及从而可能看起来未被使用，它可能连接到目标控制器中的执行器，导致不期望的外部影响。</p>
+<p>将代码追溯到文档化需求的方法应由项目确定。实现可追溯性的一种方法是对照相应的设计文档审查代码，而这些设计文档又经过了对需求的审查。</p>
+<p>注意：本指南与提供保护性编码策略之间不应存在任何冲突，因为后者应是关键系统中需求的一部分。</p>
+<p>---</p>
+<h3>7.4  代码设计</h3>
+<h4>Dir 4.1  应最小化运行时故障</h4>
+<p>C90 [Undefined 15, 19, 26, 30, 31, 32, 94]</p>
+<p>C99 [Undefined 15, 16, 33, 40, 43–45, 48, 49, 113]</p>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>C语言被设计为提供非常有限的内置运行时检查。虽然这种方法允许生成紧凑且快速的执行代码，但它将运行时检查的负担放在了程序员身上。因此，为了达到所需的健壮性水平，程序员必须在任何可能发生运行时错误的地方仔细考虑添加动态检查。</p>
+<p>有时可以证明操作数的值排除了在表达式求值期间发生运行时错误的可能性。在这种情况下，如果支持省略检查的论证被记录在案，则不需要动态检查。任何此类文档应包括该论证所依赖的假设。此信息可在代码的后续修改中使用，以确保论证仍然有效。</p>
+<p>将用于最小化运行时故障的技术应被规划并记录，例如在设计标准、测试计划、静态分析配置文件和代码审查检查清单中。这些技术的性质可能取决于项目的完整性要求。更多细节见第5.2节。</p>
+<p>注意：运行时错误的存在表明违反了Rule 1.3。</p>
+<p>以下注释为需要考虑提供动态检查的领域提供了一些指导。</p>
+<p>• 算术错误：包括表达式求值中发生的错误，如溢出、下溢、除零或通过移位丢失有效位。在考虑整数溢出时，注意无符号整数计算严格来说不会溢出，而是回绕产生定义的但可能意外的值。应仔细考虑算术表达式中值的范围和运算顺序，例如：</p>
+<pre><code>
+float32_t f1 = 1E38f;
+float32_t f2 = 10.0f;
+float32_t f3 = 0.1f;
+float32_t f4 = ( f1 * f2 ) * f3;  /* (f1 * f2) 将溢出 */
+float32_t f5 = f1 * ( f2 * f3 );  /* 无溢出，因为 (f2 * f3) 约为1 */
+</code></pre>
+<pre><code>
+if ( ( f3 &gt;= 0.0f ) &amp;&amp; ( f3 &lt;= 1.0f ) )
+</code></pre>
+<p>{</p>
+<p>/* 无溢出，因为已知f3在0..1范围内，</p>
+<p>* 所以乘法结果适合float32_t类型 */</p>
+<p>f4 = f3 * 100.0f;</p>
+<p>}</p>
+<p>• 指针算术：确保动态计算的地址是合理的并指向有意义的地方。特别是应确保如果指针指向数组内部，则当指针被递增或以其他方式改变后，它仍然指向同一数组内部。参见指针算术的限制——Rule 18.1、Rule 18.2和Rule 18.3。</p>
+<p>• 数组越界错误：确保数组索引在用于索引数组之前位于数组大小的边界内——Rule 18.1。</p>
+<p>• 函数参数：在将参数传递给库函数之前，应检查参数的有效性——Dir 4.11。</p>
+<p>• 指针解引用：除非指针已知非NULL，否则在解引用该指针之前应进行运行时检查。一旦进行了检查，在单个函数内推理指针是否可能已改变以及是否需要另一次检查是相对直接的。跨函数边界推理则困难得多，特别是在调用其他源文件或库中定义的函数时。</p>
+<p>示例：</p>
+<p>/* 给定指向消息的指针，检查消息头并返回指向消息体的指针，</p>
+<p>* 如果消息无效则返回NULL。 */</p>
+<pre><code>
+const char *msg_body ( const char *msg )
+</code></pre>
+<p>{</p>
+<pre><code>
+  const char *body = NULL;
+  if ( msg != NULL )
+</code></pre>
+<p>{</p>
+<pre><code>
+    if ( msg_header_valid ( msg ) )
+    {
+      body = &amp;msg[ MSG_HEADER_SIZE ];
+    }
+</code></pre>
+<p>}</p>
+<pre><code>
+  return body;
+</code></pre>
+<p>}</p>
+<pre><code>
+char msg_buffer[ MAX_MSG_SIZE ];
+const char *payload;
+</code></pre>
+<p>payload = msg_body ( msg_buffer );</p>
+<p>/* 检查是否有有效载荷 */</p>
+<pre><code>
+if ( payload != NULL )
+</code></pre>
+<p>{</p>
+<p>/* 处理有效载荷 */</p>
+<p>}</p>
+<p>• 动态内存：如果执行动态内存分配，必须检查每次分配是否成功，并设计和测试适当的降级或恢复策略。</p>
+<p>另见</p>
+<h4>Dir 4.11, Dir 4.12, Rule 1.3, Rule 18.1, Rule 18.2, Rule 18.3</h4>
+<p>---</p>
+<h4>Dir 4.2  汇编语言的所有使用应被记录</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>使用汇编语言的理由以及C与汇编语言之间的接口机制应被记录。</p>
+<p>理由（Rationale）</p>
+<p>汇编语言代码是实现定义的，因此不可移植。</p>
+<p>---</p>
+<h4>Dir 4.3  汇编语言应被封装和隔离</h4>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>在使用汇编语言指令的地方，它们应被封装和隔离在：</p>
+<p>• 汇编语言函数中；</p>
+<p>• C函数中（C99首选内联函数）；</p>
+<p>• C宏中。</p>
+<p>理由（Rationale）</p>
+<p>出于效率原因，有时需要内联嵌入简单的汇编语言指令，例如启用和禁用中断。如果这是必要的，则建议通过使用宏来实现，或者对于C99，使用内联函数。</p>
+<p>封装汇编语言是有益的，因为：</p>
+<p>• 提高可读性；</p>
+<p>• 封装宏或函数的名称和文档使汇编语言的意图清晰；</p>
+<p>• 给定目的的所有汇编语言使用可以共享相同的封装，提高可维护性；</p>
+<p>• 汇编语言可以轻松替换为不同的目标平台或用于静态分析目的。</p>
+<p>注意：内联汇编语言的使用是对标准C的扩展，因此违反Rule 1.2。</p>
+<p>示例：</p>
+<pre><code>
+#define NOP asm(&quot;NOP&quot;)
+</code></pre>
+<p>---</p>
+<h4>Dir 4.4  代码段不应被&quot;注释掉&quot;</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>此规则适用于//和/* ... */两种注释风格。</p>
+<p>理由（Rationale）</p>
+<p>在需要源代码段不被编译的地方，应通过使用条件编译来实现（例如#if或#ifdef结构，配合注释）。使用开始和结束注释标记来实现此目的是危险的，因为C不支持嵌套注释，并且代码段中已存在的任何注释会改变效果。</p>
+<p>另见</p>
+<h4>Rule 3.1, Rule 3.2</h4>
+<p>---</p>
+<h4>Dir 4.5  同一命名空间中可见性重叠的标识符应在排版上明确无歧义</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>&quot;无歧义&quot;一词的定义应针对项目确定，并考虑源代码编写所使用的字母表和语言。</p>
+<p>对于英语中使用的拉丁字母，至少建议标识符不应因以下任何组合而产生差异：</p>
+<p>• 小写字符与其大写等价物的互换；</p>
+<p>• 下划线字符的存在或缺失；</p>
+<p>• 字母&quot;O&quot;与数字&quot;0&quot;的互换；</p>
+<p>• 字母&quot;I&quot;与数字&quot;1&quot;的互换；</p>
+<p>• 字母&quot;I&quot;与字母&quot;l&quot;（el）的互换；</p>
+<p>• 字母&quot;l&quot;（el）与数字&quot;1&quot;的互换；</p>
+<p>• 字母&quot;S&quot;与数字&quot;5&quot;的互换；</p>
+<p>• 字母&quot;Z&quot;与数字&quot;2&quot;的互换；</p>
+<p>• 字母&quot;n&quot;与字母&quot;h&quot;的互换；</p>
+<p>• 字母&quot;B&quot;与数字&quot;8&quot;的互换；</p>
+<p>• 字母序列&quot;rn&quot;（&quot;r&quot;后接&quot;n&quot;）与字母&quot;m&quot;的互换。</p>
+<p>理由（Rationale）</p>
+<p>根据用于显示字符集的字体，某些字形可能看起来相同，即使字符不同。这可能导致开发人员将一个标识符与另一个混淆。</p>
+<p><strong>示例</strong></p>
+<p>以下示例假设了详述中对拉丁字母和英语的建议解释。</p>
+<pre><code>
+int32_t id1_a_b_c;
+int32_t id1_abc;     /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id2_abc;
+int32_t id2_ABC;     /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id3_a_bc;
+int32_t id3_ab_c;    /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id4_I;
+int32_t id4_1;       /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id5_Z;
+int32_t id5_2;       /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id6_O;
+int32_t id6_0;       /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id7_B;
+int32_t id7_8;       /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id8_rn;
+int32_t id8_m;       /* 不合规 */
+</code></pre>
+<pre><code>
+int32_t id9_rn;
+struct { int32_t id9_m; };  /* 合规 */
+</code></pre>
+<p>---</p>
+<h4>Dir 4.6  应使用指示大小和符号的typedef代替基本数值类型</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>不应使用基本数值类型char、short、int、long、long long（C99）、float、double和long double，而应使用特定长度的typedef。char的数值类型是signed char和unsigned char。本指南不将&quot;普通&quot;char视为数值类型（参见第8.10.2节关于基本字符类型）。</p>
+<p>对于C99，应使用&lt;stdint.h&gt;提供的类型。对于C90，应定义并使用等效的类型。</p>
+<p>除非实现的类型确实具有该长度，否则不得定义具有特定长度的类型。</p>
+<p>例如，在32位C90实现上，以下定义可能适用：</p>
+<pre><code>
+typedef signed   char    int8_t;
+typedef signed   short   int16_t;
+typedef signed   int     int32_t;
+typedef signed   long    int64_t;
+</code></pre>
+<pre><code>
+typedef unsigned char    uint8_t;
+typedef unsigned short   uint16_t;
+typedef unsigned int     uint32_t;
+typedef unsigned long    uint64_t;
+</code></pre>
+<pre><code>
+typedef float   float32_t;
+typedef double  float64_t;
+typedef long double float128_t;
+</code></pre>
+<p>在声明位域时不需要使用typedef。</p>
+<p>理由（Rationale）</p>
+<p>在分配内存量很重要的情况下，使用特定长度类型清楚地表明为每个对象保留了多少存储空间。</p>
+<p>遵循本指南并不保证可移植性，因为int类型的大小可能决定表达式是否受整数提升影响。例如，如果int使用16位实现，类型为int16_t的表达式不会被提升，但如果int使用32位实现则会被提升。这在附录C中关于整数提升的部分有更详细的讨论。</p>
+<p>注意：定义大小与实际实现类型不同的特定长度类型对存储需求和可移植性都是适得其反的。应注意避免定义大小错误的类型。</p>
+<p>如果抽象类型是用特定长度类型定义的，那么这些抽象类型没有必要（甚至可能不可取）指定大小或符号。例如，以下代码定义了一个表示千克质量的抽象类型，但不指示其大小或符号：</p>
+<pre><code>
+typedef uint16_t mass_kg_t;
+</code></pre>
+<p>在与标准库或项目控制范围外的代码接口时，可能不希望应用本指南。</p>
+<p>例外（Exception）</p>
+<p>1. 基本数值类型可在typedef中用于定义特定长度类型。</p>
+<p>2. 对于函数main，可以使用int而不是typedef作为返回类型。因此int main (void)是允许的。</p>
+<p>3. 对于函数main，可以使用int而不是typedef作为输入参数argc。因此int main( int argc, char *argv[] )是允许的（C99 Section 5.1.2.2.1）。</p>
+<p><strong>示例</strong></p>
+<p>/* 不合规 - 使用int定义对象 */</p>
+<pre><code>
+int x = 0;
+</code></pre>
+<p>/* 合规 - 使用int定义特定长度类型 */</p>
+<pre><code>
+typedef int SINT_16;
+</code></pre>
+<p>/* 不合规 - 未指定符号或大小 */</p>
+<pre><code>
+typedef int speed_t;
+</code></pre>
+<p>/* 合规 - 进一步抽象不需要特定长度 */</p>
+<pre><code>
+typedef int16_t torque_t;
+</code></pre>
+<p>---</p>
+<h4>Dir 4.7  如果函数返回错误信息，则该错误信息应被检测</h4>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>被认为返回错误信息的函数列表应由项目确定。函数返回的错误信息应以有意义的方式进行检测。</p>
+<p>理由（Rationale）</p>
+<p>函数（无论是标准库的一部分、第三方库还是用户定义的函数）可能被认为提供了某种指示错误发生的方式。这可能是通过错误标志、某个特殊返回值或其他方式。每当函数提供这样的机制时，调用程序应在函数返回后立即检查错误指示。</p>
+<p>然而，注意检查函数的输入值被认为是比在函数完成后试图检测错误更健壮的错误预防手段（见Dir 4.11）。</p>
+<p>例外（Exception）</p>
+<p>如果能够证明（例如通过检查参数）函数不会返回错误指示，则无需执行检查。</p>
+<p>另见</p>
+<h4>Dir 4.11, Rule 17.7</h4>
+<p>---</p>
+<h4>Dir 4.8  如果指向结构或联合的指针在翻译单元中从未被解引用，则应隐藏该对象的实现</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>对象的实现应通过指向不完整类型的指针来隐藏。本指令仅适用于翻译单元中指向特定结构或联合的所有指针从未被解引用的情况。</p>
+<p>理由（Rationale）</p>
+<p>如果指向结构或联合的指针从未被解引用，则对象的实现细节是不需要的，其内容应受到保护以免被无意更改。</p>
+<p>隐藏实现细节创建了一个不透明类型，可以通过指针引用但不能访问其内容。</p>
+<p><strong>示例</strong></p>
+<p>/* Opaque.h */</p>
+<pre><code>
+#ifndef OPAQUE_H
+#define OPAQUE_H
+typedef struct OpaqueType *pOpaqueType;
+#endif
+</code></pre>
+<p>/* Opaque.c */</p>
+<pre><code>
+#include &quot;Opaque.h&quot;
+struct OpaqueType
+</code></pre>
+<p>{</p>
+<p>/* 对象实现 */</p>
+<p>};</p>
+<p>/* UseOpaque.c */</p>
+<pre><code>
+#include &quot;Opaque.h&quot;
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>pOpaqueType pObject;</p>
+<p>pObject = GetObject ( );  /* 获取OpaqueType对象的句柄 */</p>
+<p>UseObject ( pObject );     /* 使用它... */</p>
+<p>}</p>
+<p>---</p>
+<h4>Dir 4.9  在函数和类函数宏可以互换的情况下，应优先使用函数</h4>
+<p>[Koenig 78–81]</p>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本指南仅适用于语言标准的语法和约束允许使用函数的情况。</p>
+<p>理由（Rationale）</p>
+<p>在大多数情况下，应使用函数而不是宏。函数执行参数类型检查并只对其参数求值一次，从而避免潜在的多次副作用问题。在许多调试系统中，单步执行函数比单步执行宏更容易。尽管如此，宏在某些情况下可能有用。</p>
+<p>在决定使用函数还是宏时应考虑的一些因素包括：</p>
+<p>• 函数参数和结果类型检查的好处；</p>
+<p>• C99中内联函数的可用性，但注意inline被作用的程度是实现定义的；</p>
+<p>• 代码大小和执行速度之间的权衡；</p>
+<p>• 编译时求值的可能性是否重要：具有常量参数的宏比相应的函数调用更有可能在编译时求值；</p>
+<p>• 参数对函数是否有效：宏参数是文本的，而函数参数是表达式；</p>
+<p>• 易于理解和可维护性。</p>
+<p><strong>示例</strong></p>
+<p>以下示例是合规的。类函数宏不能被函数替代，因为它有一个C运算符作为参数：</p>
+<pre><code>
+#define EVAL_BINOP( OP, L, R ) ( ( L ) OP ( R ) )
+</code></pre>
+<p>uint32_t x = EVAL_BINOP ( +, 1, 2 );</p>
+<p>在以下示例中，使用宏初始化具有静态存储期的对象是合规的，因为这里不允许函数调用：</p>
+<pre><code>
+#define DIV2(X) ( ( X ) / 2 )
+void f ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  static uint16_t x = DIV2 ( 10 );  /* 合规 - 不允许调用 */
+</code></pre>
+<p>uint16_t y = DIV2 ( 10 );          /* 不合规 - 允许调用 */</p>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 13.2, Rule 20.7</h4>
+<p>---</p>
+<h4>Dir 4.10  应采取预防措施防止头文件的内容被多次包含</h4>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>当翻译单元包含复杂的嵌套头文件层次结构时，特定头文件可能被多次包含。这充其量是混乱的根源。如果这种多次包含导致多重或冲突的定义，则可能导致未定义或错误的行为。</p>
+<p>为便于检查，应使用以下两种形式之一保护头文件的内容不被多次包含：</p>
+<p>&lt;文件开始&gt;</p>
+<pre><code>
+#if !defined ( identifier )
+#define identifier
+</code></pre>
+<p>/* 文件内容 */</p>
+<pre><code>
+#endif
+</code></pre>
+<p>&lt;文件结束&gt;</p>
+<p>&lt;文件开始&gt;</p>
+<pre><code>
+#ifndef identifier
+#define identifier
+</code></pre>
+<p>/* 文件内容 */</p>
+<pre><code>
+#endif
+</code></pre>
+<p>&lt;文件结束&gt;</p>
+<p>注意：用于测试和记录给定头文件是否已被包含的标识符应在项目中的所有头文件中是唯一的。</p>
+<p>注意：这些形式中允许出现注释。</p>
+<p><strong>示例</strong></p>
+<p>/* file.h */</p>
+<pre><code>
+#ifndef FILE_H
+</code></pre>
+<p>/* 不合规 - 未#define FILE_H */</p>
+<pre><code>
+#endif
+</code></pre>
+<p>---</p>
+<h4>Dir 4.11  传递给库函数的值应检查其有效性</h4>
+<p>C90 [Undefined 60, 63, 96; Implementation 45–47]</p>
+<p>C99 [Unspecified 30, 31, 44, 48–50; Undefined 102, 103, 107, 112, 180, 181, 183, 187, 189; Implementation J.3.12(8–11)]</p>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>项目的性质和组织将决定哪些库以及这些库中的哪些函数应受本指令约束。</p>
+<p>理由（Rationale）</p>
+<p>标准库中的许多函数，标准不要求检查传递给它们的参数的有效性。即使在标准要求检查的地方，或者编译器编写者声称检查参数的地方，也不能保证充分的检查会发生。类似地，其他库中函数的接口描述可能不规定这些函数执行的检查。还存在指定检查未充分执行的风险。</p>
+<p>程序员应为所有具有受限输入域的函数（标准库、第三方库和内部库）提供对输入值的适当检查。</p>
+<p>标准库中具有受限域且需要检查的函数示例包括：</p>
+<p>• &lt;math.h&gt;中的许多数学函数，例如：</p>
+<p>-- 不得向sqrt或log函数传递负数；</p>
+<p>-- fmod的第二个参数不应为零；</p>
+<p>• 某些实现在向toupper传递非小写字母参数时可能产生意外结果（tolower类似）；</p>
+<p>• &lt;ctype.h&gt;中的字符测试函数在传递无效值时表现出未定义行为；</p>
+<p>• 对最负整数应用abs函数会产生未定义行为。</p>
+<p>尽管&lt;math.h&gt;中的大多数数学库函数定义了允许的输入域，但它们在发生域错误时返回的值可能因编译器而异。因此，预先检查输入值的有效性对这些函数特别重要。</p>
+<p>程序员应识别出对正在使用的函数合理适用的任何域约束（可能在接口描述中有记录，也可能没有），并提供输入值位于此域内的适当检查。当然，如果需要，可以通过了解参数代表什么以及什么是参数的合理值范围来进一步限制该值。</p>
+<p>满足本指南要求的方式有多种，包括：</p>
+<p>• 在调用函数之前检查值；</p>
+<p>• 在被调用的库函数中检查值——这对内部设计的库特别适用，但如果供应商能证明他们已内置了检查，也可以适用于购买的库；</p>
+<p>• 生成执行检查然后调用原始函数的&quot;包装&quot;版本函数；</p>
+<p>• 静态证明输入参数永远不会取无效值。</p>
+<p>另见</p>
+<h4>Dir 4.1, Dir 4.7</h4>
+<p>---</p>
+<h4>Dir 4.12  不应使用动态内存分配</h4>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>此规则适用于所有动态内存分配包，包括：</p>
+<p>• 标准库提供的；</p>
+<p>• 第三方包。</p>
+<p>理由（Rationale）</p>
+<p>如Rule 21.3所述，标准库的动态内存分配和释放例程可能导致未定义行为。任何其他动态内存分配系统都可能表现出与标准库类似的未定义行为。</p>
+<p>应检查第三方例程的规范，以确保没有无意中使用动态内存分配。</p>
+<p>如果决定使用动态内存，应注意确保软件以可预测的方式运行。例如，存在以下风险：</p>
+<p>• 可能没有足够的内存来满足请求——必须注意确保对分配失败有安全且适当的响应；</p>
+<p>• 执行分配或释放所需的时间可能存在很大差异，取决于使用模式和由此产生的碎片化程度。</p>
+<p><strong>示例</strong></p>
+<p>为方便起见，这些示例基于标准库动态内存函数的使用，因为它们的接口是众所周知的。</p>
+<p>在本例中，第一次调用free后的行为是未定义的，因为指针p的值变为不确定的。尽管调用free后存储在指针中的值不变，但在某些目标上，它所指向的内存可能不再存在，复制该指针的行为可能导致内存异常。</p>
+<pre><code>
+#include &lt;stdlib.h&gt;
+void f ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  char *p = ( char * ) malloc ( 10 );
+  char *q;
+</code></pre>
+<p>free ( p );</p>
+<p>q = p;  /* 未定义行为 - p的值是不确定的 */</p>
+<p>p = ( char * ) malloc ( 20 );</p>
+<p>free ( p );</p>
+<p>p = NULL;  /* 将NULL分配给已释放的指针使其确定 */</p>
+<p>}</p>
+<p>另见</p>
+<h4>Dir 4.1, Rule 18.7, Rule 21.3, Rule 22.1, Rule 22.2</h4>
+<p>---</p>
+<h4>Dir 4.13  设计用于对资源提供操作的函数应以适当的顺序调用</h4>
+<p>类别：建议性（Advisory）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>对资源提供操作的一组函数通常有三种操作：</p>
+<p>1. 资源的分配，例如打开文件；</p>
+<p>2. 资源的释放，例如关闭文件；</p>
+<p>3. 其他操作，例如从文件读取。</p>
+<p>对于每组这样的函数，其操作的所有使用应以适当的顺序进行。</p>
+<p>理由（Rationale）</p>
+<p>静态分析器工具能够提供路径分析检查，识别程序中导致序列的释放函数未被调用的路径。为了最大化此类自动检查的好处，鼓励开发人员通过向静态分析器设计和声明成对的平衡函数集来启用这些检查。</p>
+<p>---</p>
+<p>示例（Dir 4.13 续）</p>
+<p>/* 这些函数旨在成对使用 */</p>
+<pre><code>
+extern mutex_t mutex_lock ( void );
+extern void    mutex_unlock ( mutex_t m );
+extern int16_t x;
+</code></pre>
+<pre><code>
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>mutex_t m = mutex_lock ( );</p>
+<pre><code>
+  if ( x &gt; 0 )
+</code></pre>
+<p>{</p>
+<pre><code>
+    mutex_unlock ( m );
+</code></pre>
+<p>}</p>
+<p>else</p>
+<p>{</p>
+<pre><code>
+    /* 此路径上未解锁互斥量 */
+</code></pre>
+<p>}</p>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 22.1, Rule 22.2, Rule 22.6</h4>
+<p>---</p>
+<h4>Dir 4.14  从外部来源接收的值应检查其有效性</h4>
+<p>C90 [Undefined 15, 19, 26, 30, 31, 32, 94]</p>
+<p>C99 [Undefined 15, 16, 33, 40, 43-45, 48, 49, 113]</p>
+<p>类别：要求性（Required）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>&quot;外部来源&quot;包括：</p>
+<p>• 从文件读取的数据；</p>
+<p>• 从环境变量读取的数据；</p>
+<p>• 来自用户输入的数据；</p>
+<p>• 通过通信通道接收的数据。</p>
+<p>理由（Rationale）</p>
+<p>程序无法控制来自外部来源的数据所赋予的值。因此，这些值可能无效，无论是由于错误还是外部代理的恶意修改。因此，来自外部来源的数据在使用前应进行验证。</p>
+<p>在安全（security）领域，外部数据源通常被视为不可信的，因为它们可能已被试图损害或控制程序和/或其所运行系统的人修改；此类数据需要经过验证才能安全使用。</p>
+<p>在安全（safety）领域，外部来源被视为&quot;可疑的&quot;，从中获得的值需要验证。</p>
+<p>在两个领域中，来自外部来源的数据都应经过测试，以确保其值遵守对其使用施加的所有约束（即其值是无害的），即使该值不能被证明是正确的。例如：</p>
+<p>• 用于计算数组索引的值不应导致数组越界错误；</p>
+<p>• 用于控制循环的值不应导致过度（例如无限）迭代；</p>
+<p>• 用于计算除数的值不应导致除零；</p>
+<p>• 用于计算动态内存量的值不应导致过度内存分配；</p>
+<p>• 用作SQL数据库查询的字符串应检查以确保其不包含;字符。</p>
+<p><strong>示例</strong></p>
+<p>以下示例不合规，因为没有进行检查来确保来自用户输入的字符串是以null结尾的。当通过printf调用输出该字符串时，这可能导致数组越界错误（通常称为缓冲区溢出）。</p>
+<pre><code>
+void f1( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  char input [ 128 ];
+</code></pre>
+<p>( void ) scanf ( &quot;%128c&quot;, input );</p>
+<p>( void ) printf ( &quot;%s&quot;, input );  /* 不合规 */</p>
+<p>}</p>
+<p>---</p>
+<h2>第8章  规则</h2>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+</script>
+</body>
+</html>

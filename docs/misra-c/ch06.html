@@ -1,0 +1,2637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第8章 规则 (Rule 1.1–10.8) — MISRA C:2012 中文版</title>
+<link rel="stylesheet" href="../autosar-book/styles.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="book-title">MISRA C:2012<br>中文版</a>
+  </div>
+  <nav class="nav-list">
+    <ul>
+        <li><a href="ch01.html" class="nav-chapter">封面与前言</a></li>
+        <li><a href="ch02.html" class="nav-chapter">第1-4章 背景与预备</a></li>
+        <li><a href="ch03.html" class="nav-chapter">第5章 采用MISRA C</a></li>
+        <li><a href="ch04.html" class="nav-chapter">第6章 指南引言</a></li>
+        <li><a href="ch05.html" class="nav-chapter">第7章 指令</a></li>
+        <li><a href="ch06.html" class="nav-chapter active">第8章 规则 ①</a></li>
+        <li><a href="ch07.html" class="nav-chapter">第8章 规则 ②</a></li>
+        <li><a href="ch08.html" class="nav-chapter">参考与附录</a></li>
+    </ul>
+  </nav>
+</div>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="切换导航">☰</button>
+
+<div class="main-content">
+  <div class="chapter-page">
+    <div class="container">
+
+<h3>8.1  标准C环境</h3>
+<h4>Rule 1.1  程序应不包含违反标准C语法和约束的情况，且不应超出实现的翻译限制</h4>
+<p>[MISRA Guidelines Table 3], [IEC 61508-7: Table C.1], [ISO 26262-6: Table 1]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>程序应仅使用所选版本标准（见第3.1节）中规定的C语言及其库的特性。</p>
+<p>标准允许实现提供语言扩展，使用此类扩展是本规则允许的。</p>
+<p>除非使用语言扩展，程序不应：</p>
+<p>• 包含标准中描述的语言语法的任何违反；</p>
+<p>• 包含标准施加的约束的任何违反。</p>
+<p>程序不应超出实现施加的翻译限制。最小翻译限制由标准指定，但实现可提供更高的限制。</p>
+<p>注意：符合标准的实现对语法和约束违规生成诊断，但要注意：</p>
+<p>• 诊断不一定是错误，例如可以是警告；</p>
+<p>• 尽管存在语法或约束违规，程序可能被翻译并生成可执行文件。</p>
+<p>注意：当超出翻译限制时，符合标准的实现不需要生成诊断；可能生成可执行文件，但不保证正确执行。</p>
+<p>理由（Rationale）</p>
+<p>在制定本指南的过程中，未考虑与所支持ISO/IEC 9899版本之外的语言特性相关的问题。</p>
+<p>有一些轶事证据表明某些不符合标准的实现未能诊断约束违规，例如[38]第135页示例2，题为&quot;Error of writing into the const area&quot;。</p>
+<p><strong>示例</strong></p>
+<p>某些C90编译器使用__inline关键字提供对内联函数的支持。使用__inline的C90程序将符合本规则，前提是它旨在使用此类编译器进行翻译。</p>
+<p>许多嵌入式目标编译器提供额外的关键字，为对象所在内存区域的属性限定对象类型，例如：</p>
+<p>• __zpage — 对象可以使用短指令访问</p>
+<p>• __near — 指向对象的指针可以保存在16位中</p>
+<p>• __far — 指向对象的指针可以保存在24位中</p>
+<p>使用这些额外关键字的程序将符合本规则，前提是编译器支持这些关键字作为语言扩展。</p>
+<p>另见</p>
+<h4>Dir 2.1, Rule 1.2</h4>
+<p>---</p>
+<h4>Rule 1.2  不应使用语言扩展</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：不可判定（Undecidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>依赖语言扩展的程序可能比不依赖的可移植性更差。尽管标准要求符合标准的实现记录其提供的任何语言扩展，但存在该文档可能不能在所有情况下提供完整的行为了描述的风险。</p>
+<p>如果不应用此规则，使用每个语言扩展的决定应在项目的设计文档中说明理由。确保每个扩展有效使用的方法（例如检查编译器及其诊断）也应记录在案。</p>
+<p>认识到在嵌入式系统中使用语言扩展是必要的。标准要求扩展不改变任何严格符合程序的行为。例如，编译器可能作为扩展实现对二元逻辑运算符的完全求值，即使标准规定一旦可以确定结果就停止求值。这样的扩展不符合标准，因为逻辑AND运算符右操作数中的副作用将总是发生，导致不同的行为。</p>
+<p>另见</p>
+<h4>Rule 1.1</h4>
+<p>---</p>
+<h4>Rule 1.3  不应出现未定义或关键未指定行为</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：不可判定（Undecidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>某些未定义和未指定行为由特定规则处理。本规则防止所有其他未定义和关键未指定行为。附录H列出了未定义行为和那些被认为关键的未指定行为。</p>
+<p>理由（Rationale）</p>
+<p>任何导致未定义或未指定行为的程序都可能不以预期方式运行。在许多情况下，效果是使程序不可移植，但也可能发生更严重的问题。例如，未定义行为可能影响计算的结果。如果软件的正确运行依赖于此计算，则系统安全可能受到损害。如果未定义行为仅在极少情况下显现，该问题尤其难以检测。</p>
+<p>MISRA C指南中的许多条目旨在避免某些未定义和未指定行为。例如，符合Rule 11.4、Rule 11.8和Rule 19.2确保在C中不可能创建指向声明为const限定类型对象的非const限定指针。这避免了C90 [Undefined 39]和C99 [Undefined 61]。然而，其他行为没有被特定指南覆盖，例如因为：</p>
+<p>• 该行为不太可能遇到；</p>
+<p>• 除了应避免该行为的明显陈述外，无法给出任何实际指导。</p>
+<p>与其为每种未定义和关键未指定行为引入一条指南，MISRA C指南直接处理那些被认为最重要且最可能在实践中发生的行为。那些没有特定指南的行为全部由这一条规则涵盖。附录H列出了所有未定义和关键未指定行为，以及防止其发生的MISRA C指南。因此，它指出了哪些行为预期由本规则防止，哪些行为由其他规则涵盖。</p>
+<p>注意：某些实现可能为标准中列出的一些未定义和未指定行为提供定义良好的行为。如果依赖此类定义良好的行为（包括通过语言扩展），则需要对本规则在这些行为方面进行偏离。</p>
+<p>另见</p>
+<h4>Dir 4.1</h4>
+<p>---</p>
+<h3>8.2  未使用代码</h3>
+<h4>Rule 2.1  项目不应包含不可达代码</h4>
+<p>[IEC 61508-7 Section C.5.9], [DO-178C Section 6.4.4.3.c]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：不可判定（Undecidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>如果程序不表现出任何未定义行为，不可达代码无法执行，也不能对程序输出产生任何影响。因此，不可达代码的存在可能表明程序逻辑中存在错误。</p>
+<p>编译器允许移除任何不可达代码，尽管它不必这样做。未被编译器移除的不可达代码浪费资源，例如：</p>
+<p>• 占用目标机器内存空间；</p>
+<p>• 其存在可能导致编译器在围绕不可达代码转移控制时选择更长、更慢的跳转指令；</p>
+<p>• 在循环内，它可能阻止整个循环驻留在指令缓存中。</p>
+<p>有时为了处理异常情况，插入看似不可达的代码是可取的。例如，在switch语句中，控制表达式的每个可能值都由显式case覆盖的情况下，根据Rule 16.4必须存在default子句。default子句的目的是捕获通常不应发生但可能由于以下原因产生的值：</p>
+<p>• 程序中存在的未定义行为；</p>
+<p>• 处理器硬件故障。</p>
+<p>如果编译器能证明default子句不可达，它可能将其移除，从而消除防御动作。假设防御动作很重要，则需要证明编译器尽管代码不可达但不会消除该代码，或采取措施使防御代码可达。前一种做法需要对本规则进行偏离，可能通过审查目标代码或单元测试来支持此类偏离。后一种做法通常可以通过volatile访问来实现。例如，编译器可能确定x持有的值范围已被switch语句中的case子句覆盖，如：</p>
+<p>uint16_t x;</p>
+<pre><code>
+switch ( x )
+</code></pre>
+<p>通过强制x通过volatile限定的左值访问，编译器必须假设控制表达式可以取任何值：</p>
+<pre><code>
+switch ( *( volatile uint16_t * ) &amp;x )
+</code></pre>
+<p>注意：被预处理指令有条件排除的代码不受本规则约束，因为它不会呈现给后续翻译阶段。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+enum light { red, amber, red_amber, green };
+</code></pre>
+<pre><code>
+enum light next_light ( enum light c )
+</code></pre>
+<p>{</p>
+<pre><code>
+  enum light res;
+  switch ( c )
+</code></pre>
+<p>{</p>
+<pre><code>
+    case red:       res = red_amber; break;
+    case red_amber: res = green;     break;
+    case green:     res = amber;     break;
+    case amber:     res = red;       break;
+    default:
+    {
+      /* 仅当参数c持有的值不是enum light的成员时，此default才可达 */
+      error_handler ( );
+      break;
+    }
+</code></pre>
+<p>}</p>
+<pre><code>
+  return res;
+</code></pre>
+<p>res = c;  /* 不合规 - 此语句肯定是不可达的 */</p>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 14.3, Rule 16.4</h4>
+<p>---</p>
+<h4>Rule 2.2  不应有死代码</h4>
+<p>[IEC 61508-7 Section C.5.10], [ISO 26262-6 Section 9.4.5], [DO-178C Section 6.4.4.3.c]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：不可判定（Undecidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>任何被执行但其移除不会影响程序行为的操作构成死代码。由语言扩展引入的操作总被假定为对程序行为有影响。</p>
+<p>注意：嵌入式系统的行为通常不仅由其动作的性质决定，也由它们发生的时间决定。</p>
+<p>注意：不可达代码不是死代码，因为它无法执行。</p>
+<p>注意：初始化与赋值操作不同，因此不是死代码的候选。</p>
+<p>理由（Rationale）</p>
+<p>死代码的存在可能表明程序逻辑中存在错误。由于死代码可能被编译器移除，其存在可能引起混淆。</p>
+<p>例外（Exception）</p>
+<p>假定转换为void表示有意不使用某个值。因此，该转换本身不是死代码。它被视为使用了其操作数，因此操作数也不是死代码。</p>
+<p><strong>示例</strong></p>
+<p>在本例中，假设p指向的对象在其他函数中使用。</p>
+<pre><code>
+extern volatile uint16_t v;
+extern char *p;
+</code></pre>
+<pre><code>
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>uint16_t x;</p>
+<p>( void ) v;      /* 合规 - 为访问v的副作用，void转换由例外允许 */</p>
+<p>( int32_t ) v;   /* 不合规 - 转换运算符是死的 */</p>
+<p>v &gt;&gt; 3;          /* 不合规 - &gt;&gt; 运算符是死的 */</p>
+<p>x = 3;           /* 不合规 - = 运算符是死的，x后续未被读取 */</p>
+<p>*p++;            /* 不合规 - * 运算符的结果未被使用 */</p>
+<p>( *p )++;        /* 合规 - *p被递增 */</p>
+<p>}</p>
+<p>在以下合规示例中，__asm关键字是语言扩展，不是函数调用操作，因此不是死代码：</p>
+<p>__asm ( &quot;NOP&quot; );</p>
+<p>在以下示例中，函数g不包含死代码，且本身不是死代码，因为它不包含任何操作。然而，对该函数的调用是死的，因为可以将其移除而不影响程序行为。</p>
+<pre><code>
+void g ( void )
+</code></pre>
+<p>{</p>
+<p>/* 合规 - 此函数中没有操作 */</p>
+<p>}</p>
+<pre><code>
+void h ( void )
+</code></pre>
+<p>{</p>
+<p>g ( );  /* 不合规 - 此调用可以被移除 */</p>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 17.7</h4>
+<p>---</p>
+<h4>Rule 2.3  项目不应包含未使用的类型声明</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>如果类型被声明但未使用，审查人员不清楚该类型是冗余的还是被错误地遗留未使用。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+int16_t unusedtype ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  typedef int16_t local_Type;  /* 不合规 */
+  return 67;
+</code></pre>
+<p>}</p>
+<p>---</p>
+<h4>Rule 2.4  项目不应包含未使用的标签（tag）声明</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>如果标签被声明但未使用，审查人员不清楚该标签是冗余的还是被错误地遗留未使用。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，标签state未被使用，声明本可以在没有它的情况下编写。</p>
+<pre><code>
+void unusedtag ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  enum state { S_init, S_run, S_sleep };  /* 不合规 */
+</code></pre>
+<p>}</p>
+<p>在以下示例中，标签record_t仅在record1_t的typedef中使用，而record1_t在翻译单元的其余部分中每当需要该类型时使用。可以通过省略标签以合规方式编写此typedef，如record2_t的定义所示。</p>
+<pre><code>
+typedef struct record_t       /* 不合规 */
+</code></pre>
+<p>{</p>
+<p>uint16_t key;</p>
+<p>uint16_t val;</p>
+<p>} record1_t;</p>
+<pre><code>
+typedef struct                /* 合规 */
+</code></pre>
+<p>{</p>
+<p>uint16_t key;</p>
+<p>uint16_t val;</p>
+<p>} record2_t;</p>
+<p>---</p>
+<h4>Rule 2.5  项目不应包含未使用的宏声明</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>宏的#undef被视为宏的使用。</p>
+<p>理由（Rationale）</p>
+<p>如果宏被声明但未使用，审查人员不清楚该宏是冗余的还是被错误地遗留未使用。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+void use_macro ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  #define SIZE 4
+  #define DATA 3  /* 不合规 - DATA未使用 */
+</code></pre>
+<p>use_int16 ( SIZE );</p>
+<p>}</p>
+<p>---</p>
+<h4>Rule 2.6  函数不应包含未使用的标签声明</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>如果标签被声明但未使用，审查人员不清楚该标签是冗余的还是被错误地遗留未使用。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+void unused_label ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t x = 6;
+</code></pre>
+<p>label1:            /* 不合规 */</p>
+<p>use_int16 ( x );</p>
+<p>}</p>
+<p>---</p>
+<h4>Rule 2.7  函数中不应有未使用的参数</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>大多数函数将被规定为使用其每个参数。如果函数参数未使用，则函数的实现可能与其规范不匹配。本规则突出显示此类潜在的不匹配。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+void withunusedpara ( uint16_t *para1, int16_t unusedpara )  /* 不合规 - unusedpara未使用 */
+</code></pre>
+<p>{</p>
+<p>*para1 = 42U;</p>
+<p>}</p>
+<p>---</p>
+<h3>8.3  注释</h3>
+<h4>Rule 3.1  字符序列/*和//不应在注释内部使用</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>如果注释开始序列/*或//出现在/*注释内部，很可能是由于缺少*/注释结束序列造成的。</p>
+<p>如果注释开始序列出现在//注释内部，可能是因为代码区域已使用//被注释掉。</p>
+<p>例外（Exception）</p>
+<p>序列//在//注释内是允许的。</p>
+<p><strong>示例</strong></p>
+<p>考虑以下代码片段：</p>
+<p>/* some comment, end comment marker accidentally omitted</p>
+<p>&lt;&lt;New Page&gt;&gt;</p>
+<p>Perform_Critical_Safety_Function( X );</p>
+<p>/* this comment is non-compliant */</p>
+<p>在审查包含该函数调用的页面时，假设它是执行代码。由于意外遗漏了注释结束标记，对安全关键函数的调用将不会被执行。</p>
+<p>在以下C99示例中，//注释的存在改变了程序的含义：</p>
+<p>x = y // /*</p>
+<p>+ z</p>
+<p>// */</p>
+<p>;</p>
+<p>这给出x = y + z; 但如果没有两个//注释开始序列，会是x = y;。</p>
+<p>另见</p>
+<h4>Dir 4.4</h4>
+<p>---</p>
+<h4>Rule 3.2  不应在//注释中使用行拼接</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C99</p>
+<p>详述（Amplification）</p>
+<p>当\字符紧跟换行字符时发生行拼接。如果源文件包含多字节字符，它们在任何拼接发生之前被转换为源字符集。</p>
+<p>理由（Rationale）</p>
+<p>如果包含//注释的源行以源字符集中的\字符结束，下一行将成为注释的一部分。这可能导致无意中移除代码。</p>
+<p>注意：行拼接在C90和C99的第5.1.1.2(2)节中描述。</p>
+<p><strong>示例</strong></p>
+<p>在以下不合规示例中，包含if关键字的物理行在逻辑上是前一行的部分，因此是注释。</p>
+<pre><code>
+extern bool_t b;
+</code></pre>
+<pre><code>
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>uint16_t x = 0;</p>
+<pre><code>
+  if ( b )
+</code></pre>
+<p>{</p>
+<pre><code>
+    ++x;
+</code></pre>
+<p>}</p>
+<p>}</p>
+<p>// comment \</p>
+<p>/* This is always executed */</p>
+<p>另见</p>
+<h4>Dir 4.4</h4>
+<p>---</p>
+<h3>8.4  字符集和词法约定</h3>
+<h4>Rule 4.1  八进制和十六进制转义序列应被终止</h4>
+<p>C90 [Implementation 11], C99 [Implementation J.3.4(7, 8)]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>八进制或十六进制转义序列应被以下之一终止：</p>
+<p>• 另一个转义序列的开始，或</p>
+<p>• 字符常量的结束或字符串字面量的结束。</p>
+<p>理由（Rationale）</p>
+<p>如果八进制或十六进制转义序列后跟其他字符，存在混淆的可能。例如，字符常量&#x27;\\x1f&#x27;由单个字符组成，而字符常量&#x27;\\x1g&#x27;由两个字符&#x27;\\x1&#x27;和&#x27;g&#x27;组成。多字符常量表示为整数的方式是实现定义的。</p>
+<p>如果字符常量或字符串字面量中的每个八进制或十六进制转义序列都被终止，混淆的可能性就降低了。</p>
+<p><strong>示例</strong></p>
+<p>在本例中，s1、s2和s3指向的每个字符串等价于&quot;Ag&quot;。</p>
+<pre><code>
+const char *s1 = &quot;\x41g&quot;;          /* 不合规 */
+const char *s2 = &quot;\x41&quot; &quot;g&quot;;       /* 合规 - 由字面量结尾终止 */
+const char *s3 = &quot;\x41\x67&quot;;       /* 合规 - 由另一个转义序列终止 */
+</code></pre>
+<pre><code>
+int c1 = &#x27;\141t&#x27;;                  /* 不合规 */
+int c2 = &#x27;\141\t&#x27;;                 /* 合规 - 由另一个转义序列终止 */
+</code></pre>
+<p>另见</p>
+<p>C90: Section 6.1.3.4, C99: Section 6.4.4.4</p>
+<p>---</p>
+<h4>Rule 4.2  不应使用三字符序列（trigraphs）</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>三字符序列由两个问号后跟一个指定的第三个字符表示（例如??-表示~（波浪号）字符，??)表示]）。它们可能与其他两个问号的使用意外混淆。</p>
+<p>注意：所谓的双字符序列（digraphs）：&lt;: :&gt; &lt;% %&gt; %: %:%: 是允许的，因为它们是标记（token）。三字符序列在预处理之前，在程序中出现的任何地方被替换。</p>
+<p><strong>示例</strong></p>
+<p>例如字符串 &quot;(Date should be in the form ??-??-??)&quot; 不会按预期运行，实际上被编译器解释为 &quot;(Date should be in the form ~~]&quot;。</p>
+<p>---</p>
+<h3>8.5  标识符</h3>
+<h4>Rule 5.1  外部标识符应是不同的</h4>
+<p>C90 [Undefined 7], C99 [Unspecified 7; Undefined 28]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本规则要求不同的外部标识符在实现施加的限制内是不同的。</p>
+<p>&quot;不同&quot;的定义取决于实现和正在使用的C语言版本：</p>
+<p>• 在C90中，最低要求是外部标识符的前6个字符是有效的，但不要求其大小写有效；</p>
+<p>• 在C99中，最低要求是外部标识符的前31个字符是有效的，每个通用字符或对应的扩展源字符占用6到10个字符。</p>
+<p>在实践中，许多实现提供更大的限制。例如，C90中外部标识符通常是大小写敏感的，且至少前31个字符是有效的。</p>
+<p>理由（Rationale）</p>
+<p>如果两个标识符仅在非有效字符上有差异，行为是未定义的。</p>
+<p>如果可移植性是关注点，使用标准中指定的最低限制应用本规则将是审慎的做法。</p>
+<p>长标识符可能损害代码的可读性。虽然许多自动代码生成系统产生长标识符，但有充分理由将标识符长度保持在此限制以下。</p>
+<p>注意：在C99中，如果扩展源字符出现在外部标识符中且该字符没有对应的通用字符，标准不规定它占用多少个字符。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，定义都发生在同一个翻译单元中。相关实现支持外部标识符31个有效的大小写敏感字符。</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+int32_t engine_exhaust_gas_temperature_raw;     /* 不合规 */
+int32_t engine_exhaust_gas_temperature_scaled;
+</code></pre>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+int32_t engine_exhaust_gas_temp_raw;            /* 合规 */
+int32_t engine_exhaust_gas_temp_scaled;
+</code></pre>
+<p>在以下不合规示例中，实现支持外部标识符6个有效的大小写不敏感字符。两个翻译单元中的标识符不同，但在其有效字符上不是不同的。</p>
+<p>/* file1.c */</p>
+<pre><code>
+int32_t abc = 0;
+</code></pre>
+<p>/* file2.c */</p>
+<pre><code>
+int32_t ABC = 0;
+</code></pre>
+<p>另见</p>
+<h4>Dir 1.1, Rule 5.2, Rule 5.4, Rule 5.5</h4>
+<p>---</p>
+<h4>Rule 5.2  在同一作用域和命名空间中声明的标识符应是不同的</h4>
+<p>C90 [Undefined 7], C99 [Undefined 28]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>如果两个标识符都是外部标识符，本规则不适用，因为这种情况由Rule 5.1涵盖。</p>
+<p>如果任一标识符是宏标识符，本规则不适用，因为这种情况由Rule 5.4和Rule 5.5涵盖。</p>
+<p>&quot;不同&quot;的定义取决于实现和正在使用的C语言版本：</p>
+<p>• 在C90中，最低要求是前31个字符有效；</p>
+<p>• 在C99中，最低要求是前63个字符有效，每个通用字符或扩展源字符计为单个字符。</p>
+<p>理由（Rationale）</p>
+<p>如果两个标识符仅在非有效字符上有差异，行为是未定义的。</p>
+<p>如果可移植性是关注点，使用标准中指定的最低限制应用本规则将是审慎的做法。</p>
+<p>长标识符可能损害代码的可读性。虽然许多自动代码生成系统产生长标识符，但有充分理由将标识符长度保持在此限制以下。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，相关实现支持不具有外部链接的标识符31个有效的大小写敏感字符。标识符engine_exhaust_gas_temperature_local符合本规则。虽然它与标识符engine_exhaust_gas_temperature_raw不是不同的，但它位于不同的作用域中。然而，它不符合Rule 5.3。</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+extern int32_t engine_exhaust_gas_temperature_raw;
+static int32_t engine_exhaust_gas_temperature_scaled;  /* 不合规 */
+</code></pre>
+<pre><code>
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+  int32_t engine_exhaust_gas_temperature_local;       /* 合规 */
+</code></pre>
+<p>}</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+static int32_t engine_exhaust_gas_temp_raw;            /* 合规 */
+static int32_t engine_exhaust_gas_temp_scaled;
+</code></pre>
+<p>另见</p>
+<h4>Dir 1.1, Rule 5.1, Rule 5.3, Rule 5.4, Rule 5.5</h4>
+<p>---</p>
+<h4>Rule 5.3  在内部作用域中声明的标识符不应隐藏外部作用域中声明的标识符</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>在内部作用域中声明的标识符应与外部作用域中声明的任何标识符不同。</p>
+<p>&quot;不同&quot;的定义取决于实现和正在使用的C语言版本：</p>
+<p>• 在C90中，最低要求是前31个字符有效；</p>
+<p>• 在C99中，最低要求是前63个字符有效，每个通用字符或扩展源字符计为单个字符。</p>
+<p>理由（Rationale）</p>
+<p>如果标识符在内部作用域中声明但与外部作用域中已存在的标识符不是不同的，那么最内部的声明将&quot;隐藏&quot;外部的声明。这可能导致开发人员混淆。</p>
+<p>注意：在一个命名空间中声明的标识符不会隐藏在另一个命名空间中声明的标识符。</p>
+<p>术语外部和内部作用域定义如下：</p>
+<p>• 具有文件作用域的标识符可被视为具有最外部作用域；</p>
+<p>• 具有块作用域的标识符具有更内部的作用域；</p>
+<p>• 连续的嵌套块引入更内部的作用域。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+void fn1 ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t i;        /* 声明对象&quot;i&quot; */
+</code></pre>
+<p>{</p>
+<pre><code>
+    int16_t i;      /* 不合规 - 隐藏了先前的&quot;i&quot; */
+    i = 3;          /* 可能令人困惑，不清楚这是指哪个&quot;i&quot; */
+</code></pre>
+<p>}</p>
+<p>}</p>
+<pre><code>
+struct astruct { int16_t m; };
+extern void g ( struct astruct *p );
+int16_t xyz = 0;                            /* 声明对象&quot;xyz&quot; */
+</code></pre>
+<pre><code>
+void fn2 ( struct astruct xyz )              /* 不合规 - 外部&quot;xyz&quot;现在被参数名隐藏 */
+</code></pre>
+<p>{</p>
+<p>g ( &amp;xyz );</p>
+<p>}</p>
+<p>uint16_t speed;</p>
+<pre><code>
+void fn3 ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  typedef float32_t speed;                   /* 不合规 - 类型隐藏了对象 */
+</code></pre>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 5.2, Rule 5.8</h4>
+<p>---</p>
+<h4>Rule 5.4  宏标识符应是不同的</h4>
+<p>C90 [Undefined 7], C99 [Unspecified 7; Undefined 28]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本规则要求，当定义宏时，其名称应与以下各项不同：</p>
+<p>• 当前定义的其他宏的名称；以及</p>
+<p>• 其参数的名称。</p>
+<p>它还要求给定宏的参数名称彼此不同，但不要求两个不同宏的宏参数名称不同。</p>
+<p>&quot;不同&quot;的定义取决于实现和正在使用的C语言版本：</p>
+<p>• 在C90中，最低要求是宏标识符的前31个字符有效；</p>
+<p>• 在C99中，最低要求是宏标识符的前63个字符有效。</p>
+<p>在实践中，实现可能提供更大的限制。本规则要求宏标识符在实现施加的限制内是不同的。</p>
+<p>理由（Rationale）</p>
+<p>如果两个宏标识符仅在非有效字符上有差异，行为是未定义的。由于宏参数仅在其宏展开期间有效，一个宏中的参数与另一个宏中的参数混淆是没有问题的。</p>
+<p>如果可移植性是关注点，使用标准中指定的最低限制应用本规则将是审慎的做法。</p>
+<p>长宏标识符可能损害代码的可读性。虽然许多自动代码生成系统产生长宏标识符，但有充分理由将宏标识符长度保持在此限制以下。</p>
+<p>注意：在C99中，如果扩展源字符出现在宏名称中且该字符没有对应的通用字符，标准不规定它占用多少个字符。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，相关实现支持宏标识符31个有效的大小写敏感字符。</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+#define engine_exhaust_gas_temperature_raw egt_r
+#define engine_exhaust_gas_temperature_scaled egt_s  /* 不合规 */
+</code></pre>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+#define engine_exhaust_gas_temp_raw egt_r             /* 合规 */
+#define engine_exhaust_gas_temp_scaled egt_s
+</code></pre>
+<p>另见</p>
+<h4>Rule 5.1, Rule 5.2, Rule 5.5</h4>
+<p>---</p>
+<h4>Rule 5.5  标识符应与宏名称不同</h4>
+<p>C90 [Undefined 7], C99 [Unspecified 7; Undefined 28]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本规则要求预处理之前存在的宏的名称与预处理之后存在的标识符不同。它适用于标识符（无论作用域或命名空间）和任何已定义的宏（无论声明标识符时该定义是否仍然有效）。</p>
+<p>&quot;不同&quot;的定义取决于实现和正在使用的C语言版本：</p>
+<p>• 在C90中，最低要求是前31个字符有效；</p>
+<p>• 在C99中，最低要求是前63个字符有效，每个通用字符或扩展源字符计为单个字符。</p>
+<p>理由（Rationale）</p>
+<p>保持宏名称和标识符不同有助于避免开发人员混淆。</p>
+<p><strong>示例</strong></p>
+<p>在以下不合规示例中，类函数宏Sum的名称也被用作标识符。对象Sum的声明不受宏展开影响，因为它后面没有跟(字符。因此，在预处理执行后该标识符存在。</p>
+<pre><code>
+#define Sum(x, y) ( ( x ) + ( y ) )
+int16_t Sum;
+</code></pre>
+<p>以下示例是合规的，因为预处理后没有标识符Sum的实例。</p>
+<pre><code>
+#define Sum(x, y) ( ( x ) + ( y ) )
+int16_t x = Sum ( 1, 2 );
+</code></pre>
+<p>在以下示例中，相关实现支持不具有外部链接的标识符31个有效的大小写敏感字符。该示例不合规，因为宏名称在前31个字符中与具有内部链接的标识符名称不是不同的。</p>
+<p>/* 1234567890123456789012345678901********* 字符 */</p>
+<pre><code>
+#define low_pressure_turbine_temperature_1 lp_tb_temp_1
+static int32_t low_pressure_turbine_temperature_2;
+</code></pre>
+<p>另见</p>
+<h4>Rule 5.1, Rule 5.2, Rule 5.4</h4>
+<p>---</p>
+<h4>Rule 5.6  typedef名称应是唯一标识符</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<pre><code>
+typedef名称应在所有命名空间和翻译单元中是唯一的。本规则仅当类型定义在头文件中且该头文件被包含在多个源文件中时，才允许多次声明相同的typedef名称。
+</code></pre>
+<p>理由（Rationale）</p>
+<p>将typedef名称重用为另一个typedef名称或函数、对象或枚举常量的名称，可能导致开发人员混淆。</p>
+<p>例外（Exception）</p>
+<pre><code>
+typedef名称可以与与该typedef关联的结构、联合或枚举标签名称相同。
+</code></pre>
+<p><strong>示例</strong></p>
+<pre><code>
+void func ( void )
+</code></pre>
+<p>{</p>
+<p>{</p>
+<pre><code>
+    typedef unsigned char u8_t;
+</code></pre>
+<p>}</p>
+<p>{</p>
+<pre><code>
+    typedef unsigned char u8_t;  /* 不合规 - 重用 */
+</code></pre>
+<p>}</p>
+<p>}</p>
+<pre><code>
+typedef float mass;
+void func1 ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  float32_t mass = 0.0f;         /* 不合规 - 重用 */
+</code></pre>
+<p>}</p>
+<pre><code>
+typedef struct list              /* 合规 - 例外 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  struct list *next;
+</code></pre>
+<p>uint16_t element;</p>
+<p>} list;</p>
+<pre><code>
+typedef struct
+</code></pre>
+<p>{</p>
+<pre><code>
+  struct chain                  /* 不合规 - 标签&quot;chain&quot;不与typedef关联 */
+</code></pre>
+<p>{</p>
+<pre><code>
+    struct chain *list;
+    uint16_t element;
+</code></pre>
+<p>} s1;</p>
+<p>uint16_t length;</p>
+<p>} chain;</p>
+<p>另见</p>
+<h4>Rule 5.7</h4>
+<p>---</p>
+<h4>Rule 5.7  标签（tag）名称应是唯一标识符</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>标签应在所有命名空间和翻译单元中是唯一的。标签的所有声明应指定相同的类型。</p>
+<p>本规则仅当标签在头文件中声明且该头文件被包含在多个源文件中时，才允许同一标签的多次完整声明。</p>
+<p>理由（Rationale）</p>
+<p>重用标签名称可能导致开发人员混淆。</p>
+<p>在C90中，重用标签名称还与未定义行为相关，尽管这在标准的附录中未列出。此未定义行为在C99中在第6.7.2.3节中被确认为约束。</p>
+<p>例外（Exception）</p>
+<p>标签名称可以与其关联的typedef名称相同。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+struct stag { uint16_t a; uint16_t b; };
+struct stag a1 = { 0, 0 };    /* 合规 - 与上述兼容 */
+union stag a2 = { 0, 0 };     /* 不合规 - 声明了与struct stag不同的类型。C99中的约束违规 */
+</code></pre>
+<p>以下示例也违反Rule 5.3：</p>
+<pre><code>
+struct deer { uint16_t a; uint16_t b; };
+void foo ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  struct deer { uint16_t a; };  /* 不合规 - 标签&quot;deer&quot;被重用 */
+</code></pre>
+<p>}</p>
+<pre><code>
+typedef struct coord            /* 合规（例外） */
+</code></pre>
+<p>{</p>
+<p>uint16_t x;</p>
+<p>uint16_t y;</p>
+<p>} coord;</p>
+<pre><code>
+struct elk { uint16_t x; };
+struct elk { uint32_t x; };     /* 不合规 - 声明了不同类型。C99中的约束违规 */
+</code></pre>
+<p>另见</p>
+<h4>Rule 5.6</h4>
+<p>---</p>
+<h4>Rule 5.8  定义具有外部链接的对象或函数的标识符应是唯一的</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>用作外部标识符的标识符不应在任何命名空间或翻译单元中用于任何其他目的，即使它表示没有链接的对象。</p>
+<p>理由（Rationale）</p>
+<p>以这种方式强制执行标识符名称的唯一性有助于避免混淆。没有链接的对象的标识符不需要是唯一的，因为此类混淆的风险最小。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，file1.c和file2.c都是同一项目的一部分。</p>
+<p>/* file1.c */</p>
+<pre><code>
+int32_t count;                   /* &quot;count&quot;具有外部链接 */
+void foo ( void )                /* &quot;foo&quot;具有外部链接 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t index;                 /* &quot;index&quot;没有链接 */
+</code></pre>
+<p>}</p>
+<p>/* file2.c */</p>
+<pre><code>
+static void foo ( void )         /* 不合规 - &quot;foo&quot;不唯一（它已在file1.c中以外部链接定义） */
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t count;                 /* 不合规 - &quot;count&quot;没有链接但与外部链接标识符冲突 */
+  int32_t index;                 /* 合规 - &quot;index&quot;没有链接 */
+</code></pre>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 5.3</h4>
+<p>---</p>
+<h4>Rule 5.9  定义具有内部链接的对象或函数的标识符应是唯一的</h4>
+<p>类别：建议性（Advisory）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>定义具有内部链接的对象或函数的标识符名称应在所有命名空间和翻译单元中是唯一的。以这种方式使用的任何标识符不应与任何其他标识符具有相同的名称，即使该其他标识符表示没有链接的对象。</p>
+<p>理由（Rationale）</p>
+<p>以这种方式强制执行标识符名称的唯一性有助于避免混淆。</p>
+<p>例外（Exception）</p>
+<p>具有内部链接的内联函数可以在多个翻译单元中定义，前提是所有此类定义都在同一头文件中进行，且该头文件被包含在每个翻译单元中。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，file1.c和file2.c都是同一项目的一部分。</p>
+<p>/* file1.c */</p>
+<pre><code>
+static int32_t count;            /* &quot;count&quot;具有内部链接 */
+static void foo ( void )         /* &quot;foo&quot;具有内部链接 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t count;                 /* 不合规 - &quot;count&quot;没有链接但与内部链接标识符冲突 */
+  int16_t index;                 /* &quot;index&quot;没有链接 */
+</code></pre>
+<p>foo ( );</p>
+<p>}</p>
+<pre><code>
+void bar1 ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  static int16_t count;          /* 不合规 - &quot;count&quot;没有链接但与内部链接标识符冲突 */
+  int16_t index;                 /* 合规 - &quot;index&quot;不唯一但没有链接 */
+</code></pre>
+<p>}</p>
+<p>/* 文件1结束 */</p>
+<p>/* file2.c */</p>
+<pre><code>
+static int8_t count;             /* 不合规 - &quot;count&quot;具有内部链接但与同名其他标识符冲突 */
+static void foo ( void )         /* 不合规 - &quot;foo&quot;具有内部链接但与同名函数冲突 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  int32_t index;                 /* 合规 - &quot;index&quot;和&quot;nbytes&quot;不唯一但没有链接 */
+  int16_t nbytes;
+</code></pre>
+<p>}</p>
+<pre><code>
+void bar2 ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+  static uint8_t nbytes;         /* 合规 - &quot;nbytes&quot;不唯一但没有链接，存储类别无关 */
+</code></pre>
+<p>}</p>
+<p>/* 文件2结束 */</p>
+<p>另见</p>
+<h4>Rule 8.10</h4>
+<p>---</p>
+<h3>8.6  类型</h3>
+<h4>Rule 6.1  位域应仅以适当类型声明</h4>
+<p>C90 [Undefined 38; Implementation 29], C99 [Implementation J.3.9(1, 2)]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>适当的位域类型是：</p>
+<p>• C90：unsigned int或signed int；</p>
+<p>• C99：以下之一：</p>
+<p>-- unsigned int或signed int；</p>
+<p>-- 实现允许的另一个显式有符号或显式无符号整数类型；</p>
+<p>-- _Bool。</p>
+<p>注意：允许使用typedef来指定适当的类型。</p>
+<p>理由（Rationale）</p>
+<p>使用int是实现定义的，因为int类型的位域可以是有符号或无符号的。</p>
+<p>在C90中，不允许将enum、short、char或任何其他类型用于位域，因为行为是未定义的。</p>
+<p>在C99中，实现可以定义在位域声明中允许的其他整数类型。</p>
+<p><strong>示例</strong></p>
+<p>以下示例适用于C90和不提供额外位域类型的C99实现。假设int类型是16位的。</p>
+<pre><code>
+typedef unsigned int UINT_16;
+struct s {
+  unsigned int b1:2;    /* 合规 */
+  int          b2:2;    /* 不合规 - 不允许普通int */
+</code></pre>
+<p>UINT_16      b3:2;    /* 合规 - typedef指定unsigned int */</p>
+<pre><code>
+  signed long  b4:2;    /* 不合规 - 即使long和int大小相同 */
+</code></pre>
+<p>};</p>
+<p>---</p>
+<h4>Rule 6.2  单比特命名位域不应为有符号类型</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>根据C99标准第6.2.6.2节，单比特有符号位域具有一个（1）符号位和零个（0）值位。在任何整数表示中，0个值位不能指定有意义的值。</p>
+<p>因此，单比特有符号位域不太可能以有用的方式运行，其存在很可能表明程序员混淆。</p>
+<p>虽然C90标准未提供关于类型表示的如此多细节，但同样的考虑适用于C99。</p>
+<p>注意：本规则不适用于未命名位域，因为其值无法访问。</p>
+<p>---</p>
+<h3>8.7  字面量和常量</h3>
+<h4>Rule 7.1  不应使用八进制常量</h4>
+<p>[Koenig 9]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>编写具有前导零的常量的开发人员可能期望它们被解释为十进制常量。</p>
+<p>注意：本规则不适用于八进制转义序列，因为使用前导\字符意味着混淆的范围较小。</p>
+<p>例外（Exception）</p>
+<p>整数常量零（写为单个数字），严格来说是八进制常量，但它是本规则的允许例外。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+extern uint16_t code[ 10 ];
+</code></pre>
+<p>code[ 1 ] = 109;   /* 合规 - 十进制109 */</p>
+<p>code[ 2 ] = 100;   /* 合规 - 十进制100 */</p>
+<p>code[ 3 ] = 052;   /* 不合规 - 十进制42 */</p>
+<p>code[ 4 ] = 071;   /* 不合规 - 十进制57 */</p>
+<p>---</p>
+<h4>Rule 7.2  对所有以无符号类型表示的整数常量应添加&quot;u&quot;或&quot;U&quot;后缀</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>本规则适用于：</p>
+<p>• 出现在#if和#elif预处理指令的控制表达式中的整数常量；</p>
+<p>• 预处理后存在的任何其他整数常量。</p>
+<p>注意：在预处理期间，整数常量的类型以与预处理后相同的方式确定，除了：</p>
+<p>• 所有有符号整数类型的行为如同它们是long（C90）或intmax_t（C99）；</p>
+<p>• 所有无符号整数类型的行为如同它们是unsigned long（C90）或uintmax_t（C99）。</p>
+<p>理由（Rationale）</p>
+<p>整数常量的类型是一个潜在的混淆来源，因为它依赖于多种因素的复杂组合，包括：</p>
+<p>• 常量的大小；</p>
+<p>• 整数类型的实现大小；</p>
+<p>• 任何后缀的存在；</p>
+<p>• 值表示的数制（即十进制、八进制或十六进制）。</p>
+<p>例如，整数常量40000在32位环境中是signed int类型，但在16位环境中是signed long类型。值0x8000在16位环境中是unsigned int类型，但在32位环境中是signed int类型。</p>
+<p>注意：</p>
+<p>• 任何带有&quot;U&quot;后缀的值是无符号类型；</p>
+<p>• 小于2^31的无后缀十进制值是有符号类型。</p>
+<p>但：</p>
+<p>• 大于或等于2^15的无后缀十六进制值可能是有符号或无符号类型；</p>
+<p>• 对于C90，大于或等于2^31的无后缀十进制值可能是有符号或无符号类型。</p>
+<p>常量的符号性应是显式的。如果常量是无符号类型，添加&quot;U&quot;后缀清楚地表明程序员理解该常量是无符号的。</p>
+<p>注意：本规则不依赖于使用常量的上下文；可能应用于常量的提升和其他转换与确定本规则合规性无关。</p>
+<p>示例（Rule 7.2 续）</p>
+<p>以下示例假设机器具有16位int类型和32位long类型。它显示了根据标准确定的每个整数常量的类型。整数常量0x8000不合规，因为它具有无符号类型但没有&quot;U&quot;后缀。</p>
+<p>常量        类型             合规性</p>
+<p>32767       signed int        合规</p>
+<p>32768       signed long       合规</p>
+<p>32768u      unsigned int      合规</p>
+<p>0x7fff      signed int        合规</p>
+<p>0x8000      unsigned int      不合规</p>
+<p>0x8000u     unsigned int      合规</p>
+<p>---</p>
+<h4>Rule 7.3  小写字母&quot;l&quot;不应在字面量后缀中使用</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>使用大写后缀&quot;L&quot;消除了声明字面量时&quot;1&quot;（数字1）和&quot;l&quot;（字母&quot;el&quot;）之间的潜在歧义。</p>
+<p><strong>示例</strong></p>
+<p>注意：包含long long后缀的示例仅适用于C99。</p>
+<pre><code>
+const int64_t   a = 0L;     /* 合规 */
+const int64_t   b = 0l;     /* 不合规 */
+const uint64_t  c = 0Lu;    /* 合规 */
+const uint64_t  d = 0lU;    /* 不合规 */
+const uint64_t  e = 0ULL;   /* 合规 */
+const uint64_t  f = 0Ull;   /* 不合规 */
+const int128_t  g = 0LL;    /* 合规 */
+const int128_t  h = 0ll;    /* 不合规 */
+const float128_t m = 1.2L;  /* 合规 */
+const float128_t n = 2.4l;  /* 不合规 */
+</code></pre>
+<p>---</p>
+<h4>Rule 7.4  字符串字面量不应赋值给对象，除非该对象的类型为&quot;指向const限定char的指针&quot;</h4>
+<p>C90 [Undefined 12], C99 [Unspecified 14; Undefined 30]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>不应尝试直接修改字符串字面量或宽字符串字面量。</p>
+<p>取地址运算符&amp;应用于字符串字面量的结果不应赋值给对象，除非该对象的类型为&quot;指向const限定char数组的指针&quot;。</p>
+<p>同样的考虑适用于宽字符串字面量。宽字符串字面量不应赋值给对象，除非该对象的类型为&quot;指向const限定wchar_t的指针&quot;。取地址运算符&amp;应用于宽字符串字面量的结果不应赋值给对象，除非该对象的类型为&quot;指向const限定wchar_t数组的指针&quot;。</p>
+<p>理由（Rationale）</p>
+<p>任何修改字符串字面量的尝试都会导致未定义行为。例如，某些实现可能将字符串字面量存储在只读内存中，在这种情况下，尝试修改字符串字面量将失败，并可能导致异常或崩溃。</p>
+<p>当与其他规则结合应用时，本规则可防止字符串字面量被修改。</p>
+<p>在C99中，共享公共结尾的字符串字面量是否存储在不同的内存位置是显式未指定的。因此，即使修改字符串字面量的尝试看似成功，另一个字符串字面量也可能被无意更改。</p>
+<p><strong>示例</strong></p>
+<p>以下示例显示直接尝试修改字符串字面量：</p>
+<p>&quot;0123456789&quot;[0] = &#x27;*&#x27;;  /* 不合规 */</p>
+<p>以下示例显示如何间接防止修改字符串字面量：</p>
+<p>/* 不合规 - s不是const限定的 */</p>
+<pre><code>
+char *s = &quot;string&quot;;
+</code></pre>
+<p>/* 合规 - p是const限定的；允许额外的限定符 */</p>
+<pre><code>
+const volatile char *p = &quot;string&quot;;
+</code></pre>
+<pre><code>
+extern void f1 ( char *s1 );
+extern void f2 ( const char *s2 );
+</code></pre>
+<pre><code>
+void g ( void )
+</code></pre>
+<p>{</p>
+<p>f1 ( &quot;string&quot; );   /* 不合规 - 参数s1不是const限定的 */</p>
+<p>f2 ( &quot;string&quot; );   /* 合规 */</p>
+<p>}</p>
+<pre><code>
+char *name1 ( void )         /* 不合规 - 返回类型不是const限定的 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  return ( &quot;MISRA&quot; );
+</code></pre>
+<p>}</p>
+<pre><code>
+const char *name2 ( void )   /* 合规 */
+</code></pre>
+<p>{</p>
+<pre><code>
+  return ( &quot;MISRA&quot; );
+</code></pre>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 11.4, Rule 11.8</h4>
+<p>---</p>
+<h3>8.8  声明和定义</h3>
+<h4>Rule 8.1  类型应被显式指定</h4>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90</p>
+<p>理由（Rationale）</p>
+<p>C90标准允许在某些情况下省略类型，在这种情况下隐式指定int类型。可能使用隐式int的情况示例包括：</p>
+<p>• 对象声明；</p>
+<p>• 参数声明；</p>
+<p>• 成员声明；</p>
+<p>• typedef声明；</p>
+<p>• 函数返回类型。</p>
+<p>省略显式类型可能导致混淆。例如，在声明中：</p>
+<pre><code>
+extern void g ( char c, const k );
+</code></pre>
+<p>k的类型是const int，而可能期望的是const char。</p>
+<p><strong>示例</strong></p>
+<p>以下示例显示合规和不合规的对象声明：</p>
+<pre><code>
+extern x;              /* 不合规 - 隐式int类型 */
+extern int16_t x;      /* 合规 - 显式类型 */
+const y;               /* 不合规 - 隐式int类型 */
+const int16_t y;       /* 合规 - 显式类型 */
+</code></pre>
+<p>以下示例显示合规和不合规的函数类型声明：</p>
+<pre><code>
+extern f ( void );                    /* 不合规 - 隐式int返回类型 */
+extern int16_t f ( void );            /* 合规 */
+extern void g ( char c, const k );    /* 不合规 - 参数k为隐式int */
+extern void g ( char c, const int16_t k );  /* 合规 */
+</code></pre>
+<p>以下示例显示合规和不合规的类型定义：</p>
+<pre><code>
+typedef ( *pfi ) ( void );                 /* 不合规 - 隐式int返回类型 */
+typedef int16_t ( *pfi ) ( void );         /* 合规 */
+typedef void ( *pfv ) ( const x );         /* 不合规 - 参数x为隐式int */
+typedef void ( *pfv ) ( int16_t x );       /* 合规 */
+</code></pre>
+<p>以下示例显示合规和不合规的成员声明：</p>
+<pre><code>
+struct str
+</code></pre>
+<p>{</p>
+<pre><code>
+  int16_t x;    /* 合规 */
+  const y;      /* 不合规 - 成员y为隐式int */
+</code></pre>
+<p>} s;</p>
+<p>另见</p>
+<h4>Rule 8.2</h4>
+<p>---</p>
+<h4>Rule 8.2  函数类型应采用带有命名参数的原型形式</h4>
+<p>C90 [Undefined 22–25], C99 [Undefined 36–39, 73, 79]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>理由（Rationale）</p>
+<p>C语言的早期版本（通常称为K&amp;R C [30]）没有提供对照相应参数检查参数数量或类型的机制。在K&amp;R C中，对象或函数的类型不必声明，因为对象的默认类型和函数的默认返回类型是int。</p>
+<p>C90标准引入了函数原型，这是一种声明参数类型的函数声明符形式。这允许对照参数类型检查参数类型。它还允许检查参数数量，除非函数原型指定期望可变数量的参数。出于与现有代码向后兼容的原因，C90标准不要求使用函数原型。出于同样的原因，它继续允许省略类型，在这种情况下类型默认为int。</p>
+<p>C99标准从语言中移除了默认int类型，但继续允许K&amp;R风格的函数类型，其中在声明中无法提供参数类型信息，在定义中提供参数类型信息是可选的。</p>
+<p>参数和参数数量、类型以及函数的预期返回类型和实际返回类型之间的不匹配可能导致未定义行为。本规则以及Rule 8.1和Rule 8.4的目的是通过要求显式指定参数类型和函数返回类型来避免这种未定义行为。Rule 17.3确保在函数调用时可获得此信息，从而要求编译器诊断检测到的任何不匹配。</p>
+<p>本规则还要求在声明中为所有参数指定名称。参数名称可以提供有关函数接口的有用信息，声明和定义之间的不匹配可能表明编程错误。</p>
+<p>注意：空参数列表在原型中无效。如果函数类型没有参数，其原型形式使用关键字void。</p>
+<p><strong>示例</strong></p>
+<p>第一个示例显示一些函数的声明和其中一些函数的相应定义。</p>
+<p>/* 合规 */</p>
+<pre><code>
+extern int16_t func1 ( int16_t n );
+</code></pre>
+<p>/* 不合规 - 未指定参数名称 */</p>
+<pre><code>
+extern void func2 ( int16_t );
+</code></pre>
+<p>/* 不合规 - 非原型形式 */</p>
+<pre><code>
+static int16_t func3 ( );
+</code></pre>
+<p>/* 合规 - 原型指定0个参数 */</p>
+<pre><code>
+static int16_t func4 ( void );
+</code></pre>
+<p>/* 合规 */</p>
+<pre><code>
+int16_t func1 ( int16_t n )
+</code></pre>
+<p>{</p>
+<pre><code>
+  return n;
+</code></pre>
+<p>}</p>
+<p>/* 不合规 - 旧式标识符和声明列表 */</p>
+<pre><code>
+static int16_t func3 ( vec, n )
+int16_t *vec;
+int16_t n;
+</code></pre>
+<p>{</p>
+<pre><code>
+  return vec[ n - 1 ];
+</code></pre>
+<p>}</p>
+<p>此示例部分显示规则对函数类型在函数声明和定义以外的应用：</p>
+<p>/* 不合规 - 无原型 */</p>
+<pre><code>
+int16_t ( *pf1 ) ( );
+</code></pre>
+<p>/* 合规 - 原型指定0个参数 */</p>
+<pre><code>
+int16_t ( *pf1 ) ( void );
+</code></pre>
+<p>/* 不合规 - 未指定参数名称 */</p>
+<pre><code>
+typedef int16_t ( *pf2_t ) ( int16_t );
+</code></pre>
+<p>/* 合规 */</p>
+<pre><code>
+typedef int16_t ( *pf3_t ) ( int16_t n );
+</code></pre>
+<p>另见</p>
+<h4>Rule 8.1, Rule 8.4, Rule 17.3</h4>
+<p>---</p>
+<h4>Rule 8.3  对象或函数的所有声明应使用相同的名称和类型限定符</h4>
+<p>C90 [Undefined 10], C99 [Undefined 14], [Koenig 59–62]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），系统（System）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>存储类别说明符不包括在本规则的范围内。</p>
+<p>理由（Rationale）</p>
+<p>在同一对象或函数的声明中一致使用类型和限定符鼓励更强的类型化。</p>
+<p>在函数原型中指定参数名称允许对照其声明检查函数定义的接口一致性。</p>
+<p>例外（Exception）</p>
+<p>相同基本类型的兼容版本可以互换使用。例如，int、signed和signed int都是等价的。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+extern void f ( signed int );
+void f ( int );                   /* 合规 - 例外 */
+</code></pre>
+<pre><code>
+extern void g ( int * const );
+void g ( int * );                 /* 不合规 - 类型限定符 */
+</code></pre>
+<p>注意：上述所有内容均不符合Dir 4.6。</p>
+<pre><code>
+extern int16_t func ( int16_t num, int16_t den );
+</code></pre>
+<p>/* 不合规 - 参数名称不匹配 */</p>
+<pre><code>
+int16_t func ( int16_t den, int16_t num )
+</code></pre>
+<p>{</p>
+<pre><code>
+  return num / den;
+</code></pre>
+<p>}</p>
+<p>在本例中，area的定义为参数h使用了与声明中不同的类型名称。这不符规则，即使width_t和height_t是相同的基本类型。</p>
+<pre><code>
+typedef uint16_t width_t;
+typedef uint16_t height_t;
+typedef uint32_t area_t;
+extern area_t area ( width_t w, height_t h );
+</code></pre>
+<p>area_t area ( width_t w, width_t h )  /* 不合规 - h的类型名称与声明不匹配 */</p>
+<p>{</p>
+<pre><code>
+  return ( area_t ) w * h;
+</code></pre>
+<p>}</p>
+<p>本规则不要求函数指针声明使用与函数声明相同的名称。因此以下示例是合规的。</p>
+<pre><code>
+extern void f1 ( int16_t x );
+extern void f2 ( int16_t y );
+void f ( bool_t b )
+</code></pre>
+<p>{</p>
+<pre><code>
+  void ( *fp1 ) ( int16_t z ) = b ? f1 : f2;
+</code></pre>
+<p>}</p>
+<p>另见</p>
+<h4>Rule 8.4</h4>
+<p>---</p>
+<h4>Rule 8.4  当定义具有外部链接的对象或函数时，应有兼容的声明可见</h4>
+<p>C90 [Undefined 24], C99 [Undefined 39]</p>
+<p>类别：要求性（Required）</p>
+<p>分析：可判定（Decidable），单个翻译单元（Single Translation Unit）</p>
+<p>适用于：C90, C99</p>
+<p>详述（Amplification）</p>
+<p>兼容声明是指声明了正在定义的对象或函数的兼容类型的声明。</p>
+<p>理由（Rationale）</p>
+<p>如果在定义对象或函数时该对象或函数的声明可见，编译器必须检查声明和定义是否兼容。在存在函数原型的情况下（如Rule 8.2所要求），检查扩展到函数参数的数量和类型。</p>
+<p>例外（Exception）</p>
+<p>函数main不需要有单独的声明。</p>
+<p><strong>示例</strong></p>
+<p>推荐的实现具有外部链接的对象和函数声明的方法是在头文件中声明它们，然后将头文件包含在所有需要它们的代码文件中，包括定义它们的文件（见Rule 8.5）。</p>
+<p>在这些示例中，除了代码中存在的那些之外，没有对象或函数的声明或定义。</p>
+<pre><code>
+extern int16_t count;
+int16_t count = 0;              /* 合规 */
+</code></pre>
+<pre><code>
+extern uint16_t speed = 6000u;  /* 不合规 - 此定义之前没有声明 */
+</code></pre>
+<p>uint8_t pressure = 101u;        /* 不合规 - 此定义之前没有声明 */</p>
+<pre><code>
+extern void func1 ( void );
+extern void func2 ( int16_t x, int16_t y );
+extern void func3 ( int16_t x, int16_t y );
+</code></pre>
+<pre><code>
+void func1 ( void )  /* 合规 */
+</code></pre>
+<p>{</p>
+<p>}</p>
+<pre><code>
+void func2 ( int16_t x, int16_t y )  /* 合规 */
+</code></pre>
+<p>{</p>
+<p>}</p>
+<p>以下func3的不合规定义也违反Rule 8.3：</p>
+<pre><code>
+void func3 ( int16_t x, uint16_t y )  /* 不合规 - 参数类型不同 */
+</code></pre>
+<p>{</p>
+<p>}</p>
+<pre><code>
+void func4 ( void )  /* 不合规 - 此定义之前没有声明 */
+</code></pre>
+<p>{</p>
+<p>}</p>
+<p>（注：原文此处结束）</p>
+<p>{</p>
+<p>/* 不合规 - func4 在此定义之前未声明</p>
+<p>}</p>
+<pre><code>
+static void func5 ( void )
+</code></pre>
+<p>{</p>
+<p>/* 合规 - 本规则不适用于具有内部链接的对象/函数</p>
+<p>* linkage</p>
+<p>}</p>
+<p>*/</p>
+<p>*/</p>
+<p><strong>参见</strong></p>
+<h4>Rule 8.2, Rule 8.3, Rule 8.5, Rule 17.3</h4>
+<p>69</p>
+<h2>第8章：规则</h2>
+<h4>Rule 8.5</h4>
+<p>外部对象或函数应在且仅在一个文件中声明一次</p>
+<p>[Koenig 66]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>本规则仅适用于非定义性声明。</p>
+<p>原理</p>
+<p>通常，单个声明应当放在一个头文件中，该头文件将被包含到任何定义或使用该标识符的翻译单元中。这确保以下各项之间的一致性：</p>
+<p>•</p>
+<p>声明与定义之间；</p>
+<p>•</p>
+<p>不同翻译单元中的声明之间。</p>
+<p>注：项目中可能存在多个头文件，但每个外部对象或函数应仅在一个头文件中声明。</p>
+<p><strong>示例</strong></p>
+<p>/* featureX.h */</p>
+<pre><code>
+extern int16_t a;
+</code></pre>
+<p>/* 声明 a */</p>
+<p>/* file.c */</p>
+<pre><code>
+#include &quot;featureX.h&quot;
+int16_t a = 0;
+</code></pre>
+<p>/* 定义 a</p>
+<p>*/</p>
+<p><strong>参见</strong></p>
+<h4>Rule 8.4</h4>
+<h4>Rule 8.6</h4>
+<p>具有外部链接的标识符应有且仅有一个外部定义</p>
+<p>C90 [Undefined 44], C99 [Undefined 78], [Koenig 55, 63–65]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>如果一个标识符存在多个定义（在不同文件中）或根本没有定义，则行为是未定义的。即使定义相同，不同文件中的多个定义也是本规则不允许的。如果声明不同，或将标识符初始化为不同的值，则行为是未定义的。</p>
+<p>70</p>
+<h2>第8章：规则</h2>
+<p><strong>示例</strong></p>
+<p>在此示例中，对象 i 被定义了两次。</p>
+<p>/* file1.c */</p>
+<pre><code>
+int16_t i = 10;
+</code></pre>
+<p>/* file2.c */</p>
+<pre><code>
+int16_t i = 20;
+</code></pre>
+<p>/* 不合规 - i 有两个定义</p>
+<p>*/</p>
+<p>在此示例中，对象 j 有一个试探性定义和一个外部定义。</p>
+<p>/* file3.c */</p>
+<pre><code>
+int16_t j;
+int16_t j = 1;
+</code></pre>
+<p>/* 试探性定义</p>
+<p>/* 合规 - 外部定义</p>
+<p>*/</p>
+<p>*/</p>
+<p>以下示例不合规，因为对象 k 有两个外部定义。file4.c 中的试探性定义在翻译单元末尾成为外部定义。</p>
+<p>/* file4.c */</p>
+<pre><code>
+int16_t k;
+</code></pre>
+<p>/* 试探性定义 - 成为外部定义 */</p>
+<p>/* file5.c */</p>
+<pre><code>
+int16_t k = 0;
+</code></pre>
+<p>/* 外部定义</p>
+<h4>Rule 8.7</h4>
+<p>*/</p>
+<p>如果函数和对象仅在一个翻译单元中被引用，则不应定义为具有外部链接</p>
+<p>[Koenig 56, 57]</p>
+<p><strong>类别</strong></p>
+<p><strong>建议性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>通过赋予对象内部链接或不赋予链接来限制其可见性，可以减少其被意外访问的可能性。同样，通过赋予函数内部链接来降低其可见性，可以减少其被意外调用的可能性。</p>
+<p>遵循本规则还可以避免标识符与另一个翻译单元或库中相同标识符之间的混淆。</p>
+<h4>Rule 8.8</h4>
+<p>在具有内部链接的对象和函数的所有声明中，应使用 static 存储类说明符</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>由于定义也是声明，本规则同样适用于定义。</p>
+<p>原理</p>
+<p>标准规定，如果一个对象或函数使用 extern 存储类说明符声明，且该对象或函数的另一个声明已经可见，则链接由先前的声明指定。这可能令人困惑，因为人们可能期望 extern 存储类说明符创建外部链接。因此，对于具有内部链接的对象和函数，应统一使用 static 存储类说明符。</p>
+<p>71</p>
+<h2>第8章：规则</h2>
+<p><strong>示例</strong></p>
+<pre><code>
+static int32_t x = 0;
+extern int32_t x;
+</code></pre>
+<p>/* 定义：内部链接</p>
+<p>/* 不合规</p>
+<p>*/</p>
+<p>*/</p>
+<pre><code>
+static int32_t f ( void );
+int32_t f ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+return 1;
+</code></pre>
+<p>}</p>
+<p>/* 声明：内部链接 */</p>
+<p>/* 不合规</p>
+<p>*/</p>
+<pre><code>
+static int32_t g ( void );
+extern int32_t g ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+return 1;
+</code></pre>
+<p>}</p>
+<p>/* 声明：内部链接 */</p>
+<p>/* 不合规</p>
+<p>*/</p>
+<h4>Rule 8.9</h4>
+<p>如果一个对象的标识符仅出现在单个函数中，则该对象应在块作用域中定义</p>
+<p><strong>类别</strong></p>
+<p><strong>建议性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>在块作用域中定义对象可以减少该对象被意外访问的可能性，并明确表明不应在其他地方访问它的意图。</p>
+<p>在函数内部，对象是在最外层块还是最内层块定义在很大程度上是一个风格问题。</p>
+<p>应当认识到，在某些情况下可能无法遵循本规则。例如，在块作用域中声明的具有静态存储期的对象不能从块外部直接访问。这使得在不使用间接访问该对象的情况下，无法建立和检查单元测试用例的结果。在这种情况下，某些项目可能选择不应用本规则。</p>
+<p><strong>示例</strong></p>
+<p>在此合规示例中，i 在块作用域中声明，因为它是循环计数器。同一文件中的其他函数不需要将同一对象用于任何其他目的。</p>
+<pre><code>
+void func ( void )
+</code></pre>
+<p>{</p>
+<pre><code>
+int32_t i;
+</code></pre>
+<p>}</p>
+<p>72</p>
+<pre><code>
+for ( i = 0; i &lt; N; ++i )
+</code></pre>
+<p>{</p>
+<p>}</p>
+<p>在此合规示例中，函数 count 跟踪自身被调用的次数并返回该次数。其他函数不需要了解 count 的实现细节，因此调用计数器在块作用域中定义。</p>
+<p>}</p>
+<p>++call_count;</p>
+<pre><code>
+return call_count;
+</code></pre>
+<h4>Rule 8.10</h4>
+<p>内联函数应使用 static 存储类说明符声明</p>
+<h2>第8章：规则</h2>
+<p>uint32_t count ( void )</p>
+<p>{</p>
+<pre><code>
+static uint32_t call_count = 0;
+</code></pre>
+<p>C99 [Unspecified 20; Undefined 67]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C99</p>
+<p>原理</p>
+<p>如果内联函数声明为具有外部链接但在同一翻译单元中未定义，则行为是未定义的。</p>
+<p>对声明为具有外部链接的内联函数的调用，可能调用该函数的外部定义，也可能使用内联定义。虽然这不应影响被调用函数的行为，但可能影响执行时序，从而对实时程序产生影响。</p>
+<p>注：可以通过将内联函数的定义放在头文件中，使其对多个翻译单元可用。</p>
+<p><strong>参见</strong></p>
+<h4>Rule 5.9</h4>
+<h4>Rule 8.11</h4>
+<p>当声明具有外部链接的数组时，应显式指定其大小</p>
+<p><strong>类别</strong></p>
+<p><strong>建议性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>本规则仅适用于非定义性声明。可以通过初始化来隐式指定数组的大小并进行定义。</p>
+<p>原理</p>
+<p>虽然可以使用不完整类型声明数组并访问其元素，但能够显式确定数组大小时更安全。为每个声明提供大小信息可以检查它们的一致性。这也可以使静态检查器无需分析多个翻译单元即可执行某些数组边界分析。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+extern int32_t array1[ 10 ];
+extern int32_t array2[ ];
+</code></pre>
+<p>/* 合规</p>
+<p>*/</p>
+<p>/* 不合规 */</p>
+<p>73</p>
+<h2>第8章：规则</h2>
+<h4>Rule 8.12</h4>
+<p>在枚举器列表中，隐式指定的枚举常量值应是唯一的</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>隐式指定的枚举常量的值比其前一个常量大1。如果第一个枚举常量是隐式指定的，则其值为0。</p>
+<p>显式指定的枚举常量具有关联常量表达式的值。</p>
+<p>如果隐式指定和显式指定的常量在枚举列表中混合使用，则值可能会重复。这种重复可能是无意的，并可能导致意外行为。</p>
+<p>本规则要求枚举常量的任何重复都必须是显式的，从而使意图清晰。</p>
+<p><strong>示例</strong></p>
+<p>在以下示例中，green 和 yellow 枚举常量被赋予相同的值。</p>
+<p>/* 不合规 - yellow 复制了隐式的 green */</p>
+<pre><code>
+enum colour { red = 3, blue, green, yellow = 5 };
+</code></pre>
+<p>/* 合规</p>
+<p>*/</p>
+<pre><code>
+enum colour { red = 3, blue, green = 5, yellow = 5 };
+</code></pre>
+<h4>Rule 8.13</h4>
+<p>只要可能，指针应指向 const 限定类型</p>
+<p><strong>类别</strong></p>
+<p><strong>建议性</strong></p>
+<p><strong>分析</strong></p>
+<p>不可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>指针应指向 const 限定类型，除非：</p>
+<p>•</p>
+<p>它用于修改对象，或</p>
+<p>•</p>
+<p>它被复制到另一个指向非 const 限定类型的指针，通过以下任一方式：</p>
+<p>-- 赋值，或</p>
+<p>-- 内存移动或复制函数。</p>
+<p>为简单起见，本规则以指针及其指向的类型来表述。但是，它同样适用于数组及其包含的元素类型。数组应具有 const 限定类型的元素，除非：</p>
+<p>74</p>
+<p>•</p>
+<p>数组的任何元素被修改，或</p>
+<p>•</p>
+<p>它被复制到指向非 const 限定类型的指针（通过上述方式）。</p>
+<p>本规则鼓励最佳实践，确保指针不会被无意中用于修改对象。从概念上讲，这相当于最初声明：</p>
+<p>•</p>
+<p>所有数组的元素都具有 const 限定类型，以及</p>
+<p>•</p>
+<p>所有指针都指向 const 限定类型。</p>
+<h2>第8章：规则</h2>
+<p>原理</p>
+<p>然后仅在需要满足语言标准约束的地方移除 const 限定。</p>
+<p><strong>示例</strong></p>
+<p>在以下不合规示例中，p 不用于修改对象，但其指向的类型不是 const 限定的。</p>
+<p>uint16_t f ( uint16_t *p )</p>
+<p>{</p>
+<pre><code>
+return *p;
+</code></pre>
+<p>}</p>
+<p>如果函数定义为以下形式，则代码是合规的：</p>
+<p>uint16_t g ( const uint16_t *p )</p>
+<p>以下示例违反约束，因为尝试使用 const 限定指针修改对象。</p>
+<pre><code>
+void h ( const uint16_t *p )
+</code></pre>
+<p>{</p>
+<p>*p = 0;</p>
+<p>}</p>
+<p>在以下示例中，指针 s 是 const 限定的，但其指向的类型不是。由于 s 不用于修改对象，这是不合规的。</p>
+<pre><code>
+#include &lt;string.h&gt;
+char last_char ( char * const s )
+</code></pre>
+<p>{</p>
+<pre><code>
+return s[ strlen ( s ) - 1u ];
+</code></pre>
+<p>}</p>
+<p>如果函数定义为以下形式，则代码是合规的：</p>
+<pre><code>
+char last_char ( const char * const s )
+</code></pre>
+<p>在此不合规示例中，数组 a 的元素都没有被修改，但元素类型不是 const 限定的。</p>
+<p>uint16_t first ( uint16_t a[ 5 ] )</p>
+<p>{</p>
+<pre><code>
+return a[ 0 ];
+</code></pre>
+<p>}</p>
+<p>如果函数定义为以下形式，则代码是合规的：</p>
+<p>uint16_t first ( const uint16_t a[ 5 ] )</p>
+<p>75</p>
+<h2>第8章：规则</h2>
+<h4>Rule 8.14</h4>
+<p>不得使用 restrict 类型限定符</p>
+<p>C99 [Undefined 65, 66]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C99</p>
+<p>原理</p>
+<p>谨慎使用时，restrict 类型限定符可以提高编译器生成代码的效率。它还可以改善静态分析。但是，要使用 restrict 类型限定符，程序员必须确保由两个或多个指针操作的内存区域不重叠。</p>
+<p>如果 restrict 使用不当，编译器生成不符合预期的代码的风险很大。</p>
+<p><strong>示例</strong></p>
+<p>以下示例是合规的，因为 MISRA C 指南不适用于标准库函数。程序员必须确保 p、q 和 n 定义的区域不重叠。</p>
+<pre><code>
+#include &lt;string.h&gt;
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>/* memcpy 具有 restrict 限定的参数 */</p>
+<p>memcpy ( p, q, n );</p>
+<p>}</p>
+<p>以下示例不合规，因为定义了一个使用 restrict 的函数。</p>
+<pre><code>
+void user_copy ( void * restrict p, void * restrict q, size_t n )
+</code></pre>
+<p>{</p>
+<p>}</p>
+<p>8.9</p>
+<p>初始化</p>
+<h4>Rule 9.1</h4>
+<p>具有自动存储期的对象的值在设置之前不应被读取</p>
+<p>C90 [Undefined 41], C99 [Undefined 10, 17]</p>
+<p><strong>类别</strong></p>
+<p><strong>强制性</strong></p>
+<p><strong>分析</strong></p>
+<p>不可判定，系统级</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>就本规则而言，数组元素或结构体成员应被视为离散对象。</p>
+<p>76</p>
+<p>根据标准，具有静态存储期的对象除非显式初始化，否则自动初始化为零。具有自动存储期的对象不会自动初始化，因此可能具有不确定的值。</p>
+<p>注：有时自动对象的显式初始化可能被忽略。当使用 goto 或 switch 语句跳转到标签时，如果&quot;绕过&quot;了对象的声明，就会发生这种情况；对象将按预期被声明，但任何显式初始化将被忽略。</p>
+<h2>第8章：规则</h2>
+<p>原理</p>
+<p><strong>示例</strong></p>
+<pre><code>
+void f ( bool_t b, uint16_t *p )
+</code></pre>
+<p>{</p>
+<pre><code>
+if ( b )
+</code></pre>
+<p>{</p>
+<p>*p = 3U;</p>
+<p>}</p>
+<p>}</p>
+<pre><code>
+void g ( void )
+</code></pre>
+<p>{</p>
+<p>uint16_t u;</p>
+<p>f ( false, &amp;u );</p>
+<p>}</p>
+<pre><code>
+if ( u == 3U )
+</code></pre>
+<p>{</p>
+<p>/* 不合规 - u 尚未被赋值 */</p>
+<p>}</p>
+<p>在以下不合规的 C99 示例中，goto 语句跳过了 x 的初始化。</p>
+<p>注：此示例也不符合 Rule 15.1。</p>
+<p>{</p>
+<pre><code>
+goto L1;
+</code></pre>
+<p>uint16_t x = 10u;</p>
+<p>L1:</p>
+<p>x = x + 1u;</p>
+<p>}</p>
+<p>/* 不合规 - x 尚未被赋值 */</p>
+<p><strong>参见</strong></p>
+<h4>Rule 15.1, Rule 15.3</h4>
+<p>77</p>
+<h2>第8章：规则</h2>
+<h4>Rule 9.2</h4>
+<p>聚合体或联合体的初始化器应使用花括号括起来</p>
+<p>C90 [Undefined 42], C99 [Undefined 76, 77]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>本规则适用于对象和子对象的初始化器。</p>
+<p>形式为 { 0 } 的初始化器（将所有值设为零）可用于初始化子对象而不使用嵌套花括号。</p>
+<p>注：本规则本身不要求对象或子对象的显式初始化。</p>
+<p>原理</p>
+<p>使用花括号来表示子对象的初始化可以提高代码的清晰度，并迫使程序员考虑复杂数据结构（如多维数组或结构体数组）中元素的初始化。</p>
+<p><strong>例外</strong></p>
+<p>1.</p>
+<p>可以使用字符串字面量来初始化数组。</p>
+<p>2.</p>
+<p>可以使用具有兼容结构体或联合体类型的表达式来初始化自动结构体或联合体。</p>
+<p>3.</p>
+<p>可以使用指定初始化器来初始化子对象的一部分。</p>
+<p><strong>示例</strong></p>
+<p>以下三种初始化（标准允许的）是等价的。第一种形式不被本规则允许，因为它没有使用花括号显式显示子数组的初始化。</p>
+<pre><code>
+int16_t y[ 3 ][ 2 ] = { 1, 2, 0, 0, 5, 6 };
+</code></pre>
+<p>/* 不合规 */</p>
+<pre><code>
+int16_t y[ 3 ][ 2 ] = { { 1, 2 }, { 0 }, { 5, 6 } };
+</code></pre>
+<p>/* 合规</p>
+<p>*/</p>
+<pre><code>
+int16_t y[ 3 ][ 2 ] = { { 1, 2 }, { 0, 0 }, { 5, 6 } }; /* 合规
+</code></pre>
+<p>*/</p>
+<p>在以下示例中，z1 的初始化根据例外3是合规的，因为使用了指定初始化器来初始化子对象 z1[ 1 ]。z2 的初始化出于同样原因也是合规的。z3 的初始化不合规，因为子对象 z3[ 1 ] 的一部分使用位置初始化器初始化，但没有用花括号括起来。z4 的初始化是合规的，因为使用指定初始化器初始化子对象 z4[ 0 ]，并且子对象 z4[ 1 ] 的初始化器是用花括号括起来的。</p>
+<pre><code>
+int16_t z1[ 2 ][ 2 ] = { { 0 }, [ 1 ][ 1 ] = 1 };
+</code></pre>
+<p>/* 合规</p>
+<p>*/</p>
+<pre><code>
+int16_t z2[ 2 ][ 2 ] = { { 0 },
+</code></pre>
+<p>[ 1 ][ 1 ] = 1, [ 1 ][ 0 ] = 0</p>
+<p>};</p>
+<p>/* 合规</p>
+<p>*/</p>
+<pre><code>
+int16_t z3[ 2 ][ 2 ] = { { 0 }, [ 1 ][ 0 ] = 0, 1 };
+</code></pre>
+<p>/* 不合规 */</p>
+<pre><code>
+int16_t z4[ 2 ][ 2 ] = { [ 0 ][ 1 ] = 0, { 0, 1 } };
+</code></pre>
+<p>/* 合规</p>
+<p>*/</p>
+<p>78</p>
+<pre><code>
+float32_t a[ 3 ][ 2 ] = { 0 };
+float32_t a[ 3 ][ 2 ] = { { 0 }, { 0 }, { 0 } };
+float32_t a[ 3 ][ 2 ] = { { 0.0f, 0.0f },
+</code></pre>
+<p>{ 0.0f, 0.0f },</p>
+<p>{ 0.0f, 0.0f }</p>
+<p>};</p>
+<pre><code>
+union u1 {
+int16_t
+</code></pre>
+<p>i;</p>
+<pre><code>
+float32_t f;
+</code></pre>
+<p>} u = { 0 };</p>
+<p>/* 合规</p>
+<p>/* 合规</p>
+<p>*/</p>
+<p>*/</p>
+<p>/* 合规</p>
+<p>*/</p>
+<p>/* 合规</p>
+<p>*/</p>
+<pre><code>
+struct s1 {
+</code></pre>
+<p>uint16_t len;</p>
+<pre><code>
+char
+</code></pre>
+<p>buf[ 8 ];</p>
+<p>} s[ 3 ] = {</p>
+<p>{ 5u, { &#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;, &#x27;\0&#x27;, &#x27;\0&#x27;, &#x27;\0&#x27; } },</p>
+<p>{ 2u, { 0 } },</p>
+<p>{ .len = 0u }</p>
+<p>/* 合规 - buf 被隐式初始化</p>
+<p>};</p>
+<p>/* 合规 - s[] 被完全初始化</p>
+<h4>Rule 9.3</h4>
+<p>数组不应被部分初始化</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<h2>第8章：规则</h2>
+<p>以下示例中的第一行初始化了3个子数组，但未使用嵌套花括号。第二行和第三行显示了编写相同初始化器的等价方式。</p>
+<p>*/</p>
+<p>*/</p>
+<p>补充说明</p>
+<p>如果数组对象或子对象的任何元素被显式初始化，则整个对象或子对象应被显式初始化。</p>
+<p>原理</p>
+<p>为数组的每个元素提供显式初始化可以清楚地表明每个元素都已被考虑。</p>
+<p><strong>例外</strong></p>
+<p>1.</p>
+<p>形式为 { 0 } 的初始化器可用于显式初始化数组对象或子对象的所有元素。</p>
+<p>2.</p>
+<p>可以使用仅包含指定初始化器的数组初始化器，例如执行稀疏初始化。</p>
+<p>3.</p>
+<p>使用字符串字面量初始化的数组不需要为每个元素提供初始化器。</p>
+<p><strong>示例</strong></p>
+<p>/* 合规 */</p>
+<pre><code>
+int32_t x[ 3 ] = { 0, 1, 2 };
+</code></pre>
+<p>/* 不合规 - y[ 2 ] 被隐式初始化 */</p>
+<pre><code>
+int32_t y[ 3 ] = { 0, 1 };
+</code></pre>
+<p>79</p>
+<h2>第8章：规则</h2>
+<p>/* 不合规 - t[ 0 ] 和 t[ 3 ] 被隐式初始化 */</p>
+<pre><code>
+float32_t t[ 4 ] = { [ 1 ] = 1.0f, 2.0f };
+</code></pre>
+<p>/* 合规 - 用于稀疏矩阵的指定初始化器 */</p>
+<pre><code>
+float32_t z[ 50 ] = { [ 1 ] = 1.0f, [ 25 ] = 2.0f };
+</code></pre>
+<p>在以下合规示例中，数组 arr 的每个元素都被初始化：</p>
+<pre><code>
+float32_t arr[ 3 ][ 2 ] =
+</code></pre>
+<p>{</p>
+<p>{ 0.0f, 0.0f },</p>
+<p>{ PI / 4.0f, -PI / 4.0f },</p>
+<p>{ 0 }</p>
+<p>/* 初始化数组子对象 arr[ 2 ] 的所有元素 */</p>
+<p>};</p>
+<p>在以下示例中，数组元素 6 到 9 被隐式初始化为 &#x27;\0&#x27;：</p>
+<pre><code>
+char h[ 10 ] = &quot;Hello&quot;;
+</code></pre>
+<p>/* 根据例外3合规 */</p>
+<h4>Rule 9.4</h4>
+<p>对象的元素不应被多次初始化</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C99</p>
+<p>补充说明</p>
+<p>本规则适用于对象和子对象的初始化器。</p>
+<p>C99 中提供的指定初始化器允许在初始化器列表中命名要初始化的聚合体（结构体或数组）或联合体的组件，并允许通过指定它们所适用的数组索引或结构体成员名称以任何顺序初始化对象的元素（没有初始化值的元素采用未初始化对象的默认值）。</p>
+<p>原理</p>
+<p>使用指定初始化器时需要小心，因为对象元素的初始化可能无意中被重复，导致覆盖先前初始化的元素。C99 标准没有规定被覆盖的初始化器中的副作用是否发生，尽管这在附录 J 中没有列出。</p>
+<p>为了允许稀疏数组和结构体，仅初始化应用程序所需的那些元素是可以接受的。</p>
+<p><strong>示例</strong></p>
+<p>数组初始化：</p>
+<p>/*</p>
+<p>* 使用位置初始化的所需行为</p>
+<p>* 合规 - a1 为 -5, -4, -3, -2, -1</p>
+<p>*/</p>
+<pre><code>
+int16_t a1[ 5 ] = { -5, -4, -3, -2, -1 };
+</code></pre>
+<p>80</p>
+<p>/*</p>
+<p>* 使用指定初始化器的类似行为</p>
+<p>* 合规 - a2 为 -5, -4, -3, -2, -1</p>
+<p>*/</p>
+<pre><code>
+int16_t a2[ 5 ] = { [ 0 ] = -5, [ 1 ] = -4, [ 2 ] = -3,
+</code></pre>
+<p>[ 3 ] = -2, [ 4 ] = -1</p>
+<p>};</p>
+<p>在以下不合规示例中，副作用是否发生是未指定的：</p>
+<p>uint16_t *p;</p>
+<h2>第8章：规则</h2>
+<p>/*</p>
+<p>* 重复的指定初始化器元素值会覆盖先前的值</p>
+<p>* 不合规 - a3 为 -5, -4, -2, 0, -1</p>
+<p>*/</p>
+<pre><code>
+int16_t a3[ 5 ] = { [ 0 ] = -5, [ 1 ] = -4, [ 2 ] = -3,
+</code></pre>
+<p>[ 2 ] = -2, [ 4 ] = -1</p>
+<p>};</p>
+<pre><code>
+void f ( void )
+</code></pre>
+<p>{</p>
+<p>uint16_t a[ 2 ] = { [ 0 ] = *p++, [ 0 ] = 1 };</p>
+<p>}</p>
+<p>结构体初始化：</p>
+<pre><code>
+struct mystruct
+</code></pre>
+<p>{</p>
+<pre><code>
+int32_t a;
+int32_t b;
+int32_t c;
+int32_t d;
+</code></pre>
+<p>};</p>
+<p>/*</p>
+<p>* 使用位置初始化的所需行为</p>
+<p>* 合规 - s1 为 100, -1, 42, 999</p>
+<p>*/</p>
+<pre><code>
+struct mystruct s1 = { 100, -1, 42, 999 };
+</code></pre>
+<p>/*</p>
+<p>* 使用指定初始化器的类似行为</p>
+<p>* 合规 - s2 为 100, -1, 42, 999</p>
+<p>*/</p>
+<pre><code>
+struct mystruct s2 = { .a = 100, .b = -1, .c = 42, .d = 999 };
+</code></pre>
+<p>/*</p>
+<p>* 重复的指定初始化器元素值会覆盖先前的值</p>
+<p>* 不合规 - s3 为 42, -1, 0, 999</p>
+<p>*/</p>
+<pre><code>
+struct mystruct s3 = { .a = 100, .b = -1, .a = 42, .d = 999 };
+</code></pre>
+<h4>Rule 9.5</h4>
+<p>当使用指定初始化器初始化数组对象时，数组的大小应显式指定</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C99</p>
+<p>补充说明</p>
+<p>本规则同样适用于作为柔性数组成员的数组子对象。</p>
+<p>原理</p>
+<p>如果数组的大小未显式指定，则由所初始化元素中的最高索引决定。当使用指定初始化器时，可能并不总能清楚地确定哪个初始化器具有最高索引，特别是当初始化器包含大量元素时。</p>
+<p>81</p>
+<h2>第8章：规则</h2>
+<p>为了明确意图，数组大小应显式声明。如果在程序开发过程中初始化元素的索引发生改变，这可以提供一些保护，因为初始化数组边界之外的元素是一种约束违反（C99 第6.7.8节）。</p>
+<p><strong>示例</strong></p>
+<p>/* 不合规 - 可能无意中只有单个元素 */</p>
+<pre><code>
+int a1[ ] = { [ 0 ] = 1 };
+</code></pre>
+<p>/* 合规</p>
+<pre><code>
+int a2[ 10 ] = { [ 0 ] = 1 };
+</code></pre>
+<p>*/</p>
+<h3>8.10 基本类型模型</h3>
+<p>8.10.1 原理</p>
+<p>本节中的规则共同定义了基本类型模型并限制 C 类型系统，以便：</p>
+<p>1.</p>
+<p>支持更强的类型检查系统；</p>
+<p>2.</p>
+<p>为定义控制隐式和显式类型转换使用的规则提供合理基础；</p>
+<p>3.</p>
+<p>促进可移植的编码实践；</p>
+<p>4. 解决 ISO C 中发现的一些类型转换异常。</p>
+<p>基本类型模型通过为 ISO C 认为具有算术类型的对象和表达式分配一个基本类型来实现这一点。例如，将一个 int 与一个 char 相加得到的结果具有基本字符类型，而不是整数提升实际产生的 int 类型。</p>
+<p>基本类型模型背后的完整原理在附录 C 中给出，附录 D 提供了任何算术表达式的基本类型的全面定义。</p>
+<p>8.10.2 基本类型</p>
+<p>对象或表达式的基本类型由其基本类型类别和大小来定义。</p>
+<p>表达式的基本类型类别反映其底层行为，可以是：</p>
+<p>82</p>
+<p>•</p>
+<p>基本布尔型；</p>
+<p>•</p>
+<p>基本字符型；</p>
+<p>•</p>
+<p>基本枚举型；</p>
+<p>•</p>
+<p>基本有符号型；</p>
+<p>•</p>
+<p>基本无符号型；</p>
+<p>•</p>
+<p>基本浮点型。</p>
+<p>注：每个枚举类型都是唯一的基本枚举类型，标识为 enum&lt;i&gt;。这允许将不同的枚举类型作为不同的类型处理，从而支持更强的类型检查系统。一个例外是在 C90 中使用枚举类型定义布尔值。此类类型被认为具有基本布尔类型。另一个例外是使用附录 D 中定义的匿名枚举。匿名枚举是定义一组相关常整数的一种方式，被认为具有基本有符号类型。</p>
+<p>下表显示了标准整数类型如何映射到基本类型类别。</p>
+<p>基本类型类别</p>
+<p>布尔型</p>
+<p>字符型</p>
+<p>有符号型</p>
+<p>无符号型</p>
+<pre><code>
+enum&lt;i&gt;
+</code></pre>
+<p>浮点型</p>
+<p>_Bool</p>
+<pre><code>
+char
+</code></pre>
+<pre><code>
+signed char
+signed short
+signed int
+signed long
+signed long long
+</code></pre>
+<pre><code>
+unsigned char
+unsigned short
+unsigned int
+unsigned long
+unsigned long long
+</code></pre>
+<p>命名 enum</p>
+<pre><code>
+float
+double
+long double
+</code></pre>
+<h2>第8章：规则</h2>
+<p>在比较同一类型类别的两种类型时，使用术语&quot;更宽&quot;和&quot;更窄&quot;来描述它们以字节为单位的相对大小。两种不同的类型有时以相同的大小实现。</p>
+<p>注：C99 实现可能提供扩展整数类型，每种类型将根据其秩和有符号性分配到适当的位置（参见 C99 第6.3.1.1节）。</p>
+<p>本节中规则所强制执行的限制也适用于复合赋值运算符（例如 ^=），因为它们等效于赋值使用算术、按位或移位运算符之一获得的结果。例如：</p>
+<p>u8a += u8b + 1U;</p>
+<p>等价于：</p>
+<p>u8a = u8a + ( u8b + 1U );</p>
+<h4>Rule 10.1</h4>
+<p>操作数不得具有不适当的基本类型</p>
+<p>C90 [Unspecified 23; Implementation 14, 17, 19, 32]</p>
+<p>C99 [Undefined 13, 49; Implementation J.3.4(2, 5), J.3.5(5), J.3.9(6)]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>在下表中，单元格内的数字表示对将某种基本类型用作运算符操作数的限制。这些数字对应于下面&quot;原理&quot;部分中的段落编号，并说明施加每条限制的原因。</p>
+<p>运算符</p>
+<p>操作数</p>
+<p>[ ]</p>
+<p>整数</p>
+<p>算术操作数的基本类型类别</p>
+<p>布尔型</p>
+<p>字符型</p>
+<p>枚举型</p>
+<p>3</p>
+<p>4</p>
+<p>+ (一元)</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>- (一元)</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>有符号型</p>
+<p>无符号型</p>
+<p>浮点型</p>
+<p>1</p>
+<p>+ -</p>
+<p>任一</p>
+<p>3</p>
+<p>* /</p>
+<p>任一</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>%</p>
+<p>任一</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>&lt; &gt; &lt;= &gt;=</p>
+<p>任一</p>
+<p>3</p>
+<p>== !=</p>
+<p>任一</p>
+<p>3</p>
+<p>! &amp;&amp; ||</p>
+<p>任意</p>
+<p>2</p>
+<p>2</p>
+<p>8</p>
+<p>5</p>
+<p>1</p>
+<p>2</p>
+<p>2</p>
+<p>2</p>
+<p>83</p>
+<h2>第8章：规则</h2>
+<p>运算符</p>
+<p>操作数</p>
+<p>&lt;&lt; &gt;&gt;</p>
+<p>算术操作数的基本类型类别</p>
+<p>布尔型</p>
+<p>字符型</p>
+<p>枚举型</p>
+<p>有符号型</p>
+<p>无符号型</p>
+<p>浮点型</p>
+<p>左</p>
+<p>3</p>
+<p>4</p>
+<p>5, 6</p>
+<p>6</p>
+<p>1</p>
+<p>&lt;&lt; &gt;&gt;</p>
+<p>右</p>
+<p>3</p>
+<p>4</p>
+<p>7</p>
+<p>7</p>
+<p>1</p>
+<p>~ &amp; | ^</p>
+<p>任意</p>
+<p>3</p>
+<p>4</p>
+<p>5, 6</p>
+<p>6</p>
+<p>1</p>
+<p>?:</p>
+<p>第1</p>
+<p>2</p>
+<p>2</p>
+<p>2</p>
+<p>?:</p>
+<p>第2和第3</p>
+<p>2</p>
+<p>2</p>
+<p>2</p>
+<p>根据本规则，++ 和 -- 运算符的行为与二元 + 和 - 运算符相同。</p>
+<p>此外，本规则禁止对指针类型的操作数使用逻辑运算符（! &amp;&amp; ||）。</p>
+<p>其他规则对表达式中可以使用的基本类型组合施加了进一步的限制。</p>
+<p>原理</p>
+<p>1.</p>
+<p>对这些操作数使用基本浮点类型的表达式是约束违反。</p>
+<p>2.</p>
+<p>在将操作数解释为布尔值的地方，应始终使用基本布尔类型的表达式。</p>
+<p>3.</p>
+<p>在将操作数解释为数值的地方，不应使用基本布尔类型的操作数。</p>
+<p>4. 在将操作数解释为数值的地方，不应使用基本字符类型的操作数。字符数据的数值是实现定义的。</p>
+<p>5.</p>
+<p>不应在算术运算中使用基本枚举类型的操作数，因为枚举对象使用实现定义的整数类型。涉及枚举对象的运算可能因此产生具有意外类型的结果。请注意，匿名枚举的枚举常量具有基本有符号类型。</p>
+<p>6. 移位和按位运算应仅对基本无符号类型的操作数执行。对基本有符号类型使用这些运算所产生的数值结果是实现定义的。</p>
+<p>7.</p>
+<p>移位运算符的右操作数应为基本无符号类型，以确保不会因负移位导致未定义行为。</p>
+<p>8. 不应将基本无符号类型的操作数用作一元减号运算符的操作数，因为结果的有符号性由 int 的实现大小决定。</p>
+<p><strong>例外</strong></p>
+<p>基本有符号类型的非负整数常量表达式可用作移位运算符的右操作数。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+enum enuma { a1, a2, a3 } ena, enb;
+enum { K1 = 1, K2 = 2 };
+</code></pre>
+<p>84</p>
+<p>/* 基本 enum&lt;enuma&gt;</p>
+<p>/* 基本有符号型</p>
+<p>*/</p>
+<p>*/</p>
+<p>f32a &amp; 2U</p>
+<p>f32a &lt;&lt; 2</p>
+<p>/* 原理1 - 约束违反</p>
+<p>/* 原理1 - 约束违反</p>
+<p>*/</p>
+<p>*/</p>
+<p>cha &amp;&amp; bla</p>
+<p>ena ? a1 : a2</p>
+<p>s8a &amp;&amp; bla</p>
+<p>u8a ? a1 : a2</p>
+<p>f32a &amp;&amp; bla</p>
+<p>/* 原理2 - 字符型用作布尔值</p>
+<p>/* 原理2 - 枚举型用作布尔值</p>
+<p>/* 原理2 - 有符号型用作布尔值</p>
+<p>/* 原理2 - 无符号型用作布尔值</p>
+<p>/* 原理2 - 浮点型用作布尔值</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>bla * blb</p>
+<p>bla &gt; blb</p>
+<p>/* 原理3 - 布尔型用作数值</p>
+<p>/* 原理3 - 布尔型用作数值</p>
+<p>*/</p>
+<p>*/</p>
+<p>cha &amp; chb</p>
+<p>cha &lt;&lt; 1</p>
+<p>/* 原理4 - 字符型用作数值</p>
+<p>/* 原理4 - 字符型用作数值</p>
+<p>*/</p>
+<p>*/</p>
+<p>ena-ena * a1</p>
+<p>/* 原理5 - 枚举型用于算术运算 */</p>
+<p>/* 原理5 - 枚举型用于算术运算 */</p>
+<p>s8a &amp; 2</p>
+<p>50 &lt;&lt; 3U</p>
+<p>/* 原理6 - 对有符号型进行按位运算</p>
+<p>/* 原理6 - 对有符号型进行移位运算</p>
+<p>*/</p>
+<p>*/</p>
+<p>u8a &lt;&lt; s8a</p>
+<p>u8a &lt;&lt; -1</p>
+<p>/* 原理7 - 移位量使用有符号类型</p>
+<p>/* 原理7 - 移位量使用有符号类型</p>
+<p>*/</p>
+<p>*/</p>
+<p>-u8a</p>
+<p>/* 原理8 - 对无符号类型使用一元减号</p>
+<p>*/</p>
+<h2>第8章：规则</h2>
+<p>以下示例不合规。注释引用了导致不合规的编号原理项。</p>
+<p>以下示例不合规且还违反了 Rule 10.3：</p>
+<p>ena += a1</p>
+<p>/* 原理5 - 枚举型用于算术运算 */</p>
+<p>以下示例合规：</p>
+<p>bla &amp;&amp; blb</p>
+<p>bla ? u8a : u8b</p>
+<p>cha - chb</p>
+<p>cha &gt; chb</p>
+<p>ena &gt; a1</p>
+<p>K1 * s8a</p>
+<p>/* 合规，因为 K1 来自匿名枚举</p>
+<p>*/</p>
+<p>/* 根据例外合规</p>
+<p>*/</p>
+<p>s8a + s16b</p>
+<p>-( s8a ) * s8b</p>
+<p>s8a &gt; 0</p>
+<p>--s16b</p>
+<p>u8a + u16b</p>
+<p>u8a &amp; 2U</p>
+<p>u8a &gt; 0U</p>
+<p>u8a &lt;&lt; 2U</p>
+<p>u8a &lt;&lt; 1</p>
+<p>f32a + f32b</p>
+<p>f32a &gt; 0.0</p>
+<p>以下合规于本规则但违反了 Rule 10.2</p>
+<p>cha + chb</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.2</h4>
+<p>85</p>
+<h2>第8章：规则</h2>
+<h4>Rule 10.2</h4>
+<p>基本字符类型的表达式不应不适当地用于加减运算</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>适当的使用是：</p>
+<p>1.</p>
+<p>对于 + 运算符，一个操作数应具有基本字符类型，另一个应具有基本有符号类型或基本无符号类型。运算结果具有基本字符类型。</p>
+<p>2.</p>
+<p>对于 - 运算符，第一个操作数应具有基本字符类型，第二个应具有基本有符号类型、基本无符号类型或基本字符类型。如果两个操作数都具有基本字符类型，则结果具有标准类型（在此情况下通常是 int），否则结果具有基本字符类型。</p>
+<p>原理</p>
+<p>具有基本字符类型的表达式（字符数据）不应用于算术运算，因为该数据不表示数值。</p>
+<p>以上使用情况被允许，因为它们允许对字符数据进行可能合理的操作。例如：</p>
+<p>•</p>
+<p>两个基本字符类型操作数的减法可用于在 &#x27;0&#x27; 到 &#x27;9&#x27; 范围内的数字与对应的序数值之间进行转换；</p>
+<p>•</p>
+<p>基本字符类型与基本无符号类型的加法可用于将序数值转换为 &#x27;0&#x27; 到 &#x27;9&#x27; 范围内的对应数字；</p>
+<p>•</p>
+<p>基本字符类型减去基本无符号类型可用于将字符从小写转换为大写。</p>
+<p><strong>示例</strong></p>
+<p>以下示例合规：</p>
+<p>&#x27;0&#x27; + u8a</p>
+<p>s8a + &#x27;0&#x27;</p>
+<p>cha - &#x27;0&#x27;</p>
+<p>&#x27;0&#x27; - s8a</p>
+<p>/* 将 u8a 转换为数字</p>
+<p>*/</p>
+<p>/* 将 s8a 转换为数字</p>
+<p>*/</p>
+<p>/* 将 cha 转换为序数 */</p>
+<p>/* 将 -s8a 转换为数字 */</p>
+<p>以下示例不合规：</p>
+<p>s16a - &#x27;a&#x27;</p>
+<p>&#x27;0&#x27; + f32a</p>
+<p>cha + &#x27;:&#x27;</p>
+<p>cha - ena</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.1</h4>
+<p>86</p>
+<p>表达式的值不应赋值给具有更窄基本类型或不同基本类型类别的对象</p>
+<p>C90 [Undefined 15; Implementation 16]</p>
+<p>C99 [Undefined 15, 16; Implementation J.3.5(4)]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<h2>第8章：规则</h2>
+<h4>Rule 10.3</h4>
+<p>补充说明</p>
+<p>本规则涵盖以下操作：</p>
+<p>1.</p>
+<p>术语表中定义的赋值；</p>
+<p>2.</p>
+<p>switch 语句的 case 标签中的常量表达式转换为控制表达式的提升类型。</p>
+<p>原理</p>
+<p>C 语言允许程序员有相当大的自由度，并允许在不同算术类型之间自动执行赋值。然而，使用这些隐式转换可能导致意外结果，可能丢失值、符号或精度。关于 C 类型系统问题的更多详细信息可在附录 C 中找到。</p>
+<p>使用更强的类型检查（由 MISRA 基本类型模型强制执行）可以减少这些问题的发生。</p>
+<p><strong>例外</strong></p>
+<p>1.</p>
+<p>本质上是有符号整数常量表达式，其秩不大于 signed int，可以赋值给基本无符号类型的对象，如果其值可以在该类型中表示。</p>
+<p>2.</p>
+<p>初始化器 { 0 } 可用于初始化聚合体或联合体类型。</p>
+<p>3.</p>
+<p>当控制表达式具有基本无符号类型且值可以在该类型中表示时，允许 switch 语句的 case 标签为非负整数常量表达式（基本有符号类型）。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+enum enuma { A1, A2, A3
+</code></pre>
+<p>} ena;</p>
+<pre><code>
+enum enumb { B1, B2, B3
+</code></pre>
+<p>} enb;</p>
+<pre><code>
+enum
+</code></pre>
+<p>{ K1=1, K2=128 };</p>
+<p>以下合规：</p>
+<p>uint8_t u8a = 0;</p>
+<p>bool_t flag = ( bool_t ) 0;</p>
+<p>bool_t set = true;</p>
+<p>bool_t get = ( u8b &gt; u8c );</p>
+<p>ena = A1;</p>
+<p>s8a = K1;</p>
+<p>u8a = 2;</p>
+<p>u8a = 2 * 24;</p>
+<p>cha += 1;</p>
+<p>/* 根据例外</p>
+<p>*/</p>
+<p>/* true 是基本布尔型</p>
+<p>*/</p>
+<p>/* 常量值适合</p>
+<p>/* 根据例外</p>
+<p>/* 根据例外</p>
+<p>/* cha = cha + 1 将字符赋值给字符</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>87</p>
+<h2>第8章：规则</h2>
+<p>pu8a = pu8b;</p>
+<p>u8a = u8b + u8c + u8d;</p>
+<p>u8a = ( uint8_t ) s8a;</p>
+<p>/* 相同的基本类型</p>
+<p>/* 相同的基本类型</p>
+<p>/* 强制转换给出相同的基本类型</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>u32a = u16a;</p>
+<p>u32a = 2U + 125U;</p>
+<p>use_uint16 ( u8a );</p>
+<p>use_uint16 ( u8a + u16b );</p>
+<p>/* 赋值给更宽的基本类型</p>
+<p>/* 赋值给更宽的基本类型</p>
+<p>/* 赋值给更宽的基本类型</p>
+<p>/* 赋值给相同的基本类型</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>以下不合规，因为它们具有不同的基本类型类别：</p>
+<p>uint8_t u8a = 1.0f;</p>
+<p>bool_t bla = 0;</p>
+<p>cha = 7;</p>
+<p>u8a = &#x27;a&#x27;;</p>
+<p>u8b = 1 - 2;</p>
+<p>u8c += &#x27;a&#x27;;</p>
+<p>use_uint32 ( s32a );</p>
+<p>/* 无符号型和浮点型</p>
+<p>*/</p>
+<p>/* 布尔型和有符号型</p>
+<p>*/</p>
+<p>/* 字符型和有符号型</p>
+<p>*/</p>
+<p>/* 无符号型和字符型</p>
+<p>*/</p>
+<p>/* 无符号型和有符号型</p>
+<p>*/</p>
+<p>/* u8c = u8c + &#x27;a&#x27; 将字符赋值给无符号型 */</p>
+<p>/* 有符号型和无符号型</p>
+<p>*/</p>
+<p>以下不合规，因为它们包含对更窄基本类型的赋值：</p>
+<p>s8a = K2;</p>
+<p>u16a = u32a;</p>
+<p>/* 常量值不适合</p>
+<p>/* uint32_t 到 uint16_t</p>
+<p>*/</p>
+<p>*/</p>
+<p>use_uint16 ( u32a );</p>
+<p>/* uint32_t 到 uint16_t</p>
+<p>*/</p>
+<p>/* uint16_t 到 uint8_t</p>
+<p>*/</p>
+<p>uint8_t foo1 ( uint16_t x )</p>
+<p>{</p>
+<pre><code>
+return x;
+</code></pre>
+<p>}</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.4, Rule 10.5, Rule 10.6</h4>
+<h4>Rule 10.4</h4>
+<p>在执行通常算术转换的运算符中，两个操作数应具有相同的基本类型类别</p>
+<p>C90 [Implementation 21], C99 [Implementation J.3.6(4)]</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>本规则适用于通常算术转换中描述的运算符（参见 C90 第6.2.1.5节，C99 第6.3.1.8节）。这包括所有二元运算符，但不包括移位、逻辑 &amp;&amp;、逻辑 || 和逗号运算符。此外，三元运算符的第二和第三操作数也受本规则约束。</p>
+<p>注：自增和自减运算符不受本规则约束。</p>
+<p>原理</p>
+<p>88</p>
+<p>C 语言允许程序员有相当大的自由度，并允许在不同算术类型之间自动执行转换。然而，使用这些隐式转换可能导致意外结果，可能丢失值、符号或精度。关于 C 类型系统问题的更多详细信息可在附录 C 中找到。</p>
+<p><strong>例外</strong></p>
+<p>允许以下情况，以支持字符操作的常见形式：</p>
+<p>1.</p>
+<p>二元 + 和 += 运算符可以有一个具有基本字符类型的操作数和另一个具有基本有符号或基本无符号类型的操作数；</p>
+<p>2.</p>
+<p>二元 - 和 -= 运算符可以有一个具有基本字符类型的左操作数和一个具有基本有符号或基本无符号类型的右操作数。</p>
+<h2>第8章：规则</h2>
+<p>使用更强的类型检查（由 MISRA 基本类型模型强制执行）允许将隐式转换限制为应当产生开发人员预期答案的那些转换。</p>
+<p><strong>示例</strong></p>
+<pre><code>
+enum enuma { A1, A2, A3 } ena;
+enum enumb { B1, B2, B3 } enb;
+</code></pre>
+<p>以下合规，因为它们具有相同的基本类型类别：</p>
+<p>ena &gt; A1</p>
+<p>u8a + u16b</p>
+<p>以下根据例外1合规：</p>
+<p>cha += u8a</p>
+<p>以下根据例外1合规，但违反 Rule 10.3：</p>
+<p>u8a += cha</p>
+<p>/* 无符号型和字符型</p>
+<p>*/</p>
+<p>以下不合规于本规则且还违反 Rule 10.3：</p>
+<p>s8a += u8a</p>
+<p>/* 有符号型和无符号型</p>
+<p>*/</p>
+<p>以下不合规：</p>
+<p>u8b + 2</p>
+<p>enb &gt; A1</p>
+<p>ena == enb</p>
+<p>/* 无符号型和有符号型</p>
+<p>*/</p>
+<p>/* enum&lt;enumb&gt; 和 enum&lt;enuma&gt; */</p>
+<p>/* enum&lt;enuma&gt; 和 enum&lt;enumb&gt; */</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.3, Rule 10.7</h4>
+<p>89</p>
+<h2>第8章：规则</h2>
+<h4>Rule 10.5</h4>
+<p>表达式的值不应被强制转换为不适当的基本类型</p>
+<p><strong>类别</strong></p>
+<p><strong>建议性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>应避免的强制转换如下表所示，其中值被强制转换（显式转换）为第一列的基本类型类别。</p>
+<p>基本类型</p>
+<p><strong>类别</strong></p>
+<p>到</p>
+<p>从</p>
+<p>布尔型</p>
+<p>字符型</p>
+<p>枚举型</p>
+<p>有符号型</p>
+<p>无符号型</p>
+<p>浮点型</p>
+<p>布尔型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>字符型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>枚举型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免*</p>
+<p>避免</p>
+<p>避免</p>
+<p>有符号型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>无符号型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>浮点型</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>避免</p>
+<p>* 注：枚举类型可以强制转换为枚举类型，前提是强制转换为相同的基本枚举类型。此类强制转换是冗余的。</p>
+<p>从 void 强制转换为任何其他类型是不允许的，因为这会导致未定义行为。这由 Rule 1.3 涵盖。</p>
+<p>原理</p>
+<p>显式强制转换可能出于合法的功能原因而引入，例如：</p>
+<p>•</p>
+<p>更改后续算术运算执行的类型；</p>
+<p>•</p>
+<p>有意截断值；</p>
+<p>•</p>
+<p>为了清晰起见，使类型转换显式化。</p>
+<p>然而，某些显式强制转换被认为是不适当的：</p>
+<p>90</p>
+<p>•</p>
+<p>在 C99 中，强制转换或赋值给 _Bool 的结果始终为 0 或 1。当强制转换为另一个被定义为基本布尔型的类型时，情况不一定如此；</p>
+<p>•</p>
+<p>强制转换为基本枚举类型可能产生不在该类型枚举常量集合内的值；</p>
+<p>•</p>
+<p>从基本布尔型强制转换为任何其他类型不太可能有意义；</p>
+<p>•</p>
+<p>在浮点型和字符型之间转换没有意义，因为两种表示之间没有精确的映射。</p>
+<p>具有值 0 或 1 且为基本有符号型或基本无符号型的整数常量表达式可以强制转换为被定义为基本布尔型的类型。这允许实现非 C99 的布尔模型。</p>
+<p><strong>示例</strong></p>
+<p>( bool_t ) false</p>
+<p>( int32_t ) 3U</p>
+<p>( bool_t ) 0</p>
+<p>( bool_t ) 3U</p>
+<p>/* 合规 - C99 &#x27;false&#x27; 是基本布尔型 */</p>
+<p>/* 合规</p>
+<p>*/</p>
+<p>/* 合规 - 根据例外</p>
+<p>*/</p>
+<p>/* 不合规</p>
+<p>*/</p>
+<p>( int32_t ) ena</p>
+<p>( enum enuma ) 3</p>
+<p>( char ) enc</p>
+<p>/* 合规</p>
+<p>/* 不合规</p>
+<p>/* 合规</p>
+<h2>第8章：规则</h2>
+<p><strong>例外</strong></p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.3, Rule 10.8</h4>
+<p>8.10.3 复合运算符和表达式</p>
+<p>通过限制可以应用于非平凡表达式的隐式和显式转换，可以避免附录 C 中提到的一些问题。这些问题包括：</p>
+<p>•</p>
+<p>关于整数表达式在何种类型中求值的混淆，因为这取决于任何整数提升后操作数的类型。算术运算结果的类型取决于 int 的实现大小；</p>
+<p>•</p>
+<p>程序员中常见的误解，即计算的执行类型受结果赋值或强制转换到的类型的影响。这种错误的预期可能导致意外结果。</p>
+<p>除了前述规则外，基本类型模型还对操作数为复合表达式（定义如下）的表达式施加了进一步的限制。</p>
+<p>在本文档中，以下被定义为复合运算符：</p>
+<p>•</p>
+<p>乘法（*、/、%）</p>
+<p>•</p>
+<p>加法（二元 +、二元 -）</p>
+<p>•</p>
+<p>按位（&amp;、|、^、~）</p>
+<p>•</p>
+<p>移位（&lt;&lt;、&gt;&gt;）</p>
+<p>•</p>
+<p>条件（?:），如果第二个或第三个操作数是复合表达式</p>
+<p>复合赋值等价于对其相应复合运算符的结果进行赋值。</p>
+<p>在本文档中，复合表达式定义为作为复合运算符直接结果的非常量表达式。</p>
+<p>注：</p>
+<p>•</p>
+<p>带括号的复合表达式也是复合表达式；</p>
+<p>•</p>
+<p>一元 + 或一元 - 表达式，其操作数是复合表达式的，也是复合表达式。</p>
+<p>91</p>
+<h2>第8章：规则</h2>
+<p>•</p>
+<p>以下运算符的结果不是复合表达式：</p>
+<p>-- 赋值和复合赋值</p>
+<p>-- 后缀和前缀自增和自减</p>
+<p>-- 强制转换</p>
+<p>•</p>
+<p>常量表达式不是复合表达式。</p>
+<h4>Rule 10.6</h4>
+<p>复合表达式的值不应赋值给具有更宽基本类型的对象</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>补充说明</p>
+<p>本规则涵盖 Rule 10.3 中描述的赋值操作。</p>
+<p>原理</p>
+<p>原理在复合运算符和表达式的介绍中描述（参见第8.10.3节）。</p>
+<p><strong>示例</strong></p>
+<p>以下合规：</p>
+<p>u16c = u16a + u16b;</p>
+<p>u32a = ( uint32_t ) u16a + u16b;</p>
+<p>/* 相同的基本类型</p>
+<p>/* 强制转换使加法在 uint32_t 中进行</p>
+<p>*/</p>
+<p>*/</p>
+<p>以下不合规：</p>
+<p>u32a = u16a + u16b;</p>
+<p>use_uint32 ( u16a + u16b );</p>
+<p>/* 赋值时的隐式转换 */</p>
+<p>/* 函数参数的隐式转换 */</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.3, Rule 10.7, 第8.10.3节</h4>
+<h4>Rule 10.7</h4>
+<p>如果复合表达式用作执行通常算术转换的运算符的一个操作数，</p>
+<p>则另一个操作数不应具有更宽的基本类型</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>原理在复合运算符和表达式的介绍中描述（参见第8.10.3节）。</p>
+<p>92</p>
+<p>限制对复合表达式的隐式转换意味着表达式中的算术运算序列必须在完全相同的基本类型中进行。这减少了开发人员可能的困惑。</p>
+<p>表达式 u32a + u16b + u16c 是合规的，因为两次加法在概念上都将在类型 uint32_t 中执行。在这种情况下，只有非复合表达式被隐式转换。</p>
+<p>表达式 (u16a + u16b) + u32c 是不合规的，因为左侧加法在概念上在类型 uint16_t 中执行，而右侧在类型 uint32_t 中执行，需要对复合表达式 u16a + u16b 进行到 uint32_t 的隐式转换。</p>
+<h2>第8章：规则</h2>
+<p>注：这并不意味着表达式中的所有操作数都具有相同的基本类型。</p>
+<p><strong>示例</strong></p>
+<p>以下合规：</p>
+<p>u32a * u16a + u16b</p>
+<p>( u32a * u16a ) + u16b</p>
+<p>u32a * ( ( uint32_t ) u16a + u16b )</p>
+<p>u32a += ( u32b + u16b )</p>
+<p>/* 无复合转换</p>
+<p>/* 无复合转换</p>
+<p>/* * 的两个操作数具有</p>
+<p>* 相同的基本类型</p>
+<p>/* 无复合转换</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>*/</p>
+<p>以下不合规：</p>
+<p>u32a * ( u16a + u16b )</p>
+<p>u32a += ( u16a + u16b )</p>
+<p>/* ( u16a + u16b ) 的隐式转换</p>
+<p>/* ( u16a + u16b ) 的隐式转换</p>
+<p>*/</p>
+<p>*/</p>
+<p><strong>参见</strong></p>
+<h4>Rule 10.4, Rule 10.6, 第8.10.3节</h4>
+<h4>Rule 10.8</h4>
+<p>复合表达式的值不应被强制转换为不同的基本类型类别或更宽的基本类型</p>
+<p><strong>类别</strong></p>
+<p><strong>要求性</strong></p>
+<p><strong>分析</strong></p>
+<p>可判定，单翻译单元</p>
+<p>适用于</p>
+<p>C90, C99</p>
+<p>原理</p>
+<p>原理在复合运算符和表达式的介绍中描述（参见第8.10.3节）。</p>
+<p>不允许强制转换为更宽的类型，因为结果可能因实现而异。考虑以下情况：</p>
+<p>( uint32_t ) ( u16a + u16b );</p>
+<p>在16位机器上，加法将在16位中执行，结果在强制转换为32位之前会以模 2^16 回绕。然而，在32位机器上，加法将在32位中进行，并保留在16位机器上会丢失的高位。</p>
+<p>强制转换为具有相同基本类型类别的更窄类型是可以接受的，因为结果的显式截断总是导致相同的信息丢失。</p>
+<p><strong>示例</strong></p>
+<p>( uint16_t ) ( u32a + u32b )</p>
+<p>( uint16_t ) ( s32a + s32b )</p>
+<p>( uint16_t ) s32a</p>
+<p>( uint32_t ) ( u16a + u16b )</p>
+<p>/* 合规</p>
+<p>*/</p>
+<p>/* 不合规 - 不同的基本</p>
+<p>*</p>
+<p>类型类别</p>
+<p>*/</p>
+<p>/* 合规</p>
+<p>- s32a 不是复合的 */</p>
+<p>/* 不合规 - 强制转换为更宽的</p>
+<p>*</p>
+<p>基本类型</p>
+<p>*/</p>
+<p>93</p>
+<h2>第8章：规则</h2>
+<p><strong>参见</strong></p>
+<h4>Rule 10.5, 第8.10.3节</h4>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+</script>
+</body>
+</html>

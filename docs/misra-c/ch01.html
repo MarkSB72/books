@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>封面与前言 — MISRA C:2012 中文版</title>
+<link rel="stylesheet" href="../autosar-book/styles.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="book-title">MISRA C:2012<br>中文版</a>
+  </div>
+  <nav class="nav-list">
+    <ul>
+        <li><a href="ch01.html" class="nav-chapter active">封面与前言</a></li>
+        <li><a href="ch02.html" class="nav-chapter">第1-4章 背景与预备</a></li>
+        <li><a href="ch03.html" class="nav-chapter">第5章 采用MISRA C</a></li>
+        <li><a href="ch04.html" class="nav-chapter">第6章 指南引言</a></li>
+        <li><a href="ch05.html" class="nav-chapter">第7章 指令</a></li>
+        <li><a href="ch06.html" class="nav-chapter">第8章 规则 ①</a></li>
+        <li><a href="ch07.html" class="nav-chapter">第8章 规则 ②</a></li>
+        <li><a href="ch08.html" class="nav-chapter">参考与附录</a></li>
+    </ul>
+  </nav>
+</div>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="切换导航">☰</button>
+
+<div class="main-content">
+  <div class="chapter-page">
+    <div class="container">
+
+<p>MISRA C:2012</p>
+<p>关键系统中C语言的使用指南</p>
+<p>第三版，第一次修订</p>
+<p>2019年2月</p>
+<p>于2019年2月首次出版，由HORIBA MIRA Limited出版</p>
+<p>Watling Street</p>
+<p>Nuneaton</p>
+<p>Warwickshire</p>
+<p>CV10 0TU</p>
+<p>UK</p>
+<p>www.misra.org.uk</p>
+<p>© HORIBA MIRA Limited 2019.</p>
+<p>&quot;MISRA&quot;、&quot;MISRA C&quot;及三角形标志是HORIBA MIRA Limited代表MISRA联盟持有的注册商标。其他产品或品牌名称是其各自持有者的商标或注册商标，MISRA对此类产品不作任何认可或推荐。</p>
+<p>版权所有。未经出版商事先书面许可，不得以任何形式或任何方式（电子、机械或影印、录制或其他方式）复制、存储在检索系统中或传输本出版物的任何部分。</p>
+<p>ISBN 978-1-906400-21-7 平装</p>
+<p>ISBN 978-1-906400-22-4 PDF</p>
+<p>英国图书馆出版数据编目</p>
+<p>本书的编目记录可从英国图书馆获得</p>
+<p>MISRA C:2012</p>
+<p>关键系统中C语言的使用指南</p>
+<p>第三版，第一次修订</p>
+<p>2019年2月</p>
+<p>MISRA使命宣言</p>
+<p>我们为嵌入式控制系统和独立软件的安全可靠应用提供世界领先的最佳实践指南。</p>
+<p>MISRA是制造商、组件供应商和工程咨询公司之间的合作组织，旨在促进开发安全相关电子系统和其他软件密集型应用的最佳实践。为此，MISRA发布文档，为工程师和管理层提供易于获取的信息，并举办活动以促进从业者之间的经验交流。</p>
+<p>免责声明</p>
+<p>遵循本文档的要求本身并不能保证软件无错误、健壮，也不能保证可移植性和可重用性。</p>
+<p>遵循本文档或任何其他标准的要求，本身并不能免除法律义务。</p>
+<p>前言</p>
+<p>MISRA C指南第三版的本次修订合并了对MISRA C:2012的两次更新，反映了工作组的持续工作：</p>
+<p>• MISRA C:2012修订1，MISRA C:2012的附加安全指南 [40]</p>
+<p>• MISRA C:2012技术勘误1 [41]</p>
+<p>本次修订还参考了MISRA Compliance:2016 [42]所提供的关于实现MISRA C合规性的增强指南。虽然该指南对于MISRA C:2012仍然是可选的，但它将在适当的时候成为MISRA C指南的组成部分。我鼓励所有用户和所有组织尽早考虑采用。</p>
+<p>Andrew Banks MIET FBCS CITP</p>
+<p>MISRA C工作组主席</p>
+<p>第三版前言</p>
+<p>乍一看，MISRA C指南的第三版可能有些令人生畏。由于其篇幅大约是前一版的两倍，人们可能会认为它包含了两倍的指南，且遵循这些指南可能需要两倍的努力。</p>
+<p>实际上，指南数量的增加相对适中，约为10%。其余篇幅的增加是由于所提供的指南的改进，例如：</p>
+<p>• 更好的指南理由说明；</p>
+<p>• 更精确的描述；</p>
+<p>• 大多数指南附有展示合规性和不合规性的代码示例；</p>
+<p>• 关于合规性检查和偏离程序的更详细指导；</p>
+<p>• 可用于支持合规性声明的检查清单。</p>
+<p>最后，我想提请注意本文档的引言部分。这些部分不仅包含了关于如何使用MISRA C的实用指导，同时也比其前身更加简洁。我鼓励所有用户熟悉这些材料。</p>
+<p>Steve Montgomery MA (Cantab), PhD</p>
+<p>2008–2013年MISRA C工作组主席</p>
+<p>致谢</p>
+<p>MISRA联盟谨感谢以下个人对本文档编写做出的重大贡献：</p>
+<p>Dave Banham — Rolls-Royce plc</p>
+<p>Andrew Banks — Intuitive Consulting</p>
+<p>Mark Bradbury — Aero Engine Controls</p>
+<p>Paul Burden — Programming Research Ltd</p>
+<p>Mark Dawson-Butterworth — Zytek Automotive Ltd</p>
+<p>Mike Hennell — LDRA Ltd</p>
+<p>Chris Hills — Phaedrus Systems Ltd</p>
+<p>Steve Montgomery — Ricardo UK Ltd</p>
+<p>Chris Tapp — LDRA Ltd (also Keylevel Consultants Ltd)</p>
+<p>Liz Whiting — LDRA Ltd (previously of QinetiQ plc)</p>
+<p>MISRA联盟也希望感谢以下个人在开发和审查过程中的贡献：</p>
+<p>Fulvio Baccaglini, William Forbes, Joel Kuehner, Koki Onoda, Roberto Bagnara, Takao Futagami, Voilmy Laurent, Paulo Pinheiro, John Bailey, Jim Gimpel, Fred Long, Mohanraj Ragupathi, Johan Bezem, Ben Godwood, Daniel Lundin, Paul Rigas, Gunter Blache, Gilles Goulas, Gavin McCall, Andrew Scholan, Jill Britton, Wolfgang von Hansen, Douglas Mearns, Marco Sorich, Michael Burke, Takahiro Hashimoto, Svante Möller, Takuji Takuma, Andrew Burnard, Dave Higham, Frederic Mondot, Martin Thompson, Paul Butler, Shinya Ito, Jürgen Mottok, Thomas M. Tuerke, Mirko Conrad, David Jennings, Yannick Moy, Takafumi Wakita, David Cozens, Peter Jesty, Alexander Much, David Ward, David Crocker, Daniel Kästner, Robert Mummé, Tetsuhiro Yamamoto, Greg Davis, Grzegorz Konopko, Tadanori Nakagawa, Naoki Yoshikawa, Manoj Dwivedi, Taneli Korhonen, Greg Newman, Achim Olaf Zacher, Carl Edmunds</p>
+<p>特别感谢David Crocker对附录H的开发做出的重大贡献。</p>
+<p>附录G中关于实现定义行为的描述摘录自BSI Standards Limited发布的ISO标准版本；其文本与ISO版本完全相同。根据许可证号2013ET0003，经BSI Standards Limited (BSI)许可复制英国标准的摘录。未经许可，不得对此材料进行其他使用。英国标准可通过BSI在线商店以PDF或纸质格式获取：www.bsigroup.com/Shop，或联系BSI客户服务仅获取纸质版：电话：+44 20 8996 9001，电子邮件：cservices@bsigroup.com。</p>
+<p>本文档在起草过程中广泛使用了DokuWiki。我们感谢所有参与其开发的人员。</p>
+<p>本文档使用Open Sans排版。Open Sans是Google的商标，可能在某些司法管辖区注册。数字化数据版权© 2010–2011, Google Corporation。根据Apache许可证2.0版授权。</p>
+<p>目录</p>
+<p>1  愿景</p>
+<p>2  MISRA C的背景</p>
+<h3>2.1 C语言的流行</h3>
+<h3>2.2 C语言的缺点</h3>
+<h3>2.3 C语言在关键系统中的使用</h3>
+<p>3  工具选择</p>
+<h3>3.1 C语言及其编译器</h3>
+<h3>3.2 分析工具</h3>
+<p>4  预备知识</p>
+<h3>4.1 培训</h3>
+<h3>4.2 理解编译器</h3>
+<h3>4.3 理解静态分析工具</h3>
+<p>5  采用和使用MISRA C</p>
+<h3>5.1 采用</h3>
+<h3>5.2 软件开发过程</h3>
+<h3>5.3 合规性</h3>
+<h3>5.4 偏离程序</h3>
+<h3>5.5 声明合规性</h3>
+<p>6  指南引言</p>
+<h3>6.1 指南分类</h3>
+<h3>6.2 指南类别</h3>
+<h3>6.3 指南组织</h3>
+<h3>6.4 指南中的冗余</h3>
+<h3>6.5 规则的可判定性</h3>
+<h3>6.6 分析范围</h3>
+<h3>6.7 多组织项目</h3>
+<h3>6.8 自动生成代码</h3>
+<h3>6.9 指南的呈现方式</h3>
+<h3>6.10 理解源引用</h3>
+<p>7  指令</p>
+<h3>7.1 实现</h3>
+<h3>7.2 编译和构建</h3>
+<h3>7.3 需求可追溯性</h3>
+<h3>7.4 代码设计</h3>
+<p>8  规则</p>
+<h3>8.1 标准C环境</h3>
+<h3>8.2 未使用代码</h3>
+<h3>8.3 注释</h3>
+<h3>8.4 字符集和词法约定</h3>
+<h3>8.5 标识符</h3>
+<h3>8.6 类型</h3>
+<h3>8.7 字面量和常量</h3>
+<h3>8.8 声明和定义</h3>
+<h3>8.9 初始化</h3>
+<h3>8.10 基本类型模型</h3>
+<h3>8.11 指针类型转换</h3>
+<h3>8.12 表达式</h3>
+<h3>8.13 副作用</h3>
+<h3>8.14 控制语句表达式</h3>
+<h3>8.15 控制流</h3>
+<h3>8.16 switch语句</h3>
+<h3>8.17 函数</h3>
+<h3>8.18 指针和数组</h3>
+<h3>8.19 重叠存储</h3>
+<h3>8.20 预处理指令</h3>
+<h3>8.21 标准库</h3>
+<h3>8.22 资源</h3>
+<p>9  参考文献</p>
+<p>附录A  指南摘要</p>
+<p>附录B  指南属性</p>
+<p>附录C  C语言的类型安全问题</p>
+<p>附录D  基本类型</p>
+<p>附录E  对自动生成代码的适用性</p>
+<p>附录F  过程和工具检查清单</p>
+<p>附录G  实现定义行为检查清单</p>
+<p>附录H  未定义和关键未指定行为</p>
+<p>附录I  偏离记录示例</p>
+<p>附录J  术语表</p>
+<p>附录K  变更日志</p>
+<p>---</p>
+<h2>第1章  愿景</h2>
+<p>MISRA C指南定义了C语言的一个子集，在该子集中，犯错的机会被消除或减少。许多安全相关软件的开发标准要求或推荐使用语言子集，这也可用于开发具有安全性、高完整性或高可靠性要求的任何应用程序。</p>
+<p>除了定义这个子集外，本MISRA C指南还提供：</p>
+<p>• 面向C程序开发人员的教育材料；</p>
+<p>• 面向工具开发人员的参考资料。</p>
+<p>MISRA C的先前版本基于1990年ISO C语言定义。由于1999年ISO定义现已被嵌入式实现不同程度地采用，因此认为发布一个认可1999年ISO定义的MISRA C新版本时机已到。</p>
+<p>前一版中提出的指南的每个方面都经过了全面审查，并在适当的情况下进行了改进。第三版还纳入了根据指南早期版本用户的反馈而创建的材料。</p>
+<p>第三版的一个重大变化是将第二版的基础类型（underlying type）概念发展为基本类型（essential type）。使用新的基本类型概念，已经能够开发出一套为C语言带来更强类型的指南。</p>
+<p>因此，MISRA C第三版的愿景是：</p>
+<p>• 采用1999年ISO C语言定义，同时保留对旧版1990定义的支持；</p>
+<p>• 纠正第二版中任何已知问题；</p>
+<p>• 添加有充分理由的新指南；</p>
+<p>• 改进现有指南的规范和理由；</p>
+<p>• 删除理由不充分的任何指南；</p>
+<p>• 增加可通过静态分析工具处理的指南数量；</p>
+<p>• 就指南对自动生成代码的适用性提供指导。</p>
+<p>---</p>
+<h2>第2章  MISRA C的背景</h2>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+</script>
+</body>
+</html>
