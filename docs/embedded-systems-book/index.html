@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌入式系统设计模式 — 中文版</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body.index-page {
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .index-container { max-width: 700px; width: 100%; padding: 30px; }
+  .book-cover {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a2744 100%);
+    border-radius: 16px;
+    padding: 50px 40px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .book-cover::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(100,181,246,0.1) 0%, transparent 50%);
+  }
+  .cover-badge {
+    position: relative;
+    display: inline-block;
+    background: rgba(100,181,246,0.2);
+    color: #64b5f6;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+  .cover-title {
+    position: relative;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .cover-subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: #64b5f6;
+    margin: 0 auto 28px;
+    border-radius: 2px;
+  }
+  .cover-authors {
+    position: relative;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.8;
+  }
+  .cover-translator {
+    position: relative;
+    margin-top: 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+  }
+  .cover-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .cover-stat { text-align: center; }
+  .cover-stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #64b5f6;
+  }
+  .cover-stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+  .toc-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  .toc-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .toc-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #444;
+    transition: color 0.2s;
+  }
+  .toc-item a:hover { color: #1565C0; }
+  .toc-chapter {
+    font-weight: 600;
+    color: #1565C0;
+    min-width: 70px;
+    font-size: 14px;
+  }
+  .toc-title {
+    flex: 1;
+    font-size: 15px;
+  }
+  .toc-arrow {
+    color: #ccc;
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .toc-item a:hover .toc-arrow {
+    color: #1565C0;
+    transform: translateX(4px);
+  }
+  .back-link {
+    text-align: center;
+    padding: 20px;
+  }
+  .back-link a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  .back-link a:hover { color: #fff; }
+  .index-footer {
+    text-align: center;
+    color: rgba(255,255,255,0.2);
+    font-size: 11px;
+    padding: 10px;
+  }
+</style>
+</head>
+<body class="index-page">
+
+<div class="index-container">
+
+  <div class="book-cover">
+    <div class="cover-badge">嵌入式</div>
+    <div class="cover-title">嵌入式系统设计模式</div>
+    <div class="cover-subtitle">Making Embedded Systems: Design Patterns for Great Software — 中文版（第2版）</div>
+    <div class="cover-divider"></div>
+    <div class="cover-authors">
+      <p>Elecia White 著</p>
+    </div>
+    <div class="cover-translator">
+      <p>AI 辅助翻译 · 2026年5月</p>
+    </div>
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-num">14</div>
+        <div class="cover-stat-label">章 节</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">~400</div>
+        <div class="cover-stat-label">页</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">832K</div>
+        <div class="cover-stat-label">中文字数</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-heading">📖 目 录</div>
+    <div class="toc-list">
+      <div class="toc-item"><a href="ch00.html">
+        <span class="toc-chapter">前言</span>
+        <span class="toc-title">前言、目录与致谢</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch01.html">
+        <span class="toc-chapter">第 1 章</span>
+        <span class="toc-title">引言</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch02.html">
+        <span class="toc-chapter">第 2 章</span>
+        <span class="toc-title">创建系统架构</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch03.html">
+        <span class="toc-chapter">第 3 章</span>
+        <span class="toc-title">动手接触硬件</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch04.html">
+        <span class="toc-chapter">第 4 章</span>
+        <span class="toc-title">输入、输出与定时器</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch05.html">
+        <span class="toc-chapter">第 5 章</span>
+        <span class="toc-title">中断</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch06.html">
+        <span class="toc-chapter">第 6 章</span>
+        <span class="toc-title">管理活动流程</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch07.html">
+        <span class="toc-chapter">第 7 章</span>
+        <span class="toc-title">与外设通信</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch08.html">
+        <span class="toc-chapter">第 8 章</span>
+        <span class="toc-title">组合一个系统</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch09.html">
+        <span class="toc-chapter">第 9 章</span>
+        <span class="toc-title">陷入麻烦</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch10.html">
+        <span class="toc-chapter">第 10 章</span>
+        <span class="toc-title">构建互联设备</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch11.html">
+        <span class="toc-chapter">第 11 章</span>
+        <span class="toc-title">用更少做更多</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch12.html">
+        <span class="toc-chapter">第 12 章</span>
+        <span class="toc-title">数学</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch13.html">
+        <span class="toc-chapter">第 13 章</span>
+        <span class="toc-title">降低功耗</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch14.html">
+        <span class="toc-chapter">第 14 章</span>
+        <span class="toc-title">电机与运动</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+      <div class="toc-item"><a href="ch15.html">
+        <span class="toc-chapter">附录</span>
+        <span class="toc-title">索引与关于作者</span>
+        <span class="toc-arrow">→</span>
+      </a></div>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="../index.html">← 返回技术文档总览</a>
+  </div>
+
+  <div class="index-footer">Generated by Hermes Agent</div>
+
+</div>
+
+</body>
+</html>
