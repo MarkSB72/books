@@ -148,10 +148,19 @@
    148|  color: #444;
    149|}
    150|
-   151|.chapter-page p {
-   152|  margin: 10px 0;
-   153|  text-align: justify;
-   154|}
+   .chapter-page p {
+     margin: 10px 0;
+     text-align: justify;
+     text-indent: 2em;
+   }
+
+   /* Override: no indent for figure captions and subtitle */
+   .chapter-page .figure p {
+     text-indent: 0;
+   }
+   .chapter-page .subtitle {
+     text-indent: 0;
+   }
    155|
    156|.chapter-page ul, .chapter-page ol {
    157|  margin: 10px 0 10px 28px;
