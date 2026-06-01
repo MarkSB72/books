@@ -51,12 +51,8 @@
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-1 — 理想的项目时间表示例</p>
 </div>
 <h3>理想的项目流程</h3>
-<p>这种时间表是基于工程经理（或技术负责人）讨论目标，然后估算项目所需的时间和资源而制定的。这只是时间表的一部分；它不包括机械工程、服务器端软件、市场发布或许多其他活动。但另一方面，这可能是时间表中包含了硬件和嵌入式软件的那部分，因此它很可能展示了你和你直属团队的工作。</p>
-<div class="figure">
-  <img src="images/fig-3-1.jpg" alt="图 3-1" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 3-1 — 中的时间表展示了一种瀑布式开发模式，即一项活动接着另一项活动顺流而下。在电路板被制造出来之前进行原理图审查是有道理的。当然，电路板是在嵌入式软件开发达到alpha版本之前被制造出来的。</p>
-</div>
-<p>但这不会成为实际的时间表。花大量时间制作这样一件杰作，结果在它完成之前就已经过时了，这可能会让人非常沮丧。规划的目标是识别依赖关系。如果制造电路板需要12周，创建嵌入式软件需要14周，那么整个项目可以在</p>
+<p>这种时间表是基于工程经理（或技术负责人）讨论目标，然后估算项目所需的时间和资源而制定的。这只是时间表的一部分；它不包括机械工程、服务器端软件、市场发布或许多其他活动。但另一方面，这可能是时间表中包含了硬件和嵌入式软件的那部分，因此它很可能展示了你和你直属团队的工作。图3-1中的时间表展示了一种瀑布式开发模式，即一项活动接着另一项活动顺流而下。在电路板被制造出来之前进行原理图审查是有道理的。当然，电路板是在嵌入式软件开发达到alpha版本之前被制造出来的。</p>
+<p>但这不会成为实际的时间表。</p>
 <h2>第3章：动手操作硬件</h2>
 <p>14周内完成，对吗？嗯，不对：软件很可能需要更多时间来配合已经完成的电路板。但希望整个项目不需要26周（12 + 14）。 制定时间表的很大一部分工作是确定哪些任务可以并行完成，哪些必须在硬件完成之后进行。人们往往过于关注最终日期，即那个至关重要的发货日期，但时间表中还有更多信息：依赖关系、人力资源需求，以及何时需要花费现金（薪资除外）。 当然，无论你做多少计划和安排，事情永远不会完全按计划进行。会有超支和返工。规划的意义在于帮助你找出哪些地方需要小心，哪些依赖关系在长期内是重要的（哪些不重要）。 可悲的是，嵌入式软件通常排在最后，试图弥补因需求变更或硬件修复而造成的延迟。你在不完整的硬件上开发，使用原型电路板，并且会做好良好的启动测试，以便在电路板最终到达时做好准备。 你可能使用敏捷方法而不是瀑布方法进行开发，允许更多、更快的发布。但在某种程度上，当创建物理的、可交付的产品时，你可能需要审视固件所依赖的各个部分，以及它们是如何被开发出来的。</p>
 <h3>硬件设计</h3>
@@ -151,10 +147,6 @@
 <p>我对你忽略方框以外一切的建议有两个例外。第一，LED、开关和按钮通常连接到处理器。原理图会告诉你这类元件连接到了处理器的哪条线上，这样你就知道在哪里读取开关状态或点亮LED。 另一类需要关注的元件是连接到处理器和电源的电阻，称为上拉电阻，因为它们把电压拉高（朝向电源）。通常，上拉电阻相对较弱（电阻值高），这样处理器可以将被上拉的I/O线驱动为低电平。上拉电阻意味着当处理器不驱动时，该线上的信号 被定义为高电平。处理器可能有内部上拉电阻，这样即使输入未连接，处理器输入也有默认状态。注意也有下拉电阻，即接地的电阻。所有关于上拉的信息也适用于下拉，只是它们的默认逻辑电平是低而不是高。没有上拉或下拉的输入既不是逻辑高也不是逻辑低，所以它们是浮空的（也可以称为高阻态、高阻抗或三态）。 动手练习读原理图：Arduino！ Arduino是很棒的小板子，设计得易于使用，让艺术家、学生和所有人都能接触电子产品。对许多人来说，Arduino是通往嵌入式系统的门户；它是他们编程的第一块硬件。 我想向你展示如何把Arduino从一个不透明的系统看作一块有熟悉原理图的板子。</p>
 <div class="figure">
   <img src="images/fig-3-11.jpg" alt="图 3-11" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 3-11 — 展示了Arduino UNO原理图的硬件框图。右下角是微控制器。这是板子的最终用户功能。I/O引脚直接从微控制器引出，但在板子上有些分开（是这个系统的一个重要特性），所以它们有自己的方框。</p>
-</div>
-<div class="figure">
-  <img src="images/fig-3-11.jpg" alt="图 3-11" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-11 — Arduino硬件框图</p>
 </div>
 <p>微控制器左边是一个USB转UART（或USB转串口）方框，表示将计算机说的语言转换为微控制器能理解的语言的硬件。它用于给板子编程新代码以及在代码运行时打印输出数据。在大多数框图里，这个部分会是一个小方框；它是一个次要特性，有时只是线缆的一部分。不过，我在为原理图做铺垫，所以把它画得和它在原理图上占据的空间差不多大。 最后一个方框，在最上面，是电源子系统。Arduino板子有点特别，因为你可以把它插到USB上，也可以插到5V直流电源适配器上。想想你周围的电子设备（手机、鼠标、摄像头），通常只能是其中一种方式。但在这块板子上，你可以同时插入两种而不会损坏任何东西。由于这种灵活性，电源子系统更复杂一些。</p>
@@ -183,10 +175,6 @@
 <p>结合了传统示波器和逻辑分析仪的特性，有几个模拟通道和8或16个数字通道。我个人最喜欢的混合信号示波器，可以用来同时观察不同类型的信息。 这些示波器往往是共享资源，因为它们相对较贵。你可以买价格合理、连接到电脑的型号，但有时它们的功能集在不显而易见的地方受到限制。一般来说，一分钱一分货。它们能节省的调试时间使其成为一项很好的投资。</p>
 <h3>设置示波器</h3>
 <p>第一步是确定哪些信号能帮你找出问题。接下来，你需要将示波器的接地夹连接到地。如果你有多个地（交流地、直流地、模拟地）并且不确定应该把示波器接到哪个，请询问你的电子工程师。选错可能会危害示波器的健康。 接下来，将探头连接到感兴趣的信号上。许多处理器的引脚非常微小，需要专用探头。另一方面，许多硬件工程师会在板子上留测试点，因为他们知道软件团队可能需要访问特定信号进行调试。或者，你可以在需要的信号处往板子上焊接导线，然后把探头钩到导线上。 如果你以前从未设置过示波器，使用它可能会让人有些畏惧。示波器的手册各不相同，但它们是寻求帮助的最佳途径（而且大部分都可以在线查阅）。没有适用于所有示波器的通用手册，所以我只能告诉你翻手册时要寻找哪些术语。</p>
-<div class="figure">
-  <img src="images/fig-3-13.jpg" alt="图 3-13" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 3-13 — 展示了一个典型示波器屏幕的示意图。最重要的一点是，时间沿x轴推进，电压沿y轴变化。这些轴的比例是可配置的。</p>
-</div>
 <div class="figure">
   <img src="images/fig-3-13.jpg" alt="图 3-13" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-13 — 简化的示波器屏幕截图</p>
@@ -224,11 +212,7 @@
 <h3>对于大多数形式的存储器，我们在这里看到的模式是一个好的起点：</h3>
 <p>1. 读取原始数据。 2. 写入一些变化但可公式化计算的数据。 3. 验证数据。 4. 写回原始数据。 5. 验证原始数据。 不过，还有许多其他类型的外设——比我能在这里覆盖的更多。虽然自动化测试是最好的，但有些测试需要外部验证，例如LCD显示一组颜色和线条图案来验证其驱动。有些测试需要伪造的外部输入来检查传感元件。 对于你的每一个外设和软件子系统，尝试找出哪些测试能让你确信它可靠地按预期工作。这听起来不难，但实际可能很困难。设计好的测试是能让你的软件变得卓越的事情之一。</p>
 <h3>命令与响应</h3>
-<p>假设你采纳了前一节的建议，为硬件的每个部分都创建了测试函数。在bring-up期间，你制作了一个特殊镜像，在每次上电时执行每个测试。如果其中一个失败了，你和硬件工程师可能想一遍又一遍地只运行那个测试。所以你重新编译并重新加载。然后你想对另一个测试做同样的事。所以你再次重新编译和重新加载。然后再对另一个测试又这样做。这个&quot;编译-加载&quot;循环越来越让人厌烦。如果能向你的嵌入式系统发送命令，让它根据需要运行测试，不是更简单吗？ 嵌入式系统通常没有计算机（甚至智能手机）上那种丰富的用户界面体验。很多嵌入式系统通过命令行来控制。即使那些有屏幕的系统，通常也使用命令行界面进行调试。本节的第一部分描述了如何在C语言中使用函数指针构建命令处理跳转表来发送命令。这个巧妙的问题和解决方案给了我一个展示标准命令模式的机会，无论你使用什么语言，这都是一个值得了解的有用模式。</p>
-<div class="figure">
-  <img src="images/fig-3-15.jpg" alt="图 3-15" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 3-15 — 展示了我们自动化命令处理器的一些高层目标——让我们能够从PC端的串行终端发送命令，并从被测设备获取响应。</p>
-</div>
+<p>假设你采纳了前一节的建议，为硬件的每个部分都创建了测试函数。在bring-up期间，你制作了一个特殊镜像，在每次上电时执行每个测试。如果其中一个失败了，你和硬件工程师可能想一遍又一遍地只运行那个测试。所以你重新编译并重新加载。然后你想对另一个测试做同样的事。所以你再次重新编译和重新加载。然后再对另一个测试又这样做。这个"编译-加载"循环越来越让人厌烦。如果能向你的嵌入式系统发送命令，让它根据需要运行测试，不是更简单吗？ 嵌入式系统通常没有计算机（甚至智能手机）上那种丰富的用户界面体验。很多嵌入式系统通过命令行来控制。即使那些有屏幕的系统，通常也使用命令行界面进行调试。本节的第一部分描述了如何在C语言中使用函数指针构建命令处理跳转表来发送命令。这个巧妙的问题和解决方案给了我一个展示标准命令模式的机会，无论你使用什么语言，这都是一个值得了解的有用模式。</p>
 <div class="figure">
   <img src="images/fig-3-15.jpg" alt="图 3-15" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-15 — 命令处理器的目标</p>
@@ -268,10 +252,6 @@
 <div class="figure">
   <img src="images/fig-3-16.jpg" alt="图 3-16" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-16 — 命令处理器的工作方式</p>
-</div>
-<div class="figure">
-  <img src="images/fig-3-17.jpg" alt="图 3-17" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 3-17 — 展示了命令模式各元素的作用。</p>
 </div>
 <div class="figure">
   <img src="images/fig-3-17.jpg" alt="图 3-17" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
