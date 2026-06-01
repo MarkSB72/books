@@ -111,7 +111,23 @@
   <img src="images/fig-3-5.jpg" alt="图 3-5" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-5 — 模拟三角龙工作原理</p>
 </div>
-<p>在阅读数据手册时，标记可能对你的代码产生影响的区域，以便之后返回查看。时序图是停下来喘口气的好地方（图3-6）。尝试将这些图与文字以及你打算的实现方式联系起来。关于时序图的更多信息，请参见侧边栏&quot;时序图如何帮助软件开发人员&quot;（第52页）。 除了确保你拥有元器件的最新数据手册外，还要查看制造商的网页，寻找勘误表，其中提供对数据手册中任何错误的更正。用元器件型号和&quot;errata&quot;这个词搜索网页（图3-7）。勘误表可能指数据手册中的错误，也可能指元器件本身的错误。大多数元器件都有某种形式的勘误表。 数据手册可能有修订版本，元器件也可能有修订版本。 请获取你正在使用的元器件版本所对应的最新数据手册。</p>
+<p>在阅读数据手册时，标记可能对你的代码产生影响的区域，以便之后返回查看。时序图是停下来喘口气的好地方</p>
+<p>（</p>
+<p>图</p>
+<p>3-6</p>
+<p>）。尝试将这些图与文字以及你打算的实现方式联系起来。关于时序图的更多信息，请参见侧边栏</p>
+<p>&quot;</p>
+<p>时序图如何帮助软件开发人员</p>
+<p>&quot;（</p>
+<p>第</p>
+<p>52</p>
+<p>页）。 除了确保你拥有元器件的最新数据手册外，还要查看制造商的网页，寻找勘误表，其中提供对数据手册中任何错误的更正。用元器件型号和</p>
+&quot;errata&quot;
+<p>这个词搜索网页</p>
+<p>（</p>
+<p>图</p>
+<p>3-7</p>
+<p>）。勘误表可能指数据手册中的错误，也可能指元器件本身的错误。大多数元器件都有某种形式的勘误表。 数据手册可能有修订版本，元器件也可能有修订版本。 请获取你正在使用的元器件版本所对应的最新数据手册。</p>
 <div class="figure">
   <img src="images/fig-3-6.jpg" alt="图 3-6" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 3-6 — 模拟三角龙时序图</p>
@@ -252,15 +268,24 @@
 <p>为了让bring-up变得容易，你需要能够执行上述每一项。你可能会选择先运行全功能的flash测试。如果通过了，你就知道另外两项也通过了。然而，如果没通过，你就需要另外两项测试可用于必要的调试。 其他章节涵盖了I/O线的控制（第4章）和SPI的更多内容（第7章），所以现在让我们专注于我们可以编写的用于测试flash存储器的测试。flash的工作原理不是关键，但你可以通过阅读Macronix MX25V8035 flash存储器datasheet来测试自己读datasheet的能力（在Google、DigiKey或供应商网站上搜索部件号）。</p>
 <h3>Flash测试示例</h3>
 <p>Flash存储器是一种非易失性存储器（所以断电后数据不会丢失）。其他类型的非易失性存储器包括ROM（只读存储器）和电可擦除可编程只读存储器（EEPROM）。易失性存储器在断电后不保留其值。易失性存储器有不同种类，但它们都是某种类型的RAM。与EEPROM类似，flash可以被擦除和写入。然而，大多数EEPROM允许你一次擦除和写入一个字节。对于flash，你可能可以一次写入一个字节，但你必须擦除整个扇区才能这么做。扇区大小取决于flash（通常flash越大，每个扇区越大）。对于我们测试的元件，一个扇区是4千字节（即4096字节），整个芯片包含8 Mb（1 MB或256个扇区）。flash通常比EEPROM空间更大，也更省电。</p>
-<p>然而，EEPROM有更小的容量，所以它们仍然有用。当我们编写bring-up测试时，flash芯片中不需要保留任何内容。对于POST，我们确实不应该修改flash，因为系统可能正在使用它（用于存储版本和图形数据）。对于单元测试，我们希望在测试后保持原样，但我们可能可以设定一些约束条件。测试通常接受三个参数：</p>
-<p>• 目标flash地址（这样测试可以在一个未使用或非关键的扇区中运行）</p>
-<p>• 一个指向内存的指针</p>
-<p>• 内存长度。内存长度是flash测试将存储到RAM的数据量。如果内存与扇区大小相同，flash中的数据就不会丢失。以下原型展示了三种类型的测试：</p>
-<p>• 一个运行其他测试的伞形测试（返回它遇到的错误数量）</p>
-<p>• 一个尝试从flash读取的测试（返回实际读取的字节数）</p>
-<p>• 一个尝试向flash写入的测试（返回写入的字节数）：</p>
+<p>然而，EEPROM有更小的容量，所以它们仍然有用。当我们编写bring-up测试时，flash芯片中不需要保留任何内容。对于POST，我们确实不应该修改flash，因为系统可能正在使用它（用于存储版本和图形数据）。对于单元测试，我们希望在测试后保持原样，但我们可能可以设定一些约束条件。测试通常接受三个参数：目标flash地址（这样测试可以在一个未使用或非关键的扇区中运行）、一个指向内存的指针、以及内存长度。内存长度是flash测试将存储到RAM的数据量。如果内存与扇区大小相同，flash中的数据就不会丢失。以下原型展示了三种类型的测试：一个运行其他测试的伞形测试（返回它遇到的错误数量）、一个尝试从flash读取的测试（返回实际读取的字节数）、以及一个尝试向flash写入的测试（返回写入的字节数）：</p>
 <h3>// C代码（保留英文，仅翻译注释）</h3>
-<p>int FlashTest(uint32_t address, uint8_t *memory, uint16_t memLength); uint16_t FlashRead(uint32_t addr, uint8_t *data, uint16_t dataLen); uint16_t FlashWrite(uint32_t addr, uint8_t *data, uint16_t dataLen); 我们将在bring-up期间广泛使用FlashTest，然后将其放入单元测试中，在情况有变或发布前根据需要启用它。我们不希望这个测试作为POST的一部分。flash在经过一定次数的擦除和写入后就会磨损（通常是100,000次；这个信息在datasheet中）。</p>
+<pre><code>int FlashTest(uint32_t address, uint8_t *memory, uint16_t memLength); uint16_t FlashRead(uint32_t addr, uint8_t *data, uint16_t dataLen); uint16_t FlashWrite(uint32_t addr, uint8_t *data, uint16_t dataLen);</code></pre>
+<p>我们将在</p>
+<p>bring-up</p>
+<p>期间广泛使用</p>
+<p>FlashTest</p>
+<p>，然后将其放入单元测试中，在情况有变或发布前根据需要启用它。我们不希望这个测试作为</p>
+<p>POST</p>
+<p>的一部分。</p>
+<p>flash</p>
+<p>在经过一定次数的擦除和写入后就会磨损</p>
+<p>（</p>
+<p>通常是</p>
+<p>100,000</p>
+<p>次；这个信息在</p>
+<p>datasheet</p>
+<p>中）。</p>
 <p>此外，这些测试中至少有两个有可能破坏我们的数据。而且，我们不需要在启动时做这个测试。如果处理器能够与flash通信，那么合理地相信flash是正常工作的。（你可以通过在flash中放置一个包含已知键值、版本和/或校验和的头部来检查基本通信。） 访问这个flash部件有两种方式：单个字节和多字节块。以后运行真实代码时，你可能想使用更快的块访问方式。在初始bring-up和测试期间，你可能想从更简单的字节方法开始，为你的驱动打好坚实基础。</p>
 <h3>测试1：读取现有数据</h3>
 <p>测试你能从flash读取数据，实际上验证了I/O线已配置为用作SPI端口、SPI端口配置正确、以及你理解了flash命令协议的基础知识。</p>
@@ -269,13 +294,34 @@
 <h3>// 测试1：读取一个块中的现有数据，以确认读取是可行的</h3>
 <p>dataLen = FlashRead(startAddress, memory, memLength); if (dataLen != memLength) {</p>
 <h3>// 读取的数据少于期望，记录错误</h3>
-<p>Log(LogUnitTest, LogLevelError, &quot;Flash test: truncation on byte read&quot;); memLength = dataLen; error++; } 请注意，这里没有对数据进行验证，因为我们不知道这个函数是否在空flash芯片上运行。如果你在写POST，你可以做这个读取然后检查数据是否有效（然后停止测试，因为这对于上电检查已经足够了）。</p>
+<pre><code>Log(LogUnitTest, LogLevelError, &quot;Flash test: truncation on byte read&quot;); memLength = dataLen; error++; }</code></pre>
+<p>请注意，这里没有对数据进行验证，因为我们不知道这个函数是否在空</p>
+<p>flash</p>
+<p>芯片上运行。如果你在写</p>
+<p>POST</p>
+<p>，你可以做这个读取然后检查数据是否有效</p>
+<p>（</p>
+<p>然后停止测试，因为这对于上电检查已经足够了）。</p>
 <h3>测试2：字节访问</h3>
-<p>下一个测试从擦除扇区中的数据开始。然后向flash填充数据，一次写入一个字节。我们希望写入一些会变化的值，以便确认命令生效。我喜欢写入一个基于地址的偏移量。（这个偏移量告诉我，我没有意外地读回了地址值。） FlashEraseSector(startAddress);</p>
+<p>下一个测试从擦除扇区中的数据开始。然后向</p>
+<p>flash</p>
+<p>填充数据，一次写入一个字节。我们希望写入一些会变化的值，以便确认命令生效。我喜欢写入一个基于地址的偏移量。</p>
+<p>（</p>
+<p>这个偏移量告诉我，我没有意外地读回了地址值。）</p>
+<pre><code>FlashEraseSector(startAddress);</code></pre>
 <h3>// 想要放入一个递增的值，但不希望是地址值</h3>
-<p>addValue = 0x55; for (i=0; i&lt; memLength; i++) { value = i + addValue; dataLen = FlashWrite(startAddress + i, &amp;value, 1); if (dataLen != 1) { Log (LogUnitTest, LogLevelError, &quot;Flash test: byte write error.&quot;); error++; } } 要完成这个检查，你需要逐字节读回数据，并验证每个地址的值是否如预期（地址 + addValue）。</p>
+<pre><code>addValue = 0x55; for (i=0; i&lt; memLength; i++) { value = i + addValue; dataLen = FlashWrite(startAddress + i, &amp;value, 1); if (dataLen != 1) { Log (LogUnitTest, LogLevelError, &quot;Flash test: byte write error.&quot;); error++; } }</code></pre>
+<p>要完成这个检查，你需要逐字节读回数据，并验证每个地址的值是否如预期</p>
+<p>（</p>
+<p>地址</p>
+<p>+ addValue</p>
+<p>）。</p>
 <h3>测试3：块访问</h3>
-<p>现在flash中包含了我们新写入的数据，通过把原始数据放回去来确认块访问是否正常工作。这意味着需要再次擦除扇区： FlashEraseSector(startAddress); dataLen = FlashWrite(startAddress, memory, memLength); if (dataLen != memLength) { LogWithNum(LogUnitTest, LogLevelError, &quot;Flash test: block write error, len &quot;, dataLen); error++; } 最后，用另一个逐字节读取来验证这些数据。</p>
+<p>现在</p>
+<p>flash</p>
+<p>中包含了我们新写入的数据，通过把原始数据放回去来确认块访问是否正常工作。这意味着需要再次擦除扇区：</p>
+<pre><code>FlashEraseSector(startAddress); dataLen = FlashWrite(startAddress, memory, memLength); if (dataLen != memLength) { LogWithNum(LogUnitTest, LogLevelError, &quot;Flash test: block write error, len &quot;, dataLen); error++; }</code></pre>
+<p>最后，用另一个逐字节读取来验证这些数据。</p>
 <p>从测试2我们知道逐字节读取是可行的。如果结果正确，那么我们就知道块写入从这个测试来看是可行的，块读取从测试1来看是可行的。错误数量返回给上层验证代码。这个测试检验的是flash驱动软件。它不检查flash是否有粘滞位（即应该改变但从来不改变的位）。制造测试可以确认所有位都能改变，但大多数flash在到达你手中之前已经以这种方式验证过了。</p>
 <h3>测试总结</h3>
 <p>如果板子通过了这三项测试，你就可以确信flash硬件和软件都能正常工作，满足了Bring-up测试和单元测试的需求。</p>
@@ -302,13 +348,54 @@
 <h3>每一个我们可以调用的命令都由一个名称、一个要调用的函数和一个帮助字符串组成：</h3>
 <p>typedef void(*functionPointerType)(void); struct commandStruct { char const *name; functionPointerType execute; char const *help; };</p>
 <h3>这些结构体的数组将提供我们的命令列表：</h3>
-<p>const struct commandStruct commands[] = { {&quot;ver&quot;, CmdVersion, &quot;Display firmware version&quot;}, {&quot;flashTest&quot;, CmdFlashTest, &quot;Runs the flash unit test, prints number of errors upon completion&quot;}, {&quot;blinkLed&quot;, CmdBlinkLed, &quot;Sets the LED to blink at a desired rate (parameter: frequency (Hz))&quot;}, {&quot;help&quot;, CmdHelp, &quot;Prints out help messages&quot;}, {&quot;&quot;,0,&quot;&quot;}   // 表结束标记。必须放在最后！！！ }; 命令执行函数CmdVersion、CmdFlashTest、CmdBlinkLed和CmdHelp在别处实现。</p>
+<pre><code>const struct commandStruct commands[] = { {&quot;ver&quot;, CmdVersion, &quot;Display firmware version&quot;}, {&quot;flashTest&quot;, CmdFlashTest, &quot;Runs the flash unit test, prints number of errors upon completion&quot;}, {&quot;blinkLed&quot;, CmdBlinkLed, &quot;Sets the LED to blink at a desired rate (parameter: frequency (Hz))&quot;}, {&quot;help&quot;, CmdHelp, &quot;Prints out help messages&quot;}, {&quot;&quot;,0,&quot;&quot;}   //</code></pre>
+<p>表结束标记。必须放在最后！！！</p>
+<p>};</p>
+<p>命令执行函数</p>
+<p>CmdVersion、CmdFlashTest、CmdBlinkLed</p>
+<p>和</p>
+<p>CmdHelp</p>
+<p>在别处实现。</p>
 <p>需要参数的命令必须与解析器协作，从字符流中获取参数。这不仅简化了这段代码，还提供了更大的灵活性，允许每个命令自行设定使用规则，如参数的数量和类型。请注意列表中的help命令是一个特殊命令，它打印表中所有项的名称和帮助字符串。</p>
 <h3>函数指针没那么可怕</h3>
-<p>你能想象这样一种情况吗：直到程序已经在运行了，你才知道要运行哪个函数？例如，假设你想对来自传感器的数据运行几个信号处理算法中的一个。你可以从一个由变量控制的switch语句开始： switch (algorithm) { case kFIRFilter: return fir(data, dataLen); case kIIRFilter: return iir(data, dataLen); } 现在，当你想改变算法时，你发送一个命令或按一个按钮来使algorithm变量改变。如果数据被持续处理，即使你没有改变算法，系统仍然需要执行switch语句。在面向对象语言中，你可以使用对接口的引用。每个算法对象会实现一个同名函数（对于这个信号处理示例，我们称它为filter）。</p>
-<p>然后，当算法需要改变时，调用者对象就会改变。根据具体语言，接口实现可以通过关键字或继承来指示。C语言没有这些特性（而在C++中使用继承可能因为编译器约束在你的系统中被禁止）。因此，我们来到函数指针，它可以做同样的事。要声明一个函数指针，你需要一个将要放入其中的函数的原型。对于我们的switch语句，那应该是一个接受数据指针和数据长度且不返回任何内容的函数。不过，它可以通过修改其第一个参数来返回结果。其中一个函数的原型看起来像这样： void fir(uint16_t* data, uint16_t dataLen);</p>
+<p>你能想象这样一种情况吗：直到程序已经在运行了，你才知道要运行哪个函数？例如，假设你想对来自传感器的数据运行几个信号处理算法中的一个。你可以从一个由变量控制的</p>
+<p>switch</p>
+<p>语句开始：</p>
+<pre><code>switch (algorithm) { case kFIRFilter: return fir(data, dataLen); case kIIRFilter: return iir(data, dataLen); }</code></pre>
+<p>现在，当你想改变算法时，你发送一个命令或按一个按钮来使</p>
+<p>algorithm</p>
+<p>变量改变。如果数据被持续处理，即使你没有改变算法，系统仍然需要执行</p>
+<p>switch</p>
+<p>语句。在面向对象语言中，你可以使用对接口的引用。每个算法对象会实现一个同名函数</p>
+<p>（</p>
+<p>对于这个信号处理示例，我们称它为</p>
+<p>filter</p>
+<p>）。</p>
+<p>然后，当算法需要改变时，调用者对象就会改变。根据具体语言，接口实现可以通过关键字或继承来指示。</p>
+<p>C</p>
+<p>语言没有这些特性</p>
+<p>（</p>
+<p>而在</p>
+<p>C++</p>
+<p>中使用继承可能因为编译器约束在你的系统中被禁止）。因此，我们来到函数指针，它可以做同样的事。要声明一个函数指针，你需要一个将要放入其中的函数的原型。对于我们的</p>
+<p>switch</p>
+<p>语句，那应该是一个接受数据指针和数据长度且不返回任何内容的函数。不过，它可以通过修改其第一个参数来返回结果。其中一个函数的原型看起来像这样：</p>
+<pre><code>void fir(uint16_t* data, uint16_t dataLen);</code></pre>
 <h3>现在去掉函数名，替换为一个星号和一个用括号括起来的通用名称：</h3>
-<p>void (*filter)(uint16_t* data, uint16_t dataLen); 与其改变你的算法变量并调用switch语句来选择函数，不如只在需要时改变算法并调用函数指针。有两种方法可以做到这一点，隐式方法（下面左侧）和显式方法（右侧）。它们是等价的，只是语法形式不同： filter = fir;              // 或者 filter = &amp;fir; filter(data, dataLen);      // 或者 (*filter)(data, dataLen); 一旦你对函数指针的概念感到得心应手，当代码需要适应其运行环境时，它们就会成为一个强大的工具。</p>
+<pre><code>void (*filter)(uint16_t* data, uint16_t dataLen);</code></pre>
+<p>与其改变你的算法变量并调用</p>
+<p>switch</p>
+<p>语句来选择函数，不如只在需要时改变算法并调用函数指针。有两种方法可以做到这一点，隐式方法</p>
+<p>（</p>
+<p>下面左侧）和显式方法</p>
+<p>（</p>
+<p>右侧）。它们是等价的，只是语法形式不同：</p>
+<pre><code>filter = fir;              //</code></pre>
+<p>或者</p>
+<pre><code>filter = &amp;fir; filter(data, dataLen);      //</code></pre>
+<p>或者</p>
+<pre><code>(*filter)(data, dataLen);</code></pre>
+<p>一旦你对函数指针的概念感到得心应手，当代码需要适应其运行环境时，它们就会成为一个强大的工具。</p>
 <p>函数指针的一些常见用途包括本章中描述的命令结构、用于指示事件完成的回调函数，以及将按钮按下映射到上下文相关操作。有一点需要注意：过度滥用函数指针可能会导致处理器运行变慢。一些处理器会尝试预测代码的走向，并在执行前加载相应的指令。函数指针会抑制分支预测，因为处理器无法猜测你在调用之后会跳转到哪里。另一方面，如果你想将代码优化到这个程度，也许可以直接跳到第11章。不过，其他动态选择函数调用的方法同样也会中断分支预测（比如我们一开始使用的switch语句）。除非你已经到了手工调优汇编代码的阶段，否则通常不值得为函数指针这种强大功能所带来的轻微性能下降而担忧。</p>
 <h3>调用命令</h3>
 <p>当命令行上的客户端通过发送字符串来指示要运行哪个命令时，你需要选择相应的命令并执行它。为此，你需要遍历表，查找匹配的字符串。一旦找到匹配项，就调用函数指针来执行对应的函数。 与上一节相比，这一部分似乎简单得有些过头。而这正是目标所在。嵌入式系统往往非常复杂，考虑到其严格的约束条件和隐藏的依赖关系，有时甚至复杂得可怕。本设计模式（以及许多其它模式）的目标就是隔离复杂性。你无法消除复杂性；一个什么都不做的系统并不复杂，但它也没什么用处。在设置表格和使用它的解析代码中仍然存在不少的复杂性，但这些细节可以被限制在它们自己的空间内。</p>
@@ -336,27 +423,67 @@
 <p>但如何实现这两种方式呢？更重要的是，应该根据什么标准来决定哪些子系统采用哪种错误处理方法？具体怎么做取决于你的产品；我的目标是让你在设计阶段就开始思考错误处理的问题。</p>
 <h3>一致的方法论</h3>
 <p>函数应该尽其所能地处理错误。例如，如果一个变量可能超出范围，就应该修正该范围并适当地记录错误。函数可以返回错误，让调用者来处理问题。调用者应该检查并处理错误，这可能意味着在多层应用程序中将错误进一步向上游传递。在许多情况下，如果一个错误不值得检查，那它也就不值得返回。另一方面，有些情况下你可能希望返回一个仅在测试中使用的诊断代码。可以在注释中说明，返回的错误代码不用于正常使用，或者只应在assert()调用中使用。 assert()在嵌入式系统中并不总是被实现，但以适合系统的方式来实现它并不复杂。它可能是在调试器控制台打印的一条消息，是向系统控制台或日志的输出，是一条断点指令（如BKPT），甚至是一根在错误条件下翻转的I/O线或LED灯。</p>
-<p>打印操作会改变嵌入式系统的时序，因此将错误通信的函数分离出来通常更有好处，以便允许其它输出方式（例如LED灯）。断点指令告诉处理器，如果调试器已连接就停止运行。程序化断点可以被编译进你的代码中。它通常是一个汇编函数，常常隐藏在一个宏后面： #define BKPT() __asm__(“BKPT”) #define BKPT() __asm__(“bkpt #0”) #define BKPT() __asm__(“break”) 这些断点会被编译到你的代码中（它们不会占用你有限的硬件断点预算！）。这可以让你更容易地单步调试代码，特别是当你只在特定条件下才遇到错误时。应用程序或系统的错误返回码应该在整个代码库中标准化。</p>
+<p>打印操作会改变嵌入式系统的时序，因此将错误通信的函数分离出来通常更有好处，以便允许其它输出方式</p>
+<p>（</p>
+<p>例如</p>
+<p>LED</p>
+<p>灯）。断点指令告诉处理器，如果调试器已连接就停止运行。程序化断点可以被编译进你的代码中。它通常是一个汇编函数，常常隐藏在一个宏后面：</p>
+<pre><code>#define BKPT() __asm__(“BKPT”) #define BKPT() __asm__(“bkpt #0”) #define BKPT() __asm__(“break”)</code></pre>
+<p>这些断点会被编译到你的代码中</p>
+<p>（</p>
+<p>它们不会占用你有限的硬件断点预算！）。这可以让你更容易地单步调试代码，特别是当你只在特定条件下才遇到错误时。应用程序或系统的错误返回码应该在整个代码库中标准化。</p>
 <p>可以创建一个单一的高层errorCodes.h文件（或类似的文件），以枚举格式提供一致的错误代码。一些建议的错误代码包括： - 无错误（应始终为0） - 未知错误（或无法识别的错误） - 参数错误 - 索引错误（指针超出范围或为空） - 未初始化的变量或子系统 - 灾难性故障（这可能导致处理器复位，除非处于开发模式，在开发模式下则可能导致断点或自旋循环） 应该有最小数量的错误代码（通用错误），以便应用程序能够解释它们。虽然你可以使用像UART_FAILED_TO_INIT_SECOND_PARAM_TOO_HIGH这样的错误码，但泛化处理会使错误处理更容易。如果某个子系统中出现了PARAMETER_BAD错误，你就有了一个很好的起点去查找问题。</p>
 <p>本质上，通过保持简单，你确保将重要信息（存在bug）交到开发者手中，而进一步的调试可以深入挖掘出错的位置和原因。</p>
 <h3>错误检查流程</h3>
-<p>如果错误没有被处理，返回错误对任何人都没有好处。我们太经常只编写正常情况下的代码，而忽略了其它路径。我们是在寄希望于错误永远不会发生吗？这太天真了。 另一方面，当函数应该跳转到末尾并返回自己的错误，将问题向上冒泡到更高层时，逐个处理每个错误就变得相当繁琐。虽然有些人使用嵌套的if/else语句，但我通常更倾向于让代码贯穿整个函数，尽量使错误处理足够冗余，以便在正常路径流程中通常可以忽略： error = FunctionSay(); if (error == NO_ERROR) { error = FunctionHello(); } if (error == NO_ERROR) { error = FunctionWorld(); } if (error != NO_ERROR) {</p>
+<p>如果错误没有被处理，返回错误对任何人都没有好处。我们太经常只编写正常情况下的代码，而忽略了其它路径。我们是在寄希望于错误永远不会发生吗？这太天真了。 另一方面，当函数应该跳转到末尾并返回自己的错误，将问题向上冒泡到更高层时，逐个处理每个错误就变得相当繁琐。虽然有些人使用嵌套的</p>
+<p>if/else</p>
+<p>语句，但我通常更倾向于让代码贯穿整个函数，尽量使错误处理足够冗余，以便在正常路径流程中通常可以忽略：</p>
+<pre><code>error = FunctionSay(); if (error == NO_ERROR) { error = FunctionHello(); } if (error == NO_ERROR) { error = FunctionWorld(); } if (error != NO_ERROR) {</code></pre>
 <h3>// 处理错误状态</h3>
-<p>} return error; 这允许你一次调用多个函数，在末尾检查错误，而不是在每次调用时都检查。</p>
+<pre><code>} return error;</code></pre>
+<p>这允许你一次调用多个函数，在末尾检查错误，而不是在每次调用时都检查。</p>
 <h3>错误处理库</h3>
 <h3>错误处理库是另一种选择：</h3>
 <p>ErrorSet(&amp;globalErrorCode, error);</p>
 <h3>或者：</h3>
-<p>ErrorSet(&amp;globalErrorCode, FunctionFoo()); 如果该函数没有失败就返回，ErrorSet函数就不会覆盖先前的错误状态。和之前一样，这允许你一次调用多个函数，在末尾检查错误，而不是在每次调用时都检查。在这样的错误处理库中，应该有四个函数，根据应用程序的实际需要来实现和使用：</p>
-<p>• ErrorSet</p>
-<p>• ErrorGet</p>
-<p>• ErrorPrint和ErrorClear。该库应该主要为调试和测试而设计，不过即使开发完成后，错误处理机制也应该保留。例如，ErrorPrint可能会从通过串口写出日志信息，变为一个仅翻转I/O线的小函数。这不是给最终用户处理的错误；它是为那些面对不能正常工作的生产单元的开发者准备的。</p>
+<pre><code>ErrorSet(&amp;globalErrorCode, FunctionFoo());</code></pre>
+<p>如果该函数没有失败就返回，</p>
+<p>ErrorSet</p>
+<p>函数就不会覆盖先前的错误状态。和之前一样，这允许你一次调用多个函数，在末尾检查错误，而不是在每次调用时都检查。在这样的错误处理库中，应该有四个函数，根据应用程序的实际需要来实现和使用：</p>
+<p>ErrorSet、ErrorGet、ErrorPrint</p>
+<p>和</p>
+<p>ErrorClear</p>
+<p>。该库应该主要为调试和测试而设计，不过即使开发完成后，错误处理机制也应该保留。例如，</p>
+<p>ErrorPrint</p>
+<p>可能会从通过串口写出日志信息，变为一个仅翻转</p>
+<p>I/O</p>
+<p>线的小函数。这不是给最终用户处理的错误；它是为那些面对不能正常工作的生产单元的开发者准备的。</p>
 <p>如果你觉得这听起来有些熟悉，那可能是因为这正是标准C/C++库所做的事情。如果你的文件用fopen打开失败，它不仅返回NULL来告诉你发生了错误，fopen还会将错误代码放入errno中，提供关于出错原因的更多信息。即使对于大多数嵌入式系统，你也可以使用perror和strerror来获取错误代码的文本描述。当然，和我上面的版本一样，如果你不清除errno，你可能看到的是旧的错误。</p>
 <h3>调试时序错误</h3>
 <p>在调试硬件/软件交互（或任何对时间敏感的软件）时，串行输出（如日志或printf）可能会改变代码的时序。在许多情况下，时序问题会根据你的输出语句和/或断点的位置而出现（或消失）。当你的工具干扰了问题本身时，调试就变得困难了。使用错误库（或第2章中描述的日志库）的一个优势在于，你不必输出数据；你可以将数据存储在本地RAM中，这通常是一个快得多的方案。事实上，如果你在时序方面遇到问题，可以考虑建立一个小的缓冲区（4–16字节，取决于你的RAM可用量），用于存放来自软件的信号（一到两字节）。在你的代码中，在感兴趣的关键触发点（例如ASSERT或ErrorSet处）填充缓冲区。当代码退出时间敏感区域后，你可以转储此缓冲区。</p>
 <p>如果你最关心的是最后一个错误，可以使用环形缓冲区来持续捕获最近发生的事件（环形缓冲区在第7章中有更详细的讨论）。另外，如果你对电路板设计有发言权，我强烈建议争取在电路板上预留可用的处理器备用I/O口，并通过排针方便地引出。它们在调试时会非常有用（特别是对于棘手的时序问题，串行输出会破坏时序），在测试中显示系统状态以及在剖析处理器周期时也同样有用。这些称为测试点（test points）。最好的电子工程师会在他们绘制原理图时问你你需要多少个。关于测试点的使用，第11章将有更多介绍。</p>
 <h3>进一步阅读</h3>
-<p>如果你想了解有关安全处理硬件、阅读原理图和焊接的更多知识，我建议阅读Charles Platt的《Make: Electronics》（O&#x27;Reilly）最新版。这本循序渐进的入门书读起来很轻松，当然如果手边有元件跟着动手做效果更佳。关于从原型到出货产品的更多信息，我推荐Alan Cohen的《Prototype to Product: A Practical Guide for Getting to Market》（O&#x27;Reilly）。它涵盖了从餐巾纸上的草图到产品所需的所有步骤。沿着同样的思路，但更专注于个人职业发展的，是Camille Fournier的《The Manager&#x27;s Path: A Guide for Tech Leaders Navigating Growth &amp; Change》（O&#x27;Reilly）。</p>
+<p>如果你想了解有关安全处理硬件</p>
+<p>、</p>
+<p>阅读原理图和焊接的更多知识，我建议阅读</p>
+<p>Charles Platt</p>
+<p>的</p>
+<p>《Make: Electronics</p>
+<p>》</p>
+（O&#x27;Reilly
+<p>）最新版。这本循序渐进的入门书读起来很轻松，当然如果手边有元件跟着动手做效果更佳。关于从原型到出货产品的更多信息，我推荐</p>
+<p>Alan Cohen</p>
+<p>的</p>
+<p>《Prototype to Product: A Practical Guide for Getting to Market</p>
+<p>》</p>
+（O&#x27;Reilly
+<p>）。它涵盖了从餐巾纸上的草图到产品所需的所有步骤。沿着同样的思路，但更专注于个人职业发展的，是</p>
+<p>Camille Fournier</p>
+<p>的</p>
+《The Manager&#x27;s Path: A Guide for Tech Leaders Navigating Growth &amp; Change
+<p>》</p>
+（O&#x27;Reilly
+<p>）。</p>
 <p>即使你不是管理者，这本书也讨论了管理者需要了解的事情，这会让你深入了解如何展示你的工作。这本书我通常读几章就放在书架上，直到我获得晋升后再读接下来的几章。Adafruit和SparkFun是令人惊叹的资源，充满了结合硬件和软件的有详尽文档的教程。更棒的是，它们丰富的GitHub仓库中包含了高质量的代码。如果它们有针对与你所用器件类似的代码，那它们的代码可能是让你的驱动程序成功运行的关键。</p>
 <h3>面试问题：谈谈失败</h3>
 <p>告诉我一个你参与过的成功项目。然后，告诉我一个你参与过的不那么成功的项目。发生了什么？你是如何应对的？（感谢Kristin Anderson提供这个问题。） 这个问题的目的并不在于评判求职者过去的成功与失败。问题之所以从这里开始，是因为导致成功（或失败）的过程依赖于知识、信息和沟通。通过谈论成功或失败，求职者会展现出他们如何从可用信息中学习，他们如何寻求信息，以及他们如何将重要信息传达给团队中的其他人。如果他们能理解大局并分析项目的进展，他们就更有可能成为团队的宝贵资产。问题的成功部分听起来很有趣，特别是当面试者对自己的项目感到兴奋和充满热情时。我想听听他们在使项目成功中所扮演的角色，以及他们所采用的过程。</p>
