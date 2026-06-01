@@ -213,11 +213,7 @@
 <h3>配置引脚以中断处理器为我们的 I/O 子系统增加了三个函数：</h3>
 <p>IOConfigureInterrupt(port, pin, trigger type, trigger state) 将引脚配置为中断。当中断看到某种触发类型时（如边沿或电平），就会触发。对于边沿触发类型，中断可以在上升沿或下降沿发生。对于电平触发类型，中断可以在电平为高或低时发生。有些系统还提供一个回调参数，即当中断发生时调用的函数；其他系统则将回调硬编码为某个函数名，你需要将代码放在那里。 IOInterruptEnable(port, pin) 使能与引脚关联的中断。 IOInterruptDisable(port, pin) 禁能与引脚关联的中断。 如果中断不是按引脚分配的（可能是按端口组分配的），处理器可能为每个端口组设有一个通用 I/O 中断，在这种情况下，ISR 需要梳理出是哪个引脚引发了中断。这取决于你的处理器。如果每个 I/O 引脚都可以有自己的中断，模块之间就可以更加松耦合。</p>
 <h3>开关去抖动</h3>
-<p>许多按钮并不提供图 4-6 上半部分所示的干净信号。相反，它们看起来更像标有&quot;有抖动的数字按钮信号&quot;的波形。如果你对该信号进行中断，系统可能会在按钮按下开始和结束时因毛刺而浪费处理器周期。开关抖动可能是由机械效应或电气效应引起的。</p>
-<div class="figure">
-  <img src="images/fig-4-6.jpg" alt="图 4-6" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
-  <p style="margin-top:6px;color:#888;font-size:14px;">图 4-6 — 还展示了按钮被按下时可能发生的模拟视图，信号只是缓慢生效。（实际情况可能要复杂得多，取决于抖动主要是由机械原因还是电气原因引起。）注意，模拟信号中有部分区域既不是高电平也不是低电平，而是介于两者之间。由于你的 I/O 线是数字信号，它无法表示这种不确定的值，可能会表现异常。一个充满边沿的数字信号会让代码以为每次用户操作产生了多次按下。结果会不一致且令用户沮丧。更糟的是，对此类信号进行中断可能导致处理器不稳定，所以我们还是回到轮询信号的方式。</p>
-</div>
+<p>许多按钮并不提供图 4-6 上半部分所示的干净信号。相反，它们看起来更像标有"有抖动的数字按钮信号"的波形。如果你对该信号进行中断，系统可能会在按钮按下开始和结束时因毛刺而浪费处理器周期。开关抖动可能是由机械效应或电气效应引起的。</p>
 <div class="figure">
   <img src="images/fig-4-6.jpg" alt="图 4-6" style="max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:4px;" onerror="this.style.display='none';var n=this.nextElementSibling;if(n)n.style.display='none'">
   <p style="margin-top:6px;color:#888;font-size:14px;">图 4-6 — 按钮信号的不同视图</p>
