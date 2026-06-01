@@ -1,529 +1,519 @@
-     1|/* === AUTOSAR Book — Shared Styles === */
-     2|
-     3|/* Reset */
-     4|*, *::before, *::after {
-     5|  margin: 0;
-     6|  padding: 0;
-     7|  box-sizing: border-box;
-     8|}
-     9|
-    10|body {
-    11|  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-    12|  background: #f8f9fa;
-    13|  color: #2c2c2c;
-    14|  line-height: 1.8;
-    15|  font-size: 15px;
-    16|}
-    17|
-    18|/* === Sidebar Navigation === */
-    19|.sidebar {
-    20|  position: fixed;
-    21|  top: 0;
-    22|  left: 0;
-    23|  width: 260px;
-    24|  height: 100vh;
-    25|  background: #1a1a2e;
-    26|  color: #e0e0e0;
-    27|  overflow-y: auto;
-    28|  z-index: 1000;
-    29|  display: flex;
-    30|  flex-direction: column;
-    31|  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    32|}
-    33|
-    34|.sidebar-header {
-    35|  padding: 28px 20px 20px;
-    36|  border-bottom: 1px solid rgba(255,255,255,0.1);
-    37|  text-align: center;
-    38|}
-    39|
-    40|.book-title {
-    41|  color: #fff;
-    42|  text-decoration: none;
-    43|  font-size: 18px;
-    44|  font-weight: 700;
-    45|  letter-spacing: 1px;
-    46|  display: block;
-    47|  transition: color 0.2s;
-    48|}
-    49|
-    50|.book-title:hover {
-    51|  color: #64b5f6;
-    52|}
-    53|
-    54|.sidebar .nav-list {
-    55|  flex: 1;
-    56|  padding: 12px 0;
-    57|}
-    58|
-    59|.sidebar .nav-list ul {
-    60|  list-style: none;
-    61|  margin: 0;
-    62|  padding: 0;
-    63|}
-    64|
-    65|.sidebar .nav-list li {
-    66|  margin: 0;
-    67|  padding: 0;
-    68|}
-    69|
-    70|.nav-chapter {
-    71|  display: block;
-    72|  padding: 10px 20px;
-    73|  color: #b0b0b8;
-    74|  text-decoration: none;
-    75|  font-size: 14px;
-    76|  line-height: 1.5;
-    77|  border-left: 3px solid transparent;
-    78|  transition: all 0.2s ease;
-    79|}
-    80|
-    81|.nav-chapter:hover {
-    82|  color: #fff;
-    83|  background: rgba(255,255,255,0.05);
-    84|  border-left-color: rgba(100,181,246,0.5);
-    85|}
-    86|
-    87|.nav-chapter.active {
-    88|  color: #fff;
-    89|  background: rgba(100,181,246,0.12);
-    90|  border-left-color: #64b5f6;
-    91|  font-weight: 600;
-    92|}
-    93|
-    94|/* === Sidebar Toggle (mobile) === */
-    95|.sidebar-toggle {
-    96|  display: none;
-    97|  position: fixed;
-    98|  top: 12px;
-    99|  left: 12px;
-   100|  z-index: 1001;
-   101|  background: #1a1a2e;
-   102|  color: #fff;
-   103|  border: none;
-   104|  border-radius: 6px;
-   105|  padding: 8px 14px;
-   106|  font-size: 18px;
-   107|  cursor: pointer;
-   108|  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-   109|  transition: background 0.2s;
-   110|}
-   111|
-   112|.sidebar-toggle:hover {
-   113|  background: #252547;
-   114|}
-   115|
-   116|/* === Main Content Area === */
-   117|.main-content {
-   118|  margin-left: 260px;
-   119|  min-height: 100vh;
-   120|}
-   121|
-   122|/* === Chapter Page Content === */
-   123|.chapter-page {
-   124|  max-width: 800px;
-   125|  margin: 0 auto;
-   126|  padding: 40px 32px;
-   127|}
-   128|
-   129|.chapter-page h1 {
-   130|  font-size: 24px;
-   131|  text-align: center;
-   132|  margin: 20px 0 8px;
-   133|  color: #1a1a2e;
-   134|  line-height: 1.4;
-   135|}
-   136|
-   137|.chapter-page h2 {
-   138|  font-size: 20px;
-   139|  margin: 32px 0 14px;
-   140|  color: #2c3e50;
-   141|  border-bottom: 2px solid #e0e0e0;
-   142|  padding-bottom: 8px;
-   143|}
-   144|
-   145|.chapter-page h3 {
-   146|  font-size: 17px;
-   147|  margin: 24px 0 10px;
-   148|  color: #444;
-   149|}
-   150|
-   .chapter-page p {
-     margin: 10px 0;
-     text-align: justify;
-     text-indent: 2em;
-   }
+/* === AUTOSAR Book — Shared Styles === */
 
-   /* Override: no indent for figure captions and subtitle */
-   .chapter-page .figure p {
-     text-indent: 0;
-   }
-   .chapter-page .subtitle {
-     text-indent: 0;
-   }
-   155|
-   156|.chapter-page ul, .chapter-page ol {
-   157|  margin: 10px 0 10px 28px;
-   158|}
-   159|
-   160|.chapter-page li {
-   161|  margin: 4px 0;
-   162|}
-   163|
-   164|.chapter-page table {
-   165|  width: 100%;
-   166|  border-collapse: collapse;
-   167|  margin: 18px 0;
-   168|  font-size: 14px;
-   169|}
-   170|
-   171|.chapter-page table th, .chapter-page table td {
-   172|  border: 1px solid #ddd;
-   173|  padding: 10px 14px;
-   174|  text-align: left;
-   175|}
-   176|
-   177|.chapter-page table th {
-   178|  background: #f0f4f8;
-   179|  font-weight: 600;
-   180|  color: #2c3e50;
-   181|}
-   182|
-   183|.chapter-page pre {
-   184|  background: #2d2d2d;
-   185|  color: #e0e0e0;
-   186|  padding: 14px 18px;
-   187|  border-radius: 6px;
-   188|  overflow-x: auto;
-   189|  font-size: 13px;
-   190|  line-height: 1.5;
-   191|  margin: 14px 0;
-   192|}
-   193|
-   194|.chapter-page code {
-   195|  font-family: "Cascadia Code", "Fira Code", Consolas, Monaco, monospace;
-   196|  background: #f0f0f0;
-   197|  padding: 2px 6px;
-   198|  border-radius: 3px;
-   199|  font-size: 13px;
-   200|}
-   201|
-   202|.chapter-page pre code {
-   203|  background: none;
-   204|  padding: 0;
-   205|}
-   206|
-   207|.chapter-page img {
-   208|  max-width: 100%;
-   209|  height: auto;
-   210|  border: 1px solid #e0e0e0;
-   211|  border-radius: 4px;
-   212|  display: block;
-   213|  margin: 14px auto;
-   214|}
-   215|
-   216|.chapter-page .figure {
-   217|  text-align: center;
-   218|  margin: 18px 0;
-   219|  padding: 14px;
-   220|  background: #fafaf7;
-   221|  border: 1px solid #eee;
-   222|  border-radius: 6px;
-   223|}
-   224|
-   225|.chapter-page .figure img {
-   226|  margin-bottom: 8px;
-   227|}
-   228|
-   229|.chapter-page .figure p {
-   230|  margin: 8px 0 0;
-   231|  font-weight: 600;
-   232|  color: #555;
-   233|  font-size: 14px;
-   234|  text-align: center;
-   235|}
-   236|
-   237|.chapter-page .caption {
-   238|  text-align: center;
-   239|  font-size: 13px;
-   240|  color: #666;
-   241|  margin-top: 6px;
-   242|}
-   243|
-   244|.chapter-page .note {
-   245|  background: #f0f7ff;
-   246|  border-left: 4px solid #4a90d9;
-   247|  padding: 12px 16px;
-   248|  margin: 14px 0;
-   249|  border-radius: 0 6px 6px 0;
-   250|  font-size: 14px;
-   251|}
-   252|
-   253|.chapter-page .note::before {
-   254|  content: "📝 注意 ";
-   255|  font-weight: bold;
-   256|  color: #4a90d9;
-   257|}
-   258|
-   259|.chapter-page .questions,
-   260|.chapter-page .summary {
-   261|  margin: 20px 0;
-   262|  padding: 18px 22px;
-   263|  border-radius: 8px;
-   264|}
-   265|
-   266|.chapter-page .summary {
-   267|  background: #f0fff0;
-   268|}
-   269|
-   270|.chapter-page .summary h3 {
-   271|  margin-top: 0;
-   272|  color: #2d7d2d;
-   273|}
-   274|
-   275|.chapter-page .questions {
-   276|  background: #f8f4ff;
-   277|}
-   278|
-   279|.chapter-page .questions h3 {
-   280|  margin-top: 0;
-   281|  color: #6b3fa0;
-   282|}
-   283|
-   284|.chapter-page .case-study {
-   285|  background: #fffdf5;
-   286|  border: 1px solid #f0e6b8;
-   287|  border-radius: 8px;
-   288|  padding: 18px 22px;
-   289|  margin: 18px 0;
-   290|}
-   291|
-   292|.chapter-page .case-study h3 {
-   293|  margin-top: 0;
-   294|  color: #b8860b;
-   295|}
-   296|
-   297|.chapter-page .page-marker {
-   298|  text-align: right;
-   299|  color: #bbb;
-   300|  font-size: 12px;
-   301|  margin: 28px 0 4px;
-   302|  border-top: 1px dashed #e8e8e8;
-   303|  padding-top: 6px;
-   304|}
-   305|
-   306|.chapter-page .page-marker:first-child {
-   307|  border-top: none;
-   308|  margin-top: 0;
-   309|}
-   310|
-   311|.chapter-page .subtitle {
-   312|  text-align: center;
-   313|  color: #888;
-   314|  font-size: 13px;
-   315|  margin-bottom: 20px;
-   316|}
-   317|
-   318|/* Fix for chapter 8 inline styles (removed, use our global styles) */
-   319|.chapter-page .container {
-   320|  max-width: none;
-   321|  margin: 0;
-   322|  padding: 0;
-   323|  background: none;
-   324|  box-shadow: none;
-   325|}
-   326|
-   327|/* === Index Page === */
-   328|body.index-page {
-   329|  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-   330|  min-height: 100vh;
-   331|  display: flex;
-   332|  align-items: center;
-   333|  justify-content: center;
-   334|}
-   335|
-   336|body.index-page .sidebar,
-   337|body.index-page .sidebar-toggle,
-   338|body.index-page .main-content {
-   339|  display: none;
-   340|}
-   341|
-   342|.index-container {
-   343|  max-width: 700px;
-   344|  width: 100%;
-   345|  margin: 40px 20px;
-   346|  background: #fff;
-   347|  border-radius: 12px;
-   348|  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-   349|  overflow: hidden;
-   350|}
-   351|
-   352|.book-cover {
-   353|  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-   354|  color: #fff;
-   355|  text-align: center;
-   356|  padding: 60px 40px 50px;
-   357|  position: relative;
-   358|}
-   359|
-   360|.cover-badge {
-   361|  display: inline-block;
-   362|  background: rgba(255,255,255,0.15);
-   363|  color: #64b5f6;
-   364|  border: 1px solid rgba(100,181,246,0.4);
-   365|  border-radius: 20px;
-   366|  padding: 4px 20px;
-   367|  font-size: 13px;
-   368|  letter-spacing: 2px;
-   369|  margin-bottom: 30px;
-   370|}
-   371|
-   372|.cover-title {
-   373|  font-size: 34px;
-   374|  font-weight: 700;
-   375|  letter-spacing: 2px;
-   376|  margin-bottom: 12px;
-   377|}
-   378|
-   379|.cover-subtitle {
-   380|  font-size: 16px;
-   381|  color: rgba(255,255,255,0.6);
-   382|  margin-bottom: 30px;
-   383|}
-   384|
-   385|.cover-divider {
-   386|  width: 60px;
-   387|  height: 3px;
-   388|  background: #64b5f6;
-   389|  margin: 0 auto 30px;
-   390|}
-   391|
-   392|.cover-authors {
-   393|  margin-bottom: 18px;
-   394|}
-   395|
-   396|.cover-authors p {
-   397|  margin: 4px 0;
-   398|  font-size: 14px;
-   399|  color: rgba(255,255,255,0.7);
-   400|  text-align: center;
-   401|}
-   402|
-   403|.cover-translator {
-   404|  margin-top: 10px;
-   405|}
-   406|
-   407|.cover-translator p {
-   408|  margin: 3px 0;
-   409|  font-size: 13px;
-   410|  color: rgba(255,255,255,0.5);
-   411|  text-align: center;
-   412|}
-   413|
-   414|.toc-section {
-   415|  padding: 40px;
-   416|}
-   417|
-   418|.toc-heading {
-   419|  font-size: 22px;
-   420|  color: #1a1a2e;
-   421|  text-align: center;
-   422|  margin-bottom: 28px;
-   423|  letter-spacing: 2px;
-   424|}
-   425|
-   426|.toc-list {
-   427|  border-top: 1px solid #eee;
-   428|}
-   429|
-   430|.toc-item {
-   431|  border-bottom: 1px solid #f0f0f0;
-   432|}
-   433|
-   434|.toc-item a {
-   435|  display: flex;
-   436|  align-items: baseline;
-   437|  padding: 14px 16px;
-   438|  text-decoration: none;
-   439|  color: #333;
-   440|  transition: all 0.2s ease;
-   441|  gap: 16px;
-   442|}
-   443|
-   444|.toc-item a:hover {
-   445|  background: #f5f9ff;
-   446|  color: #1a4d8f;
-   447|}
-   448|
-   449|.toc-chapter {
-   450|  font-weight: 700;
-   451|  font-size: 14px;
-   452|  color: #666;
-   453|  min-width: 48px;
-   454|}
-   455|
-   456|.toc-item a:hover .toc-chapter {
-   457|  color: #1a4d8f;
-   458|}
-   459|
-   460|.toc-title {
-   461|  font-size: 15px;
-   462|  flex: 1;
-   463|}
-   464|
-   465|.index-footer {
-   466|  text-align: center;
-   467|  padding: 20px 40px 36px;
-   468|  color: #999;
-   469|  font-size: 13px;
-   470|}
-   471|
-   472|/* === Mobile Responsive === */
-   473|@media (max-width: 768px) {
-   474|  .sidebar {
-   475|    transform: translateX(-100%);
-   476|    transition: transform 0.3s ease;
-   477|  }
-   478|
-   479|  .sidebar.open {
-   480|    transform: translateX(0);
-   481|  }
-   482|
-   483|  .sidebar-toggle {
-   484|    display: block;
-   485|  }
-   486|
-   487|  .main-content {
-   488|    margin-left: 0;
-   489|    padding-top: 50px;
-   490|  }
-   491|
-   492|  .chapter-page {
-   493|    padding: 24px 16px;
-   494|  }
-   495|
-   496|  .chapter-page h1 {
-   497|    font-size: 20px;
-   498|  }
-   499|
-   500|  .chapter-page h2 {
-   501|    font-size: 17px;
-   502|  }
-   503|
-   504|  .book-cover {
-   505|    padding: 40px 24px 36px;
-   506|  }
-   507|
-   508|  .cover-title {
-   509|    font-size: 26px;
-   510|  }
-   511|
-   512|  .toc-section {
-   513|    padding: 28px 20px;
-   514|  }
-   515|
-   516|  .toc-item a {
-   517|    padding: 12px 8px;
-   518|  }
-   519|}
-   520|
+/* Reset */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  background: #f8f9fa;
+  color: #2c2c2c;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+/* === Sidebar Navigation === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  overflow-y: auto;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+}
+
+.sidebar-header {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+.book-title {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  display: block;
+  transition: color 0.2s;
+}
+
+.book-title:hover {
+  color: #64b5f6;
+}
+
+.sidebar .nav-list {
+  flex: 1;
+  padding: 12px 0;
+}
+
+.sidebar .nav-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar .nav-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.nav-chapter {
+  display: block;
+  padding: 10px 20px;
+  color: #b0b0b8;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.5;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-chapter:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+  border-left-color: rgba(100,181,246,0.5);
+}
+
+.nav-chapter.active {
+  color: #fff;
+  background: rgba(100,181,246,0.12);
+  border-left-color: #64b5f6;
+  font-weight: 600;
+}
+
+/* === Sidebar Toggle (mobile) === */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1001;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: background 0.2s;
+}
+
+.sidebar-toggle:hover {
+  background: #252547;
+}
+
+/* === Main Content Area === */
+.main-content {
+  margin-left: 260px;
+  min-height: 100vh;
+}
+
+/* === Chapter Page Content === */
+.chapter-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 32px;
+}
+
+.chapter-page h1 {
+  font-size: 24px;
+  text-align: center;
+  margin: 20px 0 8px;
+  color: #1a1a2e;
+  line-height: 1.4;
+}
+
+.chapter-page h2 {
+  font-size: 20px;
+  margin: 32px 0 14px;
+  color: #2c3e50;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.chapter-page h3 {
+  font-size: 17px;
+  margin: 24px 0 10px;
+  color: #444;
+}
+
+.chapter-page p {
+  margin: 10px 0;
+  text-align: justify;
+}
+
+.chapter-page ul, .chapter-page ol {
+  margin: 10px 0 10px 28px;
+}
+
+.chapter-page li {
+  margin: 4px 0;
+}
+
+.chapter-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 14px;
+}
+
+.chapter-page table th, .chapter-page table td {
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.chapter-page table th {
+  background: #f0f4f8;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.chapter-page pre {
+  background: #2d2d2d;
+  color: #e0e0e0;
+  padding: 14px 18px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 14px 0;
+}
+
+.chapter-page code {
+  font-family: "Cascadia Code", "Fira Code", Consolas, Monaco, monospace;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.chapter-page pre code {
+  background: none;
+  padding: 0;
+}
+
+.chapter-page img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  display: block;
+  margin: 14px auto;
+}
+
+.chapter-page .figure {
+  text-align: center;
+  margin: 18px 0;
+  padding: 14px;
+  background: #fafaf7;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.chapter-page .figure img {
+  margin-bottom: 8px;
+}
+
+.chapter-page .figure p {
+  margin: 8px 0 0;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+  text-align: center;
+}
+
+.chapter-page .caption {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.chapter-page .note {
+  background: #f0f7ff;
+  border-left: 4px solid #4a90d9;
+  padding: 12px 16px;
+  margin: 14px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+}
+
+.chapter-page .note::before {
+  content: "📝 注意 ";
+  font-weight: bold;
+  color: #4a90d9;
+}
+
+.chapter-page .questions,
+.chapter-page .summary {
+  margin: 20px 0;
+  padding: 18px 22px;
+  border-radius: 8px;
+}
+
+.chapter-page .summary {
+  background: #f0fff0;
+}
+
+.chapter-page .summary h3 {
+  margin-top: 0;
+  color: #2d7d2d;
+}
+
+.chapter-page .questions {
+  background: #f8f4ff;
+}
+
+.chapter-page .questions h3 {
+  margin-top: 0;
+  color: #6b3fa0;
+}
+
+.chapter-page .case-study {
+  background: #fffdf5;
+  border: 1px solid #f0e6b8;
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin: 18px 0;
+}
+
+.chapter-page .case-study h3 {
+  margin-top: 0;
+  color: #b8860b;
+}
+
+.chapter-page .page-marker {
+  text-align: right;
+  color: #bbb;
+  font-size: 12px;
+  margin: 28px 0 4px;
+  border-top: 1px dashed #e8e8e8;
+  padding-top: 6px;
+}
+
+.chapter-page .page-marker:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+.chapter-page .subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* Fix for chapter 8 inline styles (removed, use our global styles) */
+.chapter-page .container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* === Index Page === */
+body.index-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.index-page .sidebar,
+body.index-page .sidebar-toggle,
+body.index-page .main-content {
+  display: none;
+}
+
+.index-container {
+  max-width: 700px;
+  width: 100%;
+  margin: 40px 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.book-cover {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  text-align: center;
+  padding: 60px 40px 50px;
+  position: relative;
+}
+
+.cover-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  color: #64b5f6;
+  border: 1px solid rgba(100,181,246,0.4);
+  border-radius: 20px;
+  padding: 4px 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+}
+
+.cover-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.cover-subtitle {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 30px;
+}
+
+.cover-divider {
+  width: 60px;
+  height: 3px;
+  background: #64b5f6;
+  margin: 0 auto 30px;
+}
+
+.cover-authors {
+  margin-bottom: 18px;
+}
+
+.cover-authors p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+}
+
+.cover-translator {
+  margin-top: 10px;
+}
+
+.cover-translator p {
+  margin: 3px 0;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+.toc-section {
+  padding: 40px;
+}
+
+.toc-heading {
+  font-size: 22px;
+  color: #1a1a2e;
+  text-align: center;
+  margin-bottom: 28px;
+  letter-spacing: 2px;
+}
+
+.toc-list {
+  border-top: 1px solid #eee;
+}
+
+.toc-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.toc-item a {
+  display: flex;
+  align-items: baseline;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s ease;
+  gap: 16px;
+}
+
+.toc-item a:hover {
+  background: #f5f9ff;
+  color: #1a4d8f;
+}
+
+.toc-chapter {
+  font-weight: 700;
+  font-size: 14px;
+  color: #666;
+  min-width: 48px;
+}
+
+.toc-item a:hover .toc-chapter {
+  color: #1a4d8f;
+}
+
+.toc-title {
+  font-size: 15px;
+  flex: 1;
+}
+
+.index-footer {
+  text-align: center;
+  padding: 20px 40px 36px;
+  color: #999;
+  font-size: 13px;
+}
+
+/* === Mobile Responsive === */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding-top: 50px;
+  }
+
+  .chapter-page {
+    padding: 24px 16px;
+  }
+
+  .chapter-page h1 {
+    font-size: 20px;
+  }
+
+  .chapter-page h2 {
+    font-size: 17px;
+  }
+
+  .book-cover {
+    padding: 40px 24px 36px;
+  }
+
+  .cover-title {
+    font-size: 26px;
+  }
+
+  .toc-section {
+    padding: 28px 20px;
+  }
+
+  .toc-item a {
+    padding: 12px 8px;
+  }
+}
